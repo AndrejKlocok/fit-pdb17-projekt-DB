@@ -1,0 +1,8 @@
+# .gitignore to keep this directory
+###################################
+
+# filter everything...
+*
+
+# ... except the .gitignore...
+!.gitignore
