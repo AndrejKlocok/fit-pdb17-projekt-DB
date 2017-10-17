@@ -93,7 +93,7 @@ INSERT INTO PROPERTY (ID,PROPERTY_TYPE, GEOMETRY, PROPERTY_NAME, PRICE, PROPERTY
                                     8307, 
                                     NULL, --2D polygon
                                     SDO_ELEM_INFO_ARRAY(1, 1003, 3),
-                                    SDO_ORDINATE_ARRAY(49.203700, 16.603033, 49.203500, 16.603418)
+                                    SDO_ORDINATE_ARRAY(16.603033, 49.203700, 16.603418, 49.203500)
                                 ),
     'The Czechoslovak Hussite Church', 5000000, 'Botanická 590/1, 602 00 Brno-st?ed-Veve?í');
     
@@ -103,7 +103,7 @@ INSERT INTO PROPERTY (ID,PROPERTY_TYPE, GEOMETRY, PROPERTY_NAME, PRICE, PROPERTY
                                         8307, 
                                         NULL, --2D polygon
                                         SDO_ELEM_INFO_ARRAY(1, 1003, 3),
-                                        SDO_ORDINATE_ARRAY(49.229635, 16.584492, 49.229434, 16.584727)
+                                        SDO_ORDINATE_ARRAY(16.584492, 49.229635, 16.584727, 49.229434)
                                     ),
     'Panelák Her?íkova', 0, 'Her?íkova 2498/18');
 
@@ -111,7 +111,7 @@ INSERT INTO PROPERTY (ID,PROPERTY_TYPE, GEOMETRY, PROPERTY_NAME, PRICE, PROPERTY
     PROPERTY_SEQ.NEXTVAL, 'apartment', SDO_GEOMETRY(
                                         2001, 
                                         8307, 
-                                        SDO_POINT_TYPE(49.229547, 16.584575, NULL), 
+                                        SDO_POINT_TYPE(16.584575, 49.229547, NULL), 
                                         NULL, 
                                         NULL),
     'Byt Her?íkova', 1000000, 'Her?íkova 2498/18');
