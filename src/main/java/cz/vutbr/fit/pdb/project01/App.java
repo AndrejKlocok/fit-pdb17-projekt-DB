@@ -188,5 +188,7 @@ public class App {
         } catch (IOException ioEx) {
             System.err.println("IOException: " + ioEx.getMessage());
         }
+
+        Demo.main(args);
     }
 }

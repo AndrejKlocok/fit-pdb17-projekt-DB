@@ -1,4 +1,4 @@
-package cz.cutbr.fit.pdb.demo;
+package cz.vutbr.fit.pdb.project01;
 
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
