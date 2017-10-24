@@ -1,4 +1,4 @@
-package cz.vutbr.fit.pdb.project01;
+package cz.vutbr.fit.pdb.core;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

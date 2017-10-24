@@ -6,7 +6,7 @@
  * @author Tomáš Vlk
  */
 
-package cz.vutbr.fit.pdb.project01;
+package cz.vutbr.fit.pdb.core;
 
 public class KatalogExVozidloNotFound extends Exception {
 
