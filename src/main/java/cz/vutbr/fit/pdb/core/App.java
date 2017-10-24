@@ -6,20 +6,22 @@
  * @author Tomáš Vlk
  */
 
-package cz.vutbr.fit.pdb.project01;
+package cz.vutbr.fit.pdb.core;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Properties;
+import java.util.*;
 
-import oracle.jdbc.pool.OracleDataSource;
+import com.lynden.gmapsfx.javascript.object.LatLong;
+import com.lynden.gmapsfx.javascript.object.LatLongBounds;
+import com.lynden.gmapsfx.javascript.object.MVCArray;
+import com.lynden.gmapsfx.shapes.*;
+import cz.vutbr.fit.pdb.core.model.Property;
+import cz.vutbr.fit.pdb.gui.MapWindow;
+import oracle.spatial.geometry.JGeometry;
 
 public class App {
 
@@ -27,8 +29,8 @@ public class App {
     private LinkedList<Vozidlo> removedVozidla;
 
     public App() {
-        this.vozidla = new LinkedList<>();
-        this.removedVozidla = new LinkedList<>();
+        vozidla = new LinkedList<>();
+        removedVozidla = new LinkedList<>();
     }
 
     public void addVozidlo(String vyrobce, String model) {
@@ -94,6 +96,7 @@ public class App {
 
     public static void main(String[] args) {
 
+        /*
         Properties properties = new Properties(System.getProperties());
         try {
             properties.load(new FileInputStream("config.properties"));
@@ -187,8 +190,48 @@ public class App {
             System.err.println("SQLException: " + sqlEx.getMessage());
         } catch (IOException ioEx) {
             System.err.println("IOException: " + ioEx.getMessage());
-        }
+        }*/
 
-        Demo.main(args);
+
+
+        // sample data
+
+        // Polygon
+        Property property1 = new Property();
+        property1.setId("1");
+        property1.setName("Polygon");
+        property1.setType(Property.Type.LAND);
+        property1.setPriceCurrent(1000000d);
+        property1.setDescription("popis 1");
+        property1.setGeometry(JGeometry.createLinearPolygon(new double[2],2,2));
+
+        // Rectangle
+        Property property2 = new Property();
+        property2.setId("2");
+        property2.setName("Rectangle");
+        property2.setType(Property.Type.HOUSE);
+        property2.setPriceCurrent(500000d);
+        property2.setDescription("popis 2");
+        property2.setGeometry(new JGeometry(2,2,2,2,2));
+
+        // Circle
+        Property property3 = new Property();
+        property3.setId("3");
+        property3.setName("Circle");
+        property3.setType(Property.Type.APARTMENT);
+        property3.setPriceCurrent(4200000d);
+        property3.setDescription("popis 3");
+        property3.setGeometry(JGeometry.createCircle(2,2,2, 2));
+
+        // Property list
+        List<Property> propertyList = new LinkedList<>();
+        propertyList.add(property1);
+        propertyList.add(property2);
+        propertyList.add(property3);
+
+
+        // show gui
+        MapWindow mapWindow = new MapWindow(propertyList);
+        mapWindow.showAsync();
     }
 }
