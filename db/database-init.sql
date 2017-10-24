@@ -18,7 +18,7 @@ DELETE FROM USER_SDO_GEOM_METADATA WHERE
 CREATE TABLE property(
     id_property NUMBER NOT NULL,
     -- ENUM('dom', panelak, 'apartment', terrace-house')
-    property_type VARCHAR(16) CHECK( property_type in ('house', 'prefab', 'apartment', 'terrace-house')),
+    property_type VARCHAR(16) CHECK( property_type in ('house', 'prefab', 'apartment', 'terrace-house', 'land')),
     geometry SDO_GEOMETRY,
     property_name VARCHAR(32) NOT NULL,
     property_description VARCHAR(64) NOT NULL,
@@ -34,7 +34,10 @@ CREATE TABLE property_price(
     valid_from DATE NOT NULL,
     valid_to DATE NOT NULL,
     CONSTRAINT property_price_pk PRIMARY KEY(id_price),
-    CONSTRAINT fk_property_price FOREIGN KEY(id_property) REFERENCES property(id_property) ON DELETE CASCADE
+    CONSTRAINT fk_property_price FOREIGN KEY(id_property) REFERENCES property(id_property) ON DELETE CASCADE,
+    CONSTRAINT date_viable_price CHECK(valid_from <= valid_to),
+    CONSTRAINT unique_valid_from_price UNIQUE( id_price, valid_from),
+    CONSTRAINT unique_valid_to_price UNIQUE( id_price, valid_to)
 );
 
 
@@ -74,9 +77,12 @@ CREATE TABLE owner(
     id_property NUMBER NOT NULL,
     valid_from DATE NOT NULL,
     valid_to DATE NOT NULL,
-    CONSTRAINT pk_owner PRIMARY KEY(id_owner, id_property),
+    CONSTRAINT pk_owner PRIMARY KEY(id_owner, id_property, valid_from, valid_to),
     CONSTRAINT fk_owner FOREIGN KEY(id_owner) REFERENCES person(id_person) ON DELETE CASCADE,
-    CONSTRAINT fk_property1 FOREIGN KEY(id_property) REFERENCES property(id_property) ON DELETE CASCADE
+    CONSTRAINT fk_property1 FOREIGN KEY(id_property) REFERENCES property(id_property) ON DELETE CASCADE,
+    CONSTRAINT date_viable_owner CHECK(valid_from <= valid_to),
+    CONSTRAINT unique_valid_from_owner UNIQUE( id_property, valid_from),
+    CONSTRAINT unique_valid_to_owner UNIQUE( id_property, valid_to)
 );
 
 
