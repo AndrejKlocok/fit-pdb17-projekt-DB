@@ -35,9 +35,7 @@ CREATE TABLE property_price(
     valid_to DATE NOT NULL,
     CONSTRAINT property_price_pk PRIMARY KEY(id_price),
     CONSTRAINT fk_property_price FOREIGN KEY(id_property) REFERENCES property(id_property) ON DELETE CASCADE,
-    CONSTRAINT date_viable_price CHECK(valid_from <= valid_to),
-    CONSTRAINT unique_valid_from_price UNIQUE( id_price, valid_from),
-    CONSTRAINT unique_valid_to_price UNIQUE( id_price, valid_to)
+    CONSTRAINT date_viable_price CHECK(valid_from <= valid_to)
 );
 
 
@@ -80,9 +78,7 @@ CREATE TABLE owner(
     CONSTRAINT pk_owner PRIMARY KEY(id_owner, id_property, valid_from, valid_to),
     CONSTRAINT fk_owner FOREIGN KEY(id_owner) REFERENCES person(id_person) ON DELETE CASCADE,
     CONSTRAINT fk_property1 FOREIGN KEY(id_property) REFERENCES property(id_property) ON DELETE CASCADE,
-    CONSTRAINT date_viable_owner CHECK(valid_from <= valid_to),
-    CONSTRAINT unique_valid_from_owner UNIQUE( id_property, valid_from),
-    CONSTRAINT unique_valid_to_owner UNIQUE( id_property, valid_to)
+    CONSTRAINT date_viable_owner CHECK(valid_from <= valid_to)
 );
 
 
@@ -97,12 +93,11 @@ SELECT property_name, SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(geometry, 0.000001
 
 SELECT p.property_name, p.geometry.ST_IsValid() FROM property p;
 
-CREATE INDEX property_map_index ON property(geometry) indextype is MDSYS.SPATIAL_INDEX;
+CREATE INDEX property_map_index ON property(geometry) indextype is MDSYS.SPATIAL_INDEX NOPARALLEL ;
 -- Kontrola validity
 SELECT property_name, SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(geometry, 0.000001) valid FROM PROPERTY;
 
 SELECT p.property_name, p.geometry.ST_IsValid() FROM property p;
-
 
 
 --inserts
@@ -124,6 +119,17 @@ INSERT INTO PROPERTY (ID_property,PROPERTY_TYPE, GEOMETRY, PROPERTY_NAME, PROPER
                                         NULL
                                     ),
     'Panelák Her?íkova', 'Her?íkova 2498/18');
+
+INSERT INTO PROPERTY (ID_property,PROPERTY_TYPE, GEOMETRY, PROPERTY_NAME, PROPERTY_DESCRIPTION) VALUES (
+    3, 'house', SDO_GEOMETRY(
+                                        2001, 
+                                        8307, 
+                                        SDO_POINT_TYPE(16.582020,49.228377, NULL),
+                                        NULL,
+                                        NULL
+                                    ),
+    'Technologicke Muzeum', 'Purkynova ');
+
 
 INSERT INTO PERSON (id_person, FIRSTNAME, LASTNAME, STREET, CITY, PSC, EMAIL) VALUES (
     PERSON_SEQ.NEXTVAL, 'Jirka', 'Babiš', 'Vlhká 13', 'Brno', '60200', 'jirka@gmail.com'
