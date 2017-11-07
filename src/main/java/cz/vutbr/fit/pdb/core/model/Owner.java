@@ -8,88 +8,84 @@
 
 package cz.vutbr.fit.pdb.core.model;
 
+import oracle.spatial.geometry.JGeometry;
+import oracle.sql.STRUCT;
+
+import java.sql.*;
 import java.util.HashMap;
 
 public class Owner {
 
-    private String id;
+    private int idOwner;
 
-    private String firstName;
+    private int idProperty;
 
-    private String lastName;
+    private Date validFrom;
 
-    private String street;
-
-    private String city;
-
-    private String postcode;
-
-    private String email;
+    private Date validTo;
 
     private HashMap<String, Property> propertyHistory;
+
+    private Person person;
 
     // TODO
 
     public Owner() {
-        id = null;
-        firstName = "";
+        idOwner = 0;
+        idProperty = 0;
         propertyHistory = new HashMap<>();
     }
 
-    public String getId() {
-        return id;
+    public Owner(int idOwner, int idProperty) {
+        this.idOwner = idOwner;
+        this.idProperty = idProperty;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public Owner(int idOwner, int idProperty, Date validFrom, Date validTo) {
+        this.idOwner = idOwner;
+        this.idProperty = idProperty;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public int getIdOwner() {
+        return idOwner;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setIdOwner(int idOwner) {
+        this.idOwner = idOwner;
     }
 
-    public String getLastName() {
-        return lastName;
+    public int getIdProperty() {
+        return idProperty;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setIdProperty(int idProperty) {
+        this.idProperty = idProperty;
     }
 
-    public String getStreet() {
-        return street;
+    public Date getValidTo() {
+        return validTo;
     }
 
-    public void setStreet(String street) {
-        this.street = street;
+    public void setValidTo(Date validTo) {
+        this.validTo = validTo;
     }
 
-    public String getCity() {
-        return city;
+    public Date getValidFrom() {
+        return validFrom;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setValidFrom(Date validFrom) {
+        this.validFrom = validFrom;
     }
 
-    public String getPostcode() {
-        return postcode;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPostcode(String postcode) {
-        this.postcode = postcode;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public HashMap<String, Property> getPropertyHistory() {
@@ -118,4 +114,74 @@ public class Owner {
         // TODO
         return 42d;
     }
+
+    public void save(Connection connection) throws SQLException {
+        String query = "insert into owner(id_owner, id_property, valid_from, valid_to) values(?,?,?,?)";
+
+        try (PreparedStatement insert = connection.prepareStatement(query)) {
+            insert.setInt(1, this.getIdOwner());
+            insert.setInt(2, this.getIdProperty());
+            insert.setDate(3, this.getValidFrom());
+            insert.setDate(4, this.getValidTo());
+            try {
+                insert.executeUpdate();
+            } catch (SQLException sqlEx) {
+                System.err.println("Error while inserting " + sqlEx.getMessage());
+            }
+        }
+    }
+
+    public void loadByIdOwner(Connection connection, int idOwner) throws SQLException {
+        String query = "select * from owner where id_owner =" + idOwner;
+
+        try (Statement select = connection.createStatement()) {
+            try (ResultSet rset = select.executeQuery(query)) {
+                while (rset.next()) {
+                    this.idOwner = rset.getInt("id_owner");
+                    this.idProperty = rset.getInt("id_property");
+                    this.validFrom = rset.getDate("valid_from");
+                    this.validTo = rset.getDate("valid_to");
+                }
+            }
+        }
+    }
+
+    public void loadByIdProperty(Connection connection, int idProperty) throws SQLException {
+        String query = "select * from owner where id_owner =" + idProperty;
+
+        try (Statement select = connection.createStatement()) {
+            try (ResultSet rset = select.executeQuery(query)) {
+                while (rset.next()) {
+                    this.idOwner = rset.getInt("id_owner");
+                    this.idProperty = rset.getInt("id_property");
+                    this.validFrom = rset.getDate("valid_from");
+                    this.validTo = rset.getDate("valid_to");
+                }
+            }
+        }
+    }
+
+    public void loadPersonInfo(Connection connection, int idOwner) throws SQLException {
+        String query  =  "select * from owner join person on id_owner = id_person where id_owner ="+ idOwner;
+        this.person = new Person();
+        try (Statement select = connection.createStatement()) {
+            try (ResultSet rset = select.executeQuery(query)) {
+                while (rset.next()) {
+                    this.idOwner = rset.getInt("id_owner");
+                    this.idProperty = rset.getInt("id_property");
+                    this.validFrom = rset.getDate("valid_from");
+                    this.validTo = rset.getDate("valid_to");
+                    this.person.setId(rset.getInt("id_person"));
+                    this.person.setFirstName(rset.getString("firstname"));
+                    this.person.setLastName(rset.getString("lastname"));
+                    this.person.setLastName(rset.getString("street"));
+                    this.person.setLastName(rset.getString("city"));
+                    this.person.setLastName(rset.getString("psc"));
+                    this.person.setLastName(rset.getString("email"));
+                }
+            }
+        }
+    }
+
+
 }

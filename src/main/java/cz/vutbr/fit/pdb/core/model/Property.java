@@ -8,11 +8,18 @@
 
 package cz.vutbr.fit.pdb.core.model;
 
+import oracle.jdbc.OracleStruct;
+import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
+import oracle.sql.STRUCT;
 
+import java.sql.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import static cz.vutbr.fit.pdb.core.App.connection;
+import static cz.vutbr.fit.pdb.core.model.Property.Type.HOUSE;
 
 public class Property {
 
@@ -24,15 +31,13 @@ public class Property {
         LAND
     }
 
-    private String id;
+    private int id;
 
     private Type type;
 
     private String name;
 
     private String description;
-
-    private Double priceCurrent;
 
     private HashMap<String, Double> priceHistory;
 
@@ -41,20 +46,34 @@ public class Property {
     // TODO
 
     public Property() {
-        id = null;
+        id = 0;
         type = null;
         name = "";
         description = "";
-        priceCurrent = 0d;
         priceHistory = new HashMap<>();
         geometry = null;
     }
 
-    public String getId() {
+    public Property(int id, Type type, String name, String description, JGeometry geometry) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.description = description;
+        this.geometry = geometry;
+    }
+
+    public Property(int id, Type type ,String name, String description) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.description = description;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -82,14 +101,6 @@ public class Property {
         this.description = description;
     }
 
-    public Double getPriceCurrent() {
-        return priceCurrent;
-    }
-
-    public void setPriceCurrent(Double priceCurrent) {
-        this.priceCurrent = priceCurrent;
-    }
-
     public HashMap<String, Double> getPriceHistory() {
         return priceHistory;
     }
@@ -106,31 +117,69 @@ public class Property {
         this.geometry = geometry;
     }
 
+    public String toDbType(Type type) { return type.toString().toLowerCase();}
+
+    public Type toPropertyType(String type) { return Type.valueOf(type.toUpperCase()) ; }
+
+    public void save(Connection connection) throws SQLException {
+        String query = "insert into property(id_property, property_type, geometry, property_name, property_description)"
+                + " values(?,?,?,?,?)";
+
+        try (PreparedStatement insert = connection.prepareStatement(query)) {
+            insert.setInt(1, this.getId());
+            insert.setString(2, toDbType(this.getType()));
+            STRUCT obj = JGeometry.store(this.geometry, connection);
+            insert.setObject(3, obj);
+            insert.setString(4, this.getName());
+            insert.setString(5, this.getDescription());
+
+            try {
+                insert.executeUpdate();
+            } catch (SQLException sqlEx) {
+                System.err.println("Error while inserting " + sqlEx.getMessage());
+            }
+        }
+    }
+
+    public void loadById(Connection connection,int id) throws SQLException {
+        String query = "select * from property where id_property =" + id;
+
+        try (Statement select = connection.createStatement()) {
+            try (ResultSet rset = select.executeQuery(query)) {
+                while (rset.next()) {
+                    this.id = rset.getInt("id_property");
+                    this.type = toPropertyType(rset.getString("property_type"));
+                    STRUCT st = (oracle.sql.STRUCT) rset.getObject("geometry");
+                    this.geometry = JGeometry.load(st);
+                    this.name = rset.getString("property_name");
+                    this.description = rset.getString("property_description");
+                }
+            }
+        }
+    }
+
     public List<Property> getSimilar() {
         // sample data
 
         // Polygon
         Property property1 = new Property();
-        property1.setId("1");
+        property1.setId(1);
         property1.setName("Polygon");
         property1.setType(Property.Type.APARTMENT);
-        property1.setPriceCurrent(1000000d);
         property1.setGeometry(JGeometry.createLinearPolygon(new double[2], 2, 2));
 
         // Rectangle
         Property property2 = new Property();
-        property2.setId("2");
+        property2.setId(2);
         property2.setName("Rectangle");
-        property2.setType(Property.Type.HOUSE);
-        property2.setPriceCurrent(500000d);
+        property2.setType(HOUSE);
         property2.setGeometry(new JGeometry(2, 2, 2, 2, 2));
 
         // Circle
         Property property3 = new Property();
-        property3.setId("3");
+        property3.setId(3);
         property3.setName("Circle");
         property3.setType(Property.Type.APARTMENT);
-        property3.setPriceCurrent(42000000d);
         property3.setGeometry(JGeometry.createCircle(2, 2, 2, 2));
 
         // Property list
