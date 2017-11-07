@@ -160,7 +160,7 @@ public class PropertyWindow {
         nameLabel.setFont(new Font("sans-serif", Font.BOLD, 14));
         nameLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         nameLabel.setEditable(false);
-        priceCurrentLabel.setText(property.getPriceCurrent().toString());
+       // priceCurrentLabel.setText(property.getPriceCurrent().toString());
         priceCurrentLabel.setFont(new Font("sans-Serif", Font.PLAIN, 12));
         priceCurrentLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         priceCurrentLabel.setEditable(false);

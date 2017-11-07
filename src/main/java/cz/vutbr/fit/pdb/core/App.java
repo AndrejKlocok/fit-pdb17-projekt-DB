@@ -8,34 +8,53 @@
 
 package cz.vutbr.fit.pdb.core;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.javascript.object.LatLongBounds;
 import com.lynden.gmapsfx.javascript.object.MVCArray;
 import com.lynden.gmapsfx.shapes.*;
+import cz.vutbr.fit.pdb.core.model.Owner;
+import cz.vutbr.fit.pdb.core.model.Person;
 import cz.vutbr.fit.pdb.core.model.Property;
 import cz.vutbr.fit.pdb.gui.MapWindow;
 import oracle.spatial.geometry.JGeometry;
+import oracle.jdbc.pool.OracleDataSource;
+
+import javax.sound.midi.SysexMessage;
+import java.util.Properties;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import static cz.vutbr.fit.pdb.core.model.Property.Type.HOUSE;
+
 
 public class App {
 
     private LinkedList<Vozidlo> vozidla;
     private LinkedList<Vozidlo> removedVozidla;
+    private LinkedList<Property> properties;
 
     public App() {
         vozidla = new LinkedList<>();
         removedVozidla = new LinkedList<>();
+        properties = new LinkedList<>();
     }
 
     public void addVozidlo(String vyrobce, String model) {
         this.vozidla.add(new Vozidlo(vyrobce, model));
     }
+
 
     public void delVozidlo(Vozidlo vozidlo) throws KatalogExVozidloNotFound {
         if (this.vozidla.remove(vozidlo)) {
@@ -94,9 +113,7 @@ public class App {
         }
     }
 
-    public static void main(String[] args) {
-
-        /*
+    public static OracleDataSource connection() {
         Properties properties = new Properties(System.getProperties());
         try {
             properties.load(new FileInputStream("config.properties"));
@@ -105,133 +122,113 @@ public class App {
         }
         System.out.println("Login: " + properties.getProperty("login"));
         System.out.println("Password: " + properties.getProperty("password"));
+        System.out.println("Jdbc: " + properties.getProperty("jdbc"));
 
-        App katalog = new App();
-        // 1. cast cviceni
-        katalog.addVozidlo("Skoda", "Felicia Combi");
-        katalog.addVozidlo("Fiat", "Uno");
-        katalog.addVozidlo("BMW", "x6");
+        OracleDataSource ods = null;
         try {
-            katalog.delVozidlo(new Vozidlo("Fiat", "Uno"));
-        } catch (KatalogExVozidloNotFound e) {
-            System.err.println(e.getMessage() + ", pro vozidlo " + e.getVozidlo());
-        }
-        for (Iterator<Vozidlo> i = katalog.getVozidloIterator(); i.hasNext(); ) {
-            System.out.println(i.next());
-        }
-
-
-        System.out.println("Database test");
-
-        // 2. cast cviceni
-        try {
-            // create a OracleDataSource instance
-            OracleDataSource ods = new OracleDataSource();
+            ods = new OracleDataSource();
             ods.setURL(properties.getProperty("jdbc"));
             ods.setUser(properties.getProperty("login"));
             ods.setPassword(properties.getProperty("password"));
 
-            // connect to the database
-            try (Connection conn = ods.getConnection()) {
-                // create a Statement
-                try (Statement stmt = conn.createStatement()) {
-                    // select something from the system's dual table
-                    try (ResultSet rset = stmt.executeQuery(
-                            "select 1+2 as col1, 3-4 as col2 from dual")) {
-                        // iterate through the result and print the values
-                        while (rset.next()) {
-                            System.out.println("col1: '" + rset.getString(1)
-                                    + "'\tcol2: '" + rset.getString(2) + "'");
-                        }
-                    }
-                }
-            }
+            return ods;
+
         } catch (SQLException sqlEx) {
             System.err.println("SQLException: " + sqlEx.getMessage());
         }
 
-
-        System.out.println("Database images test");
-
-        // 3. cast cviceni
-        try {
-            // create a OracleDataSource instance
-            OracleDataSource ods = new OracleDataSource();
-            ods.setURL(properties.getProperty("jdbc"));
-            ods.setUser(properties.getProperty("login"));
-            ods.setPassword(properties.getProperty("password"));
-
-            // connect to the database
-            try (Connection conn = ods.getConnection()) {
-                // bod 3
-                katalog.saveToDB(conn);
-                katalog.loadFromDB(conn);
-                for (Iterator<Vozidlo> i = katalog.getVozidloIterator(); i.hasNext(); ) {
-                    System.out.println(i.next());
-                }
-                // bod 4
-                String directory = "db";
-                int cislo = 1;
-                for (Iterator<Vozidlo> i = katalog.getVozidloIterator(); i.hasNext(); ) {
-                    i.next().loadFotoFromFile(conn, directory + "/car" + cislo + ".jpg");
-                    cislo++;
-                }
-                for (Iterator<Vozidlo> i = katalog.getVozidloIterator(); i.hasNext(); ) {
-                    Vozidlo v = i.next();
-                    v.saveFotoToFile(conn, directory + "/car." + v.vyrobce + "-" + v.model + ".jpg");
-                }
-                // bod 5
-                Vozidlo vzor = katalog.getVozidloIterator().next();
-                System.out.println("Nejpodobnejsi vozidlu '" + vzor
-                        + "' je vozidlo '" + vzor.getTheMostSimilar(conn, katalog,
-                        0.3, 0.3, 0.3, 0.1));
-            }
-        } catch (SQLException sqlEx) {
-            System.err.println("SQLException: " + sqlEx.getMessage());
-        } catch (IOException ioEx) {
-            System.err.println("IOException: " + ioEx.getMessage());
-        }*/
+        return ods;
+    }
 
 
+    public static void main(String[] args) throws SQLException, ParseException {
+        OracleDataSource ods = null;
 
-        // sample data
+        /*Person person1 = new Person(1, "Jozef", "Mak", "street", "city", "psc", "email");
+        Person person2 = new Person(2, "Vladimir", "Pes", "street", "city", "psc", "email");
+        Person person3 = new Person(3, "Milos", "Milos", "street", "city", "psc", "email");
 
-        // Polygon
+        String dateFrom = "19/07/2001";
+        DateFormat df =  new SimpleDateFormat("dd/MM/yyyy");
+        java.util.Date dtt = df.parse(dateFrom);
+        java.sql.Date ds = new java.sql.Date(dtt.getTime());
+
+
+        Owner owner1 = new Owner(1, 1, ds, ds);
+        Owner owner2 = new Owner(2, 2, ds, ds);
+        Owner owner3 = new Owner(3,3, ds ,ds);
+        Property property1 = new Property(1, HOUSE,"dom1", "desc1");
+        double [] coords1 = {16.607206, 49.191432, 16.607436, 49.191344, 16.607542, 49.191457, 16.607310, 49.191550};
+        property1.setGeometry(JGeometry.createLinearPolygon(coords1, 2, 8307));
+
+        Property property2 = new Property(2, HOUSE,"dom2", "desc2");
+        double [] coords2 = {16.603125, 49.203747, 16.603033, 49.203700, 16.603319, 49.203454, 16.603418, 49.203500};
+        property2.setGeometry(JGeometry.createLinearPolygon(coords2, 2, 8307));
+
+        Property property3 = new Property(3, HOUSE, "dom3", "desc3");
+        double [] coords3 = {16.606089, 49.191362, 16.606155, 49.191373, 16.606149, 49.191385, 16.606294, 49.191429, 16.606284, 49.191449,
+                            16.606266, 49.191457, 16.606235, 49.191536, 16.606241, 49.191543, 16.606256, 49.191543, 16.606284, 49.191571,
+                            16.606243, 49.191595, 16.606342, 49.191633, 16.606344, 49.191604, 16.606400, 49.191604, 16.606405, 49.191644,
+                            16.606500, 49.191605, 16.606456, 49.191563, 16.606534, 49.191533, 16.606580, 49.191566, 16.606637, 49.191545,
+                            16.606727, 49.191647, 16.606717, 49.191673, 16.606400, 49.191805, 16.606376, 49.191805, 16.605984, 49.191663,
+                            16.605984, 49.191622};
+        property3.setGeometry(JGeometry.createLinearPolygon(coords3, 2, 8307));
+
+        Property property4 = new Property(4, HOUSE, "dom4", "diera");
+        double outer4 [] = {16.605299, 49.192204, 16.605467, 49.191726, 16.605920, 49.191791, 16.605744, 49.192274, 16.605299, 49.192204};
+        double inner4 [] = {16.605500, 49.192087, 16.605647, 49.192108, 16.605722, 49.191899, 16.605573, 49.191874, 16.605500, 49.192087};
+        Object coords4 [] = {outer4, inner4};
+        property4.setGeometry(JGeometry.createLinearPolygon(coords4, 2, 8307));*/
+
         Property property1 = new Property();
-        property1.setId("1");
-        property1.setName("Polygon");
-        property1.setType(Property.Type.LAND);
-        property1.setPriceCurrent(1000000d);
-        property1.setDescription("popis 1");
-        property1.setGeometry(JGeometry.createLinearPolygon(new double[2],2,2));
-
-        // Rectangle
         Property property2 = new Property();
-        property2.setId("2");
-        property2.setName("Rectangle");
-        property2.setType(Property.Type.HOUSE);
-        property2.setPriceCurrent(500000d);
-        property2.setDescription("popis 2");
-        property2.setGeometry(new JGeometry(2,2,2,2,2));
-
-        // Circle
         Property property3 = new Property();
-        property3.setId("3");
-        property3.setName("Circle");
-        property3.setType(Property.Type.APARTMENT);
-        property3.setPriceCurrent(4200000d);
-        property3.setDescription("popis 3");
-        property3.setGeometry(JGeometry.createCircle(2,2,2, 2));
+        Property property4 = new Property();
 
-        // Property list
+        Person person1 = new Person();
+        Person person2 = new Person();
+        Person person3 = new Person();
+
+
+
+        try {
+            ods = connection();
+            Connection connection = ods.getConnection();
+            //property1.save(connection);
+//            property2.save(connection);
+//            property3.save(connection);
+            //property4.save(connection);
+
+            person1.loadById(connection, 1);
+            person2.loadById(connection, 2);
+            person3.loadById(connection, 3);
+            System.out.println(person1.getFirstName());
+            System.out.println(person2.getFirstName());
+            System.out.println(person3.getFirstName());
+
+            property1.loadById(connection,1);
+            property2.loadById(connection,2);
+            property3.loadById(connection,3);
+            property4.loadById(connection,4);
+
+            System.out.println(property1.getName());
+            System.out.println(property3.getName());
+            System.out.println(property2.getName());
+            System.out.println(property4.getName());
+
+
+        } catch (SQLException sqlEx) {
+            System.err.println("SQLException: " + sqlEx.getMessage());
+        }
         List<Property> propertyList = new LinkedList<>();
         propertyList.add(property1);
         propertyList.add(property2);
         propertyList.add(property3);
-
-
+        propertyList.add(property4);
+        //System.out.println(coords[0]);
         // show gui
         MapWindow mapWindow = new MapWindow(propertyList);
         mapWindow.showAsync();
     }
+
 }

@@ -119,8 +119,8 @@ public class OwnersWindow {
         topPanel.add((JComponent) (datePicker));
 
         // sample data
-        Owner owner1 = new Owner();
-        owner1.setId("1");
+        /*Owner owner1 = new Owner();
+        owner1.setId(1);
         owner1.setFirstName("Owner 1");
         owner1.setLastName("Owner");
         owner1.setStreet("Božetěchova 2");
@@ -129,7 +129,7 @@ public class OwnersWindow {
         owner1.setEmail("owner@email.com");
 
         Owner owner2 = new Owner();
-        owner2.setId("2");
+        owner2.setId(2);
         owner2.setFirstName("Owner 2");
         owner2.setLastName("Owner");
         owner2.setStreet("Božetěchova 2");
@@ -138,7 +138,7 @@ public class OwnersWindow {
         owner2.setEmail("owner@email.com");
 
         Owner owner3 = new Owner();
-        owner3.setId("3");
+        owner3.setId(3);
         owner3.setFirstName("Owner 3");
         owner3.setLastName("Owner");
         owner3.setStreet("Božetěchova 2");
@@ -183,7 +183,7 @@ public class OwnersWindow {
         });
         ownersTableScrollPane.setViewportView(ownersTable);
 
-        statusLabel.setText("status");
+        statusLabel.setText("status");*/
 
         mainFrame.setTitle("Owners list");
         mainFrame.setSize(1200, 800);

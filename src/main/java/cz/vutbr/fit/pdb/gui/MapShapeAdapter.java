@@ -22,16 +22,17 @@ public class MapShapeAdapter {
     public static MapShape jGeometry2MapShape(JGeometry geometry) {
         // TODO
 
-        if (geometry.isRectangle()) {
-            LatLongBounds rb = new LatLongBounds(new LatLong(49.191438, 16.607195), new LatLong(49.191561, 16.607505));
+        /*if (geometry.isCircle()) {
+            /*LatLongBounds rb = new LatLongBounds(new LatLong(geometry.getOrdinatesArray()[1], geometry.getOrdinatesArray()[0]),
+                    new LatLong(geometry.getOrdinatesArray()[3], geometry.getOrdinatesArray()[2]));
             RectangleOptions rectangleOptions = new RectangleOptions()
                     .bounds(rb)
                     .strokeColor("black")
                     .strokeWeight(2)
                     .fillColor("gray");
-            return new Rectangle(rectangleOptions);
+            return new Rectangle(rectangleOptions);*/
 
-        } else if (geometry.isCircle()) {
+         if (geometry.isCircle()) {
             LatLong point = new LatLong(49.191882, 16.606972);
             CircleOptions circleOptions = new CircleOptions()
                     .center(point)
@@ -46,10 +47,25 @@ public class MapShapeAdapter {
         } else {
             java.util.List<LatLong> col = new ArrayList<>();
 
-            col.add(new LatLong(49.191381, 16.606092));
-            col.add(new LatLong(49.191434, 16.606301));
-            col.add(new LatLong(49.191717, 16.606153));
-            col.add(new LatLong(49.191664, 16.605969));
+            double coords[] = geometry.getOrdinatesArray();
+            double x = 0;
+            double y = 0;
+            for (int i = 0; i < coords.length; i++) {
+
+                if(i % 2 == 0) {
+                    y = coords[i];
+                    //System.out.println("y " + y);
+                } else {
+                    x = coords[i];
+                    //System.out.println("x " + x);
+                    //System.out.println("col add: " + x + " " +y);
+                    col.add(new LatLong(x, y));
+                }
+            }
+            /*col.add(new LatLong(geometry.getOrdinatesArray()[1], geometry.getOrdinatesArray()[0])); //TR
+            col.add(new LatLong(geometry.getOrdinatesArray()[3], geometry.getOrdinatesArray()[2])); //TL
+            col.add(new LatLong(geometry.getOrdinatesArray()[5], geometry.getOrdinatesArray()[4])); //BL
+            col.add(new LatLong(geometry.getOrdinatesArray()[7], geometry.getOrdinatesArray()[6])); //BR*/
 
             MVCArray mvc = new MVCArray(col.toArray());
 
