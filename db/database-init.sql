@@ -109,11 +109,11 @@ Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Vladimir','Pes','street','city','psc','email');     --2
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Milos','Milos','street','city','psc','email');      --3
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Karol','Zeman','street','city','psc','email');      --4
-Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Aneta','Nov·kov·','street','city','psc','email');   --5
-Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Jana','Navr·tilov·','street','city','psc','email'); --6
-Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Monika','Nov·','street','city','psc','email');      --7
-Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Jozef','Star˝','street','city','psc','email');      --8
-Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Lucia','Mal·','street','city','psc','email');       --9
+Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Aneta','Nov√°ov√°','street','city','psc','email');   --5
+Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Jana','Navr√°tilov√°','street','city','psc','email'); --6
+Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Monika','Nov√°kov√°','street','city','psc','email');      --7
+Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Jozef','Star√Ω','street','city','psc','email');      --8
+Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (PERSON_SEQ.nextval,'Lucia','Mal√°','street','city','psc','email');       --9
 
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,1,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2015-1-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,1,TO_DATE('2015-1-2','yyyy-mm-dd'),TO_DATE('2016-12-1','yyyy-mm-dd'));
