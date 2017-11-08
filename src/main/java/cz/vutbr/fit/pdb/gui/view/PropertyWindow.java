@@ -6,9 +6,11 @@
  * @author Tomáš Vlk
  */
 
-package cz.vutbr.fit.pdb.gui;
+package cz.vutbr.fit.pdb.gui.view;
 
 import cz.vutbr.fit.pdb.core.model.Property;
+import cz.vutbr.fit.pdb.core.model.PropertyPrice;
+import cz.vutbr.fit.pdb.gui.controller.PropertyContract;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -20,10 +22,11 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.util.List;
 
-public class PropertyWindow {
+public class PropertyWindow implements PropertyContract.View {
 
-    private Property property;
+    private PropertyContract.Controller controller;
 
     // Window components
     private final JFrame mainFrame;
@@ -60,9 +63,7 @@ public class PropertyWindow {
     // Bottom panel components
     private JLabel statusLabel;
 
-    public PropertyWindow(Property property) {
-
-        this.property = property;
+    public PropertyWindow() {
 
         // Window components
         mainFrame = new JFrame();
@@ -98,6 +99,8 @@ public class PropertyWindow {
 
         // Bottom bar components
         statusLabel = new JLabel();
+
+        showAsync();
     }
 
     public void showAsync() {
@@ -141,7 +144,6 @@ public class PropertyWindow {
         propertyPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
         propertyPanel.add(imagePanel);
         propertyPanel.add(infoPanel);
-        imagePanel.setBackground(Color.CYAN);  // TODO load image
         imagePanel.setPreferredSize(new Dimension(400, 400));
         imagePanel.setMaximumSize(imagePanel.getPreferredSize());
         imagePanel.setMinimumSize(imagePanel.getPreferredSize());
@@ -156,15 +158,12 @@ public class PropertyWindow {
         imagePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         imagePanel.add(editImagePanel, BorderLayout.PAGE_END);
 
-        nameLabel.setText(property.getName());
         nameLabel.setFont(new Font("sans-serif", Font.BOLD, 14));
         nameLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         nameLabel.setEditable(false);
-       // priceCurrentLabel.setText(property.getPriceCurrent().toString());
         priceCurrentLabel.setFont(new Font("sans-Serif", Font.PLAIN, 12));
         priceCurrentLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         priceCurrentLabel.setEditable(false);
-        descriptionLabel.setText(property.getDescription());
         descriptionLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         descriptionLabel.setEditable(false);
         editInfoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
@@ -186,21 +185,26 @@ public class PropertyWindow {
                 priceCurrentLabel.setEditable(true);
                 descriptionLabel.setEditable(true);
             } else {
-                // TODO
                 editPropertyButton.setText("Edit");
                 nameLabel.setEditable(false);
                 priceCurrentLabel.setEditable(false);
                 descriptionLabel.setEditable(false);
+                controller.savePropertyName(nameLabel.getText());
+                controller.savePropertyDescription(descriptionLabel.getText());
+                controller.savePropertyCurrentPrice(priceCurrentLabel.getText());
             }
         });
         deletePropertyButton.setText("Delete");
         deletePropertyButton.addActionListener(e -> {
-            // TODO
-            JOptionPane.showConfirmDialog(
+            int option = JOptionPane.showConfirmDialog(
                     mainFrame,
                     "Do you want delete this property?",
-                    "Delete property " + property.getName(),
+                    "Delete property " + nameLabel.getText(),
                     JOptionPane.YES_NO_OPTION);
+
+            if (option == JOptionPane.YES_OPTION) {
+                controller.deleteProperty();
+            }
         });
         editImageButton.setText("Upload image");
         editImageButton.addActionListener(e -> {
@@ -209,39 +213,15 @@ public class PropertyWindow {
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
-                // TODO run sql file
+                controller.savePropertyImage(file);
             }
         });
         rotateLeftImageButton.setText("\u21B6");
-        rotateLeftImageButton.addActionListener(e -> {
-            // TODO
-        });
+        rotateLeftImageButton.addActionListener(e -> controller.rotatePropertyImageLeft());
         rotateRightImageButton.setText("\u21B7");
-        rotateRightImageButton.addActionListener(e -> {
-            // TODO
-        });
+        rotateRightImageButton.addActionListener(e -> controller.rotatePropertyImageRight());
 
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(15, "price", "1970");
-        dataset.addValue(30, "price", "1980");
-        dataset.addValue(60, "price", "1990");
-        dataset.addValue(120, "price", "2000");
-        dataset.addValue(240, "price", "2010");
-        dataset.addValue(300, "price", "2014");
-
-        JFreeChart lineChart = ChartFactory.createLineChart(
-                "Price history",
-                "Time",
-                "Price",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true,
-                true,
-                false
-        );
-        ChartPanel chartPanel = new ChartPanel(lineChart);
         priceHistoryPanel.setLayout(new BorderLayout());
-        priceHistoryPanel.add(chartPanel, BorderLayout.CENTER);
 
         similarLabel.setText("Similar");
         similarLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
@@ -255,7 +235,6 @@ public class PropertyWindow {
 
         statusLabel.setText("status");
 
-        mainFrame.setTitle("Detail of property " + property.getName());
         mainFrame.setSize(1200, 800);
         mainFrame.setPreferredSize(new Dimension(1200, 800));
         mainFrame.setBounds(100, 100, 500, 400);
@@ -270,47 +249,6 @@ public class PropertyWindow {
                 onExit();
             }
         });
-
-        showSimilarPropertyList();
-    }
-
-    public void showSimilarPropertyList() {
-
-        // add list of properties to map
-        for (Property property : this.property.getSimilar()) {
-
-            System.out.println("property: " + property.getName());
-
-            PropertyItem propertyItem = new PropertyItem(property);
-            propertyItem.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent mouseEvent) {
-                    if (SwingUtilities.isLeftMouseButton(mouseEvent)) {
-                        PropertyWindow propertyWindow = new PropertyWindow(property);
-                        propertyWindow.showAsync();
-                    }
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent mouseEvent) {
-                    propertyItem.setActive(true);
-                    propertyItem.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                }
-
-                @Override
-                public void mouseExited(MouseEvent mouseEvent) {
-                    propertyItem.setActive(false);
-                    propertyItem.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
-            });
-
-            propertyListPanel.add(propertyItem);
-            JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
-            seperator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-            propertyListPanel.add(seperator);
-        }
-
-        propertyListPanel.revalidate();
     }
 
     /**
@@ -318,5 +256,107 @@ public class PropertyWindow {
      */
     private void onExit() {
         mainFrame.dispose();
+    }
+
+    @Override
+    public void setController(PropertyContract.Controller controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(mainFrame, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    @Override
+    public void showError(String error) {
+        JOptionPane.showMessageDialog(
+                mainFrame,
+                error,
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void showProperty(Property property) {
+        SwingUtilities.invokeLater(() -> {
+            mainFrame.setTitle("Detail of property " + property.getName());
+            nameLabel.setText(property.getName());
+            descriptionLabel.setText(property.getDescription());
+            priceCurrentLabel.setText(property.getPriceCurrent().toString());
+            imagePanel.setBackground(Color.CYAN);  // TODO load image
+
+            DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+
+            System.out.println("price count " + property.getPriceHistory().size());
+
+            for (PropertyPrice propertyPrice : property.getPriceHistory()) {
+                dataSet.addValue(propertyPrice.getPrice(), "price", propertyPrice.getValidFrom() + "-" + propertyPrice.getValidTo());
+            }
+
+            JFreeChart lineChart = ChartFactory.createLineChart(
+                    "Price history",
+                    "Time",
+                    "Price",
+                    dataSet,
+                    PlotOrientation.VERTICAL,
+                    true,
+                    true,
+                    false
+            );
+            ChartPanel chartPanel = new ChartPanel(lineChart);
+
+            priceHistoryPanel.removeAll();
+            priceHistoryPanel.add(chartPanel, BorderLayout.CENTER);
+            priceHistoryPanel.revalidate();
+        });
+    }
+
+    @Override
+    public void showPropertyListSimilar(List<Property> propertyList) {
+        SwingUtilities.invokeLater(() -> {
+            // remove old property items
+            propertyListPanel.removeAll();
+
+            // add list of properties to map
+            for (Property property : propertyList) {
+
+                System.out.println("property: " + property.getName());
+
+                PropertyItem propertyItem = new PropertyItem(property);
+                propertyItem.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent mouseEvent) {
+                        if (SwingUtilities.isLeftMouseButton(mouseEvent)) {
+                            controller.getPropertySimilar(property);
+                        }
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent mouseEvent) {
+                        propertyItem.setActive(true);
+                        propertyItem.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent mouseEvent) {
+                        propertyItem.setActive(false);
+                        propertyItem.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                });
+
+                propertyListPanel.add(propertyItem);
+                JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
+                seperator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+                propertyListPanel.add(seperator);
+            }
+
+            propertyListPanel.revalidate();
+        });
+    }
+
+    @Override
+    public void hide() {
+        onExit();
     }
 }
