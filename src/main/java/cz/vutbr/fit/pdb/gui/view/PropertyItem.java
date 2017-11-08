@@ -6,7 +6,7 @@
  * @author Tomáš Vlk
  */
 
-package cz.vutbr.fit.pdb.gui;
+package cz.vutbr.fit.pdb.gui.view;
 
 import cz.vutbr.fit.pdb.core.model.Property;
 
@@ -56,7 +56,7 @@ public class PropertyItem extends JPanel {
         name.setMaximumSize(name.getPreferredSize());
         name.setMinimumSize(name.getPreferredSize());
 
-        //price.setText(property.getPriceCurrent().toString() + " Kč");
+        price.setText(property.getPriceCurrent().toString() + " Kč");
         price.setFont(new Font("sans-Serif", Font.PLAIN, 12));
 
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));

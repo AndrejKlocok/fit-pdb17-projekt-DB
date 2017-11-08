@@ -6,9 +6,10 @@
  * @author Tomáš Vlk
  */
 
-package cz.vutbr.fit.pdb.gui;
+package cz.vutbr.fit.pdb.gui.view;
 
 import cz.vutbr.fit.pdb.core.model.Owner;
+import cz.vutbr.fit.pdb.gui.controller.OwnersContract;
 import net.sourceforge.jdatepicker.JDatePicker;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
@@ -21,12 +22,12 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.LinkedList;
+import java.util.Date;
 import java.util.List;
 
-public class OwnersWindow {
+public class OwnersWindow implements OwnersContract.View {
 
-    private List<Owner> ownersList;
+    private OwnersContract.Controller controller;
 
     // Window components
     private final JFrame mainFrame;
@@ -49,13 +50,6 @@ public class OwnersWindow {
     private JLabel statusLabel;
 
     public OwnersWindow() {
-        // TODO get data from model
-        this(new LinkedList<>());
-    }
-
-    public OwnersWindow(java.util.List<Owner> ownersList) {
-
-        this.ownersList = ownersList;
 
         // Window components
         mainFrame = new JFrame();
@@ -75,6 +69,8 @@ public class OwnersWindow {
 
         // Bottom bar components
         statusLabel = new JLabel();
+
+        showAsync();
     }
 
     public void showAsync() {
@@ -112,78 +108,19 @@ public class OwnersWindow {
         bottomPanel.add(statusLabel);
 
         UtilDateModel datePickerModel = new UtilDateModel();
-        datePickerModel.setDate(2017, 10, 24);
+        datePickerModel.setValue(new Date());
         datePickerModel.setSelected(true);
         JDatePanelImpl datePanel = new JDatePanelImpl(datePickerModel);
         datePicker = new JDatePickerImpl(datePanel);
+        datePicker.addActionListener(actionEvent -> {
+            Date selectedDate = (Date) datePicker.getModel().getValue();
+            controller.getOwnersListOfDate(selectedDate);
+        });
         topPanel.add((JComponent) (datePicker));
 
-        // sample data
-        /*Owner owner1 = new Owner();
-        owner1.setId(1);
-        owner1.setFirstName("Owner 1");
-        owner1.setLastName("Owner");
-        owner1.setStreet("Božetěchova 2");
-        owner1.setCity("Brno");
-        owner1.setPostcode("123 45");
-        owner1.setEmail("owner@email.com");
-
-        Owner owner2 = new Owner();
-        owner2.setId(2);
-        owner2.setFirstName("Owner 2");
-        owner2.setLastName("Owner");
-        owner2.setStreet("Božetěchova 2");
-        owner2.setCity("Brno");
-        owner2.setPostcode("123 45");
-        owner2.setEmail("owner@email.com");
-
-        Owner owner3 = new Owner();
-        owner3.setId(3);
-        owner3.setFirstName("Owner 3");
-        owner3.setLastName("Owner");
-        owner3.setStreet("Božetěchova 2");
-        owner3.setCity("Brno");
-        owner3.setPostcode("123 45");
-        owner3.setEmail("owner@email.com");
-
-        List<Owner> ownersList = new LinkedList<>();
-        ownersList.add(owner1);
-        ownersList.add(owner2);
-        ownersList.add(owner3);
-
-        String[] columnNames = {"First Name",
-                "Last Name",
-                "Street",
-                "City",
-                "Postcode",
-                "Email",
-                "Property count",
-                "Land property area sum"};
-
-        Object[][] data = new Object[ownersList.size()][8];
-        for (int i = 0; i < ownersList.size(); i++) {
-            data[i][0] = ownersList.get(i).getFirstName();
-            data[i][1] = ownersList.get(i).getLastName();
-            data[i][2] = ownersList.get(i).getStreet();
-            data[i][3] = ownersList.get(i).getCity();
-            data[i][4] = ownersList.get(i).getPostcode();
-            data[i][5] = ownersList.get(i).getEmail();
-            data[i][6] = ownersList.get(i).getPropertyCurrentCount();
-            data[i][7] = ownersList.get(i).getPropertyCurrentLandAreaSum() + " m\u00B2";
-        }
-
-        ownersTable.setFillsViewportHeight(true);
-        ownersTable.setModel(new DefaultTableModel(data, columnNames) {
-
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                //all cells false
-                return false;
-            }
-        });
         ownersTableScrollPane.setViewportView(ownersTable);
 
-        statusLabel.setText("status");*/
+        statusLabel.setText("status");
 
         mainFrame.setTitle("Owners list");
         mainFrame.setSize(1200, 800);
@@ -207,5 +144,63 @@ public class OwnersWindow {
      */
     private void onExit() {
         mainFrame.dispose();
+    }
+
+    @Override
+    public void setController(OwnersContract.Controller controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(mainFrame, message, "Message", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    @Override
+    public void showError(String error) {
+        JOptionPane.showMessageDialog(
+                mainFrame,
+                error,
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void showOwnersList(List<Owner> ownersList) {
+        String[] columnNames = {"First Name",
+                "Last Name",
+                "Street",
+                "City",
+                "Postcode",
+                "Email",
+                "Property count",
+                "Land property area sum"};
+
+        Object[][] data = new Object[ownersList.size()][8];
+        for (int i = 0; i < ownersList.size(); i++) {
+            data[i][0] = ownersList.get(i).getFirstName();
+            data[i][1] = ownersList.get(i).getLastName();
+            data[i][2] = ownersList.get(i).getStreet();
+            data[i][3] = ownersList.get(i).getCity();
+            data[i][4] = ownersList.get(i).getPsc();
+            data[i][5] = ownersList.get(i).getEmail();
+            data[i][6] = ownersList.get(i).getPropertyCurrentCount();
+            data[i][7] = ownersList.get(i).getPropertyCurrentLandAreaSum() + " m\u00B2";
+        }
+
+        ownersTable.setFillsViewportHeight(true);
+        ownersTable.setModel(new DefaultTableModel(data, columnNames) {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                //all cells false
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void hide() {
+        onExit();
     }
 }

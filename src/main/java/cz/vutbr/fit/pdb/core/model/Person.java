@@ -1,23 +1,32 @@
+/**
+ * VUT FIT PDB project
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ */
+
 package cz.vutbr.fit.pdb.core.model;
-
-import oracle.jdbc.pool.OracleDataSource;
-
-import java.sql.*;
-
 
 public class Person {
 
-    private int id;
-    private String firstName;
-    private String lastName;
-    private String street;
-    private String city;
-    private String psc;
-    private String email;
+    protected int idPerson;
+
+    protected String firstName;
+
+    protected String lastName;
+
+    protected String street;
+
+    protected String city;
+
+    protected String psc;
+
+    protected String email;
 
 
     public Person() {
-        id = 0;
+        idPerson = 0;
         firstName = "";
         lastName = "";
         street = "";
@@ -27,7 +36,7 @@ public class Person {
     }
 
     public Person(int id, String firstName, String lastName, String street, String city, String psc, String email) {
-        this.id = id;
+        this.idPerson = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.street = street;
@@ -36,12 +45,12 @@ public class Person {
         this.email = email;
     }
 
-    public int getId() {
-        return id;
+    public int getIdPerson() {
+        return idPerson;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdPerson(int idPerson) {
+        this.idPerson = idPerson;
     }
 
     public String getFirstName() {
@@ -90,44 +99,5 @@ public class Person {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public void save(Connection connection) throws SQLException {
-        String query = "insert into person(id_person, firstname, lastname, street, city, psc, email)"
-                + " values(?,?,?,?,?,?,?)";
-
-        try (PreparedStatement insert = connection.prepareStatement(query)) {
-            insert.setInt(1, this.getId());
-            insert.setString(2, this.getFirstName());
-            insert.setString(3, this.getLastName());
-            insert.setString(4, this.getStreet());
-            insert.setString(5, this.getCity());
-            insert.setString(6, this.getPsc());
-            insert.setString(7, this.getEmail());
-
-            try {
-                insert.executeUpdate();
-            } catch (SQLException sqlEx) {
-                System.err.println("Error while inserting " + sqlEx.getMessage());
-            }
-        }
-    }
-
-    public void loadById(Connection connection, int id) throws SQLException {
-        String query = "select * from person where id_person = " + id;
-
-        try (Statement stmt = connection.createStatement()) {
-            try (ResultSet rset = stmt.executeQuery(query)) {
-                while (rset.next()) {
-                    this.id = rset.getInt("id_person");
-                    this.firstName = rset.getString("firstname");
-                    this.lastName = rset.getString("lastname");
-                    this.street = rset.getString("street");
-                    this.city = rset.getString("city");
-                    this.psc = rset.getString("psc");
-                    this.psc = rset.getString("email");
-                }
-            }
-        }
     }
 }

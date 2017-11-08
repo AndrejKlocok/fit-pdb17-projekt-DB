@@ -6,7 +6,7 @@
  * @author Tomáš Vlk
  */
 
-package cz.vutbr.fit.pdb.gui;
+package cz.vutbr.fit.pdb.gui.view;
 
 import com.lynden.gmapsfx.javascript.object.GMapPoint;
 import com.lynden.gmapsfx.javascript.object.GoogleMap;
