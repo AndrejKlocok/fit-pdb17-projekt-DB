@@ -8,6 +8,7 @@
 
 package cz.vutbr.fit.pdb.gui.view;
 
+import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Property;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class PropertyItem extends JPanel {
     private Property property;
     private boolean active;
 
-    private JPanel image;
+    private GroundPlanPanel image;
     private JPanel info;
     private JLabel name;
     private JLabel price;
@@ -33,7 +34,7 @@ public class PropertyItem extends JPanel {
 
         name = new JLabel();
         info = new JPanel();
-        image = new JPanel();
+        image = new GroundPlanPanel();
         price = new JLabel();
 
         setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
@@ -47,7 +48,17 @@ public class PropertyItem extends JPanel {
     public void initLayout() {
         setLayout(new BorderLayout());
 
-        image.setBackground(Color.CYAN);  // TODO load image
+        if (property.getGroundPlans().size() > 0) {
+            for (GroundPlan groundPlan : property.getGroundPlans()) {
+                // show only one ground plan
+                image.setGroundPlan(groundPlan);
+                image.repaint();
+            }
+        } else {
+            image.setGroundPlan(null);
+            image.repaint();
+        }
+
         image.setPreferredSize(new Dimension(DEFAULT_HEIGHT, DEFAULT_HEIGHT));
 
         name.setText(property.getName());
@@ -56,7 +67,7 @@ public class PropertyItem extends JPanel {
         name.setMaximumSize(name.getPreferredSize());
         name.setMinimumSize(name.getPreferredSize());
 
-        price.setText(property.getPriceCurrent().toString() + " Kč");
+        price.setText(property.getPriceCurrent() != null ? String.valueOf(property.getPriceCurrent().getPrice()) + " Kč" : "no price");
         price.setFont(new Font("sans-Serif", Font.PLAIN, 12));
 
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));

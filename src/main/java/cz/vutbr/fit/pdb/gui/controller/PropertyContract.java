@@ -8,9 +8,9 @@
 
 package cz.vutbr.fit.pdb.gui.controller;
 
+import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Property;
 
-import java.io.File;
 import java.util.List;
 
 public class PropertyContract {
@@ -34,17 +34,21 @@ public class PropertyContract {
 
         void deleteProperty();
 
+        void deleteOwner();
+
         void savePropertyName(String name);
 
         void savePropertyDescription(String description);
 
         void savePropertyCurrentPrice(String currentPrice);
 
-        void savePropertyImage(File file); // TODO image instead of file
+        void createGroundPlan(String fileName);
 
-        void rotatePropertyImageRight();
+        void deleteGroundPlan(GroundPlan groundPlan);
 
-        void rotatePropertyImageLeft();
+        void rotateGroundPlanRight(GroundPlan groundPlan);
+
+        void rotateGroundPlanLeft(GroundPlan groundPlan);
 
         void getPropertySimilar(Property property);
     }

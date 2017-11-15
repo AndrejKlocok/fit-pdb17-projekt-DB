@@ -8,6 +8,7 @@
 
 package cz.vutbr.fit.pdb.gui.view;
 
+import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Property;
 import cz.vutbr.fit.pdb.core.model.PropertyPrice;
 import cz.vutbr.fit.pdb.gui.controller.PropertyContract;
@@ -21,7 +22,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.List;
 
 public class PropertyWindow implements PropertyContract.View {
@@ -40,18 +40,21 @@ public class PropertyWindow implements PropertyContract.View {
 
     // Center panel components
     private JPanel propertyPanel;
-    private JPanel imagePanel;
+    private GroundPlanPanel groundPlanPanel;
     private JPanel infoPanel;
     private JTextField nameLabel;
     private JTextField priceCurrentLabel;
+    private JTextField ownerLabel;
     private JTextPane descriptionLabel;
     private JPanel editInfoPanel;
     private JButton editPropertyButton;
     private JButton deletePropertyButton;
-    private JPanel editImagePanel;
-    private JButton editImageButton;
-    private JButton rotateLeftImageButton;
-    private JButton rotateRightImageButton;
+    private JButton deleteOwnerButton;
+    private JPanel editGroundPlanPanel;
+    private JButton createGroundPlanButton;
+    private JButton deleteGroundPlanButton;
+    private JButton rotateLeftGroundPlanButton;
+    private JButton rotateRightGroundPlanButton;
     private JPanel priceHistoryPanel;
 
     // Right panel components
@@ -77,18 +80,21 @@ public class PropertyWindow implements PropertyContract.View {
 
         // Center panel components
         propertyPanel = new JPanel();
-        imagePanel = new JPanel();
+        groundPlanPanel = new GroundPlanPanel();
         infoPanel = new JPanel();
         nameLabel = new JTextField();
         priceCurrentLabel = new JTextField();
+        ownerLabel = new JTextField();
         descriptionLabel = new JTextPane();
         editInfoPanel = new JPanel();
         editPropertyButton = new JButton();
         deletePropertyButton = new JButton();
-        editImagePanel = new JPanel();
-        editImageButton = new JButton();
-        rotateLeftImageButton = new JButton();
-        rotateRightImageButton = new JButton();
+        deleteOwnerButton = new JButton();
+        editGroundPlanPanel = new JPanel();
+        createGroundPlanButton = new JButton();
+        deleteGroundPlanButton = new JButton();
+        rotateLeftGroundPlanButton = new JButton();
+        rotateRightGroundPlanButton = new JButton();
         priceHistoryPanel = new JPanel();
 
         // Right panel components
@@ -142,40 +148,46 @@ public class PropertyWindow implements PropertyContract.View {
         propertyPanel.setLayout(new BoxLayout(propertyPanel, BoxLayout.X_AXIS));
         propertyPanel.setPreferredSize(new Dimension(propertyPanel.getPreferredSize().width, 400));
         propertyPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 400));
-        propertyPanel.add(imagePanel);
+        propertyPanel.add(groundPlanPanel);
         propertyPanel.add(infoPanel);
-        imagePanel.setPreferredSize(new Dimension(400, 400));
-        imagePanel.setMaximumSize(imagePanel.getPreferredSize());
-        imagePanel.setMinimumSize(imagePanel.getPreferredSize());
+        groundPlanPanel.setPreferredSize(new Dimension(400, 400));
+        groundPlanPanel.setMaximumSize(groundPlanPanel.getPreferredSize());
+        groundPlanPanel.setMinimumSize(groundPlanPanel.getPreferredSize());
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
         infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         infoPanel.add(nameLabel);
         infoPanel.add(priceCurrentLabel);
+        infoPanel.add(ownerLabel);
         infoPanel.add(descriptionLabel);
         infoPanel.add(editInfoPanel);
-        imagePanel.setLayout(new BorderLayout());
-        imagePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        imagePanel.add(editImagePanel, BorderLayout.PAGE_END);
+        groundPlanPanel.setLayout(new BorderLayout());
+        groundPlanPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        groundPlanPanel.add(editGroundPlanPanel, BorderLayout.PAGE_END);
 
-        nameLabel.setFont(new Font("sans-serif", Font.BOLD, 14));
+        nameLabel.setFont(new Font("sans-serif", Font.BOLD, 18));
         nameLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         nameLabel.setEditable(false);
+        // TODO add option to specify price date
         priceCurrentLabel.setFont(new Font("sans-Serif", Font.PLAIN, 12));
         priceCurrentLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         priceCurrentLabel.setEditable(false);
+        ownerLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+        ownerLabel.setEditable(false);
         descriptionLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         descriptionLabel.setEditable(false);
         editInfoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         editInfoPanel.setLayout(new BoxLayout(editInfoPanel, BoxLayout.X_AXIS));
         editInfoPanel.add(editPropertyButton);
         editInfoPanel.add(deletePropertyButton);
-        editImagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-        editImagePanel.setLayout(new BoxLayout(editImagePanel, BoxLayout.X_AXIS));
-        editImagePanel.setOpaque(false);
-        editImagePanel.add(rotateLeftImageButton);
-        editImagePanel.add(editImageButton);
-        editImagePanel.add(rotateRightImageButton);
+        editInfoPanel.add(deleteOwnerButton);
+        editGroundPlanPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+        editGroundPlanPanel.setLayout(new BoxLayout(editGroundPlanPanel, BoxLayout.X_AXIS));
+        editGroundPlanPanel.setOpaque(false);
+        editGroundPlanPanel.add(rotateLeftGroundPlanButton);
+        editGroundPlanPanel.add(createGroundPlanButton);
+        editGroundPlanPanel.add(deleteGroundPlanButton);
+        editGroundPlanPanel.add(rotateRightGroundPlanButton);
 
         editPropertyButton.setText("Edit");
         editPropertyButton.addActionListener(e -> {
@@ -189,9 +201,16 @@ public class PropertyWindow implements PropertyContract.View {
                 nameLabel.setEditable(false);
                 priceCurrentLabel.setEditable(false);
                 descriptionLabel.setEditable(false);
-                controller.savePropertyName(nameLabel.getText());
-                controller.savePropertyDescription(descriptionLabel.getText());
-                controller.savePropertyCurrentPrice(priceCurrentLabel.getText());
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.savePropertyName(nameLabel.getText());
+                        controller.savePropertyDescription(descriptionLabel.getText());
+                        controller.savePropertyCurrentPrice(priceCurrentLabel.getText());
+
+                        return null;
+                    }
+                });
             }
         });
         deletePropertyButton.setText("Delete");
@@ -203,27 +222,62 @@ public class PropertyWindow implements PropertyContract.View {
                     JOptionPane.YES_NO_OPTION);
 
             if (option == JOptionPane.YES_OPTION) {
-                controller.deleteProperty();
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.deleteProperty();
+
+                        return null;
+                    }
+                });
             }
         });
-        editImageButton.setText("Upload image");
-        editImageButton.addActionListener(e -> {
-            final JFileChooser fc = new JFileChooser();
+        deleteOwnerButton.setText("Delete owner");
+        deleteOwnerButton.addActionListener(e -> {
+            int option = JOptionPane.showConfirmDialog(
+                    mainFrame,
+                    "Do you want delete owner from this property?",
+                    "Delete owner of property " + nameLabel.getText(),
+                    JOptionPane.YES_NO_OPTION);
+
+            if (option == JOptionPane.YES_OPTION) {
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.deleteOwner();
+
+                        return null;
+                    }
+                });
+            }
+        });
+        createGroundPlanButton.setText("Upload image");
+        createGroundPlanButton.addActionListener(e -> {
+            final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
             int returnVal = fc.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                controller.savePropertyImage(file);
+                System.out.println(fc.getSelectedFile().getAbsolutePath());
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.createGroundPlan(fc.getSelectedFile().getAbsolutePath());
+
+                        return null;
+                    }
+                });
             }
         });
-        rotateLeftImageButton.setText("\u21B6");
-        rotateLeftImageButton.addActionListener(e -> controller.rotatePropertyImageLeft());
-        rotateRightImageButton.setText("\u21B7");
-        rotateRightImageButton.addActionListener(e -> controller.rotatePropertyImageRight());
+        deleteGroundPlanButton.setText("Delete image");
+        deleteGroundPlanButton.setEnabled(false);
+        rotateLeftGroundPlanButton.setText("\u21B6");
+        rotateLeftGroundPlanButton.setEnabled(false);
+        rotateRightGroundPlanButton.setText("\u21B7");
+        rotateRightGroundPlanButton.setEnabled(false);
 
         priceHistoryPanel.setLayout(new BorderLayout());
 
-        similarLabel.setText("Similar");
+        similarLabel.setText("Property with similar ground plan");
         similarLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         similarLabel.setFont(new Font("sans-serif", Font.PLAIN, 14));
         similarLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -238,10 +292,8 @@ public class PropertyWindow implements PropertyContract.View {
         mainFrame.setSize(1200, 800);
         mainFrame.setPreferredSize(new Dimension(1200, 800));
         mainFrame.setBounds(100, 100, 500, 400);
-        mainFrame.setVisible(true);
         mainFrame.setContentPane(contentPanePanel);
         mainFrame.pack();
-        mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         mainFrame.addWindowListener(new WindowAdapter() {
@@ -249,6 +301,14 @@ public class PropertyWindow implements PropertyContract.View {
                 onExit();
             }
         });
+        mainFrame.setVisible(true);
+        int state = mainFrame.getExtendedState();
+        state &= ~JFrame.ICONIFIED;
+        mainFrame.setExtendedState(state);
+        mainFrame.setAlwaysOnTop(true);
+        mainFrame.toFront();
+        mainFrame.requestFocus();
+        mainFrame.setAlwaysOnTop(false);
     }
 
     /**
@@ -256,6 +316,29 @@ public class PropertyWindow implements PropertyContract.View {
      */
     private void onExit() {
         mainFrame.dispose();
+    }
+
+    private void runSwingWorker(SwingWorker<Void, Void> swingWorker) {
+        final JDialog dialog = new JDialog(mainFrame, "Dialog", Dialog.ModalityType.APPLICATION_MODAL);
+
+        swingWorker.addPropertyChangeListener(evt -> {
+            if (evt.getPropertyName().equals("state")) {
+                if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                    dialog.dispose();
+                }
+            }
+        });
+        swingWorker.execute();
+
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(progressBar, BorderLayout.CENTER);
+        panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(mainFrame);
+        dialog.setVisible(true);
     }
 
     @Override
@@ -282,9 +365,61 @@ public class PropertyWindow implements PropertyContract.View {
         SwingUtilities.invokeLater(() -> {
             mainFrame.setTitle("Detail of property " + property.getName());
             nameLabel.setText(property.getName());
+            priceCurrentLabel.setText(property.getPriceCurrent() != null ? String.valueOf(property.getPriceCurrent().getPrice()) : "no price");
+            ownerLabel.setText(property.getOwnerCurrent() != null ? property.getOwnerCurrent().getFirstName() + " " + property.getOwnerCurrent().getLastName() : "no owner");
             descriptionLabel.setText(property.getDescription());
-            priceCurrentLabel.setText(property.getPriceCurrent().toString());
-            imagePanel.setBackground(Color.CYAN);  // TODO load image
+
+            if (property.getGroundPlans().size() > 0) {
+                System.out.println("There are " + property.getGroundPlans().size() + " ground plans");
+                for (GroundPlan groundPlan : property.getGroundPlans()) {
+                    // TODO option to view other ground plans (something like gallery)
+                    groundPlanPanel.setGroundPlan(groundPlan);
+                    groundPlanPanel.repaint();
+
+                    deleteGroundPlanButton.setEnabled(true);
+                    rotateLeftGroundPlanButton.setEnabled(true);
+                    rotateRightGroundPlanButton.setEnabled(true);
+                    for (ActionListener act : deleteGroundPlanButton.getActionListeners()) {
+                        deleteGroundPlanButton.removeActionListener(act);
+                    }
+                    for (ActionListener act : rotateLeftGroundPlanButton.getActionListeners()) {
+                        rotateLeftGroundPlanButton.removeActionListener(act);
+                    }
+                    for (ActionListener act : rotateRightGroundPlanButton.getActionListeners()) {
+                        rotateRightGroundPlanButton.removeActionListener(act);
+                    }
+                    deleteGroundPlanButton.addActionListener(e -> runSwingWorker(new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            controller.deleteGroundPlan(groundPlan);
+
+                            return null;
+                        }
+                    }));
+                    rotateLeftGroundPlanButton.addActionListener(e -> runSwingWorker(new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            controller.rotateGroundPlanLeft(groundPlan);
+
+                            return null;
+                        }
+                    }));
+                    rotateRightGroundPlanButton.addActionListener(e -> runSwingWorker(new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            controller.rotateGroundPlanRight(groundPlan);
+
+                            return null;
+                        }
+                    }));
+                }
+            } else {// disable rotate buttons
+                groundPlanPanel.setGroundPlan(null);
+                groundPlanPanel.repaint();
+                deleteGroundPlanButton.setEnabled(false);
+                rotateLeftGroundPlanButton.setEnabled(false);
+                rotateRightGroundPlanButton.setEnabled(false);
+            }
 
             DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
@@ -328,7 +463,14 @@ public class PropertyWindow implements PropertyContract.View {
                     @Override
                     public void mouseClicked(MouseEvent mouseEvent) {
                         if (SwingUtilities.isLeftMouseButton(mouseEvent)) {
-                            controller.getPropertySimilar(property);
+                            runSwingWorker(new SwingWorker<Void, Void>() {
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    controller.getPropertySimilar(property);
+
+                                    return null;
+                                }
+                            });
                         }
                     }
 
@@ -352,6 +494,7 @@ public class PropertyWindow implements PropertyContract.View {
             }
 
             propertyListPanel.revalidate();
+            propertyListPanel.repaint();
         });
     }
 

@@ -8,15 +8,13 @@
 
 package cz.vutbr.fit.pdb.core.model;
 
-import oracle.ord.im.OrdImage;
-
 public class GroundPlan {
 
     private int idGroundPlan;
 
     private int idProperty;
 
-    private OrdImage ordImage;
+    private byte[] image;
 
 
     public int getIdGroundPlan() {
@@ -35,11 +33,11 @@ public class GroundPlan {
         this.idProperty = idProperty;
     }
 
-    public OrdImage getOrdImage() {
-        return ordImage;
+    public byte[] getImage() {
+        return image;
     }
 
-    public void setOrdImage(OrdImage ordImage) {
-        this.ordImage = ordImage;
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

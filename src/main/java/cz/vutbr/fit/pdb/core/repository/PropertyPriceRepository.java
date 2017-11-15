@@ -18,8 +18,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 
-public class PropertyPriceRepository {
+public class PropertyPriceRepository extends Observable {
 
     private OracleDataSource dataSource;
 
@@ -128,8 +129,8 @@ public class PropertyPriceRepository {
     }
 
     public boolean createPropertyPrice(PropertyPrice propertyPrice) {
-        String query = "INSERT INTO property_price(id_property, price, valid_from, valid_to)"
-                + " values(?,?,?,?,?)";
+        String query = "INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to)"
+                + " values(property_price_seq.nextval, ?,?,?,?,?)";
 
         try {
             Connection connection = dataSource.getConnection();
@@ -138,10 +139,16 @@ public class PropertyPriceRepository {
             statement.setDouble(2, propertyPrice.getPrice());
             statement.setDate(3, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
             statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+
             statement.executeQuery();
 
             connection.close();
             statement.close();
+
+            // notify observers about change
+            setChanged();
+            notifyObservers();
+
             return true;
         } catch (SQLException exception) {
             System.err.println("Error " + exception.getMessage());
@@ -161,10 +168,16 @@ public class PropertyPriceRepository {
             statement.setDate(3, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
             statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
             statement.setInt(5, propertyPrice.getIdPropertyPrice());
+
             statement.executeQuery();
 
             connection.close();
             statement.close();
+
+            // notify observers about change
+            setChanged();
+            notifyObservers();
+
             return true;
         } catch (SQLException exception) {
             System.err.println("Error " + exception.getMessage());

@@ -8,14 +8,16 @@
 
 package cz.vutbr.fit.pdb.core;
 
+import cz.vutbr.fit.pdb.core.repository.GroundPlanRepository;
+import cz.vutbr.fit.pdb.core.repository.OwnerRepository;
+import cz.vutbr.fit.pdb.core.repository.PropertyPriceRepository;
 import cz.vutbr.fit.pdb.core.repository.PropertyRepository;
-import cz.vutbr.fit.pdb.gui.view.MapWindow;
 import cz.vutbr.fit.pdb.gui.controller.MapController;
+import cz.vutbr.fit.pdb.gui.view.MapWindow;
 import oracle.jdbc.pool.OracleDataSource;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -59,7 +61,10 @@ public class App {
 
         // show gui
         PropertyRepository propertyRepository = new PropertyRepository(App.getDataSource());
+        GroundPlanRepository groundPlanRepository = new GroundPlanRepository(App.getDataSource());
+        PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(App.getDataSource());
+        OwnerRepository ownerRepository = new OwnerRepository(App.getDataSource());
         MapWindow mapWindow = new MapWindow();
-        new MapController(propertyRepository, mapWindow);
+        new MapController(propertyRepository, groundPlanRepository, propertyPriceRepository, ownerRepository, mapWindow);
     }
 }

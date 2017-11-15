@@ -14,9 +14,10 @@ import oracle.jdbc.pool.OracleDataSource;
 import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observable;
 
 
-public class PersonRepository {
+public class PersonRepository extends Observable {
 
     private OracleDataSource dataSource;
 
@@ -129,7 +130,7 @@ public class PersonRepository {
     }
 
     public boolean createPerson(Person person) {
-        String query = "INSERT INTO person (firstname, lastname, street, city, psc, email) VALUES (?,?,?,?,?,?)";
+        String query = "INSERT INTO person(id_person, firstname, lastname, street, city, psc, email) VALUES(person_seq.nextval,?,?,?,?,?,?)";
 
         try {
             Connection connection = dataSource.getConnection();
@@ -140,10 +141,16 @@ public class PersonRepository {
             statement.setString(4, person.getCity());
             statement.setString(5, person.getPsc());
             statement.setString(6, person.getEmail());
+
             statement.executeQuery();
 
             connection.close();
             statement.close();
+
+            // notify observers about change
+            setChanged();
+            notifyObservers();
+
             return true;
         } catch (SQLException exception) {
             System.err.println("Error " + exception.getMessage());
@@ -153,22 +160,28 @@ public class PersonRepository {
     }
 
     public boolean savePerson(Person person) {
-        String query = "INSERT INTO person(id_person, firstname, lastname, street, city, psc, email) VALUES(?,?,?,?,?,?,?)";
+        String query = "UPDATE person SET firstname = ?, lastname = ?, street = ?, city = ?, psc = ?, email =? WHERE id_person = ?";
 
         try {
             Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, person.getIdPerson());
-            statement.setString(2, person.getFirstName());
-            statement.setString(3, person.getLastName());
-            statement.setString(4, person.getStreet());
-            statement.setString(5, person.getCity());
-            statement.setString(6, person.getPsc());
-            statement.setString(7, person.getEmail());
+            statement.setString(1, person.getFirstName());
+            statement.setString(2, person.getLastName());
+            statement.setString(3, person.getStreet());
+            statement.setString(4, person.getCity());
+            statement.setString(5, person.getPsc());
+            statement.setString(6, person.getEmail());
+            statement.setInt(7, person.getIdPerson());
+
             statement.executeQuery();
 
             connection.close();
             statement.close();
+
+            // notify observers about change
+            setChanged();
+            notifyObservers();
+
             return true;
         } catch (SQLException exception) {
             System.err.println("Error " + exception.getMessage());
