@@ -209,21 +209,19 @@ SELECT SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M') FROM property PR WHERE id_pr
 SELECT SDO_GEOM.SDO_LENGTH(PR.geometry,1,'unit=M') FROM property PR WHERE id_property=1;
 
 -- Retrun SUM of all land areas of properties which are owned by one person
-SELECT O.id_owner, P.lastname, P.firstname, SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M') )
+SELECT P.lastname, P.firstname, ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')),1) AS Area
 FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) 
 GROUP BY O.id_owner, P.lastname, P.firstname
-ORDER BY P.lastname, P.firstname;
+ORDER BY Area DESC;
 
 -- Returns owner of N properties with SUM of all land area in that time interval
-SELECT O.id_owner, P.lastname, P.firstname, COUNT(*) as properties, SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M') ) as area
+SELECT P.lastname, P.firstname, COUNT(*) as PropertiesCount, ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')), 1) as Area
 FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) 
 WHERE CURRENT_DATE  BETWEEN O.valid_from AND O.valid_to AND CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to
 GROUP BY O.id_owner, P.lastname, P.firstname
-ORDER BY P.lastname, P.firstname;
+ORDER BY Area, PropertiesCount DESC;
 
-
--- Finding closest property to PR1(actual position on map), which is available right now
-SELECT P.id_property, P.distance
+SELECT P.id_property, ROUND(P.distance,1) as PropertyDistance
 FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance
         FROM property PR1, property PR2
         WHERE PR1.id_property=2 AND PR1.id_property <> PR2.id_property AND PR2.property_type <> 'land' AND
@@ -234,8 +232,6 @@ FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANC
         CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR O.id_owner IS NULL ) p_available
 WHERE P.id_property=p_available.id_property AND ROWNUM = 1
 ORDER BY P.distance ;
-
-
 
 -- Finding closest properties to PR1(actual position on map)
 SELECT /*+ ORDERED */ PR1.id_property, PR2.id_property, MDSYS.SDO_NN_DISTANCE(1) as distance
@@ -254,6 +250,17 @@ MDSYS.SDO_RELATE(PR1.geometry, PR2.geometry, 'mask=touch') = 'TRUE';
 -- Selects history of one property
 SELECT PP.id_property, PP.price, PP.valid_from, PP.valid_to FROM property_price PP WHERE PP.id_property=1;
 
+-- Selects persons with longest stay in descending list
+SELECT P.LASTNAME, P.FIRSTNAME , SUM(trunc(O.valid_to-O.valid_from)) AS DurationInDays 
+FROM owner O JOIN person P ON(O.id_owner=P.id_person) 
+GROUP BY O.ID_OWNER, P.LASTNAME, P.FIRSTNAME ORDER BY DurationInDays Desc;
+
+--Select average cost of properies in time period
+SELECT  P.property_name , ROUND(AVG(PP.price),0) AS AvgPrice 
+FROM property_price PP JOIN property P ON(PP.id_property=P.id_property) 
+WHERE (TO_DATE('2014-1-1','yyyy-mm-dd') < PP.valid_from) AND (TO_DATE('2017-8-1','yyyy-mm-dd') > PP.valid_to)
+GROUP BY PP.id_property, P.property_name
+ORDER BY AvgPrice;
 
 -- Selects properties, which are available in current date
 SELECT P.id_property FROM property P where p.id_property IN(
