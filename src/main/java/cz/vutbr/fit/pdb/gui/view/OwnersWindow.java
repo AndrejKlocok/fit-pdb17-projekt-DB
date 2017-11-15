@@ -114,7 +114,14 @@ public class OwnersWindow implements OwnersContract.View {
         datePicker = new JDatePickerImpl(datePanel);
         datePicker.addActionListener(actionEvent -> {
             Date selectedDate = (Date) datePicker.getModel().getValue();
-            controller.getOwnersListOfDate(selectedDate);
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.getOwnersListOfDate(selectedDate);
+
+                    return null;
+                }
+            });
         });
         topPanel.add((JComponent) (datePicker));
 
@@ -129,7 +136,6 @@ public class OwnersWindow implements OwnersContract.View {
         mainFrame.setVisible(true);
         mainFrame.setContentPane(contentPanePanel);
         mainFrame.pack();
-        mainFrame.setVisible(true);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         mainFrame.addWindowListener(new WindowAdapter() {
@@ -137,6 +143,14 @@ public class OwnersWindow implements OwnersContract.View {
                 onExit();
             }
         });
+        mainFrame.setVisible(true);
+        int state = mainFrame.getExtendedState();
+        state &= ~JFrame.ICONIFIED;
+        mainFrame.setExtendedState(state);
+        mainFrame.setAlwaysOnTop(true);
+        mainFrame.toFront();
+        mainFrame.requestFocus();
+        mainFrame.setAlwaysOnTop(false);
     }
 
     /**
@@ -144,6 +158,29 @@ public class OwnersWindow implements OwnersContract.View {
      */
     private void onExit() {
         mainFrame.dispose();
+    }
+
+    private void runSwingWorker(SwingWorker<Void, Void> swingWorker) {
+        final JDialog dialog = new JDialog(mainFrame, "Dialog", Dialog.ModalityType.APPLICATION_MODAL);
+
+        swingWorker.addPropertyChangeListener(evt -> {
+            if (evt.getPropertyName().equals("state")) {
+                if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                    dialog.dispose();
+                }
+            }
+        });
+        swingWorker.execute();
+
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(progressBar, BorderLayout.CENTER);
+        panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(mainFrame);
+        dialog.setVisible(true);
     }
 
     @Override
@@ -167,35 +204,40 @@ public class OwnersWindow implements OwnersContract.View {
 
     @Override
     public void showOwnersList(List<Owner> ownersList) {
-        String[] columnNames = {"First Name",
-                "Last Name",
-                "Street",
-                "City",
-                "Postcode",
-                "Email",
-                "Property count",
-                "Land property area sum"};
+        SwingUtilities.invokeLater(() -> {
+            String[] columnNames = {"First Name",
+                    "Last Name",
+                    "Street",
+                    "City",
+                    "Postcode",
+                    "Email",
+                    "Property count",
+                    "Land property area sum"};
 
-        Object[][] data = new Object[ownersList.size()][8];
-        for (int i = 0; i < ownersList.size(); i++) {
-            data[i][0] = ownersList.get(i).getFirstName();
-            data[i][1] = ownersList.get(i).getLastName();
-            data[i][2] = ownersList.get(i).getStreet();
-            data[i][3] = ownersList.get(i).getCity();
-            data[i][4] = ownersList.get(i).getPsc();
-            data[i][5] = ownersList.get(i).getEmail();
-            data[i][6] = ownersList.get(i).getPropertyCurrentCount();
-            data[i][7] = ownersList.get(i).getPropertyCurrentLandAreaSum() + " m\u00B2";
-        }
+            Object[][] data = new Object[ownersList.size()][8];
 
-        ownersTable.setFillsViewportHeight(true);
-        ownersTable.setModel(new DefaultTableModel(data, columnNames) {
+            System.out.println("There are " + ownersList.size() + " owners");
 
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                //all cells false
-                return false;
+            for (int i = 0; i < ownersList.size(); i++) {
+                data[i][0] = ownersList.get(i).getFirstName();
+                data[i][1] = ownersList.get(i).getLastName();
+                data[i][2] = ownersList.get(i).getStreet();
+                data[i][3] = ownersList.get(i).getCity();
+                data[i][4] = ownersList.get(i).getPsc();
+                data[i][5] = ownersList.get(i).getEmail();
+                data[i][6] = ownersList.get(i).getPropertyCurrentCount();
+                data[i][7] = ownersList.get(i).getPropertyCurrentLandAreaSum() + " m\u00B2";
             }
+
+            ownersTable.setFillsViewportHeight(true);
+            ownersTable.setModel(new DefaultTableModel(data, columnNames) {
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    //all cells false
+                    return false;
+                }
+            });
         });
     }
 

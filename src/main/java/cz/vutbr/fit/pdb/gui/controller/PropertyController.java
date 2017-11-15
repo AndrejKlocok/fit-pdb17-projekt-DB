@@ -8,34 +8,62 @@
 
 package cz.vutbr.fit.pdb.gui.controller;
 
-import cz.vutbr.fit.pdb.core.App;
+import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Property;
 import cz.vutbr.fit.pdb.core.model.PropertyPrice;
+import cz.vutbr.fit.pdb.core.repository.GroundPlanRepository;
+import cz.vutbr.fit.pdb.core.repository.OwnerRepository;
+import cz.vutbr.fit.pdb.core.repository.PropertyPriceRepository;
 import cz.vutbr.fit.pdb.core.repository.PropertyRepository;
 import cz.vutbr.fit.pdb.gui.view.PropertyWindow;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 
 public class PropertyController implements PropertyContract.Controller {
 
-    private PropertyRepository repository;
+    private PropertyRepository propertyRepository;
+
+    private GroundPlanRepository groundPlanRepository;
+
+    private PropertyPriceRepository propertyPriceRepository;
+
+    private OwnerRepository ownerRepository;
 
     private PropertyContract.View view;
 
     private Property property;
 
-    private List<Property> propertyListSimilar;
 
-
-    public PropertyController(PropertyRepository repository, PropertyContract.View view, int idProperty) {
-        this.repository = repository;
+    public PropertyController(PropertyRepository propertyRepository,
+                              GroundPlanRepository groundPlanRepository,
+                              PropertyPriceRepository propertyPriceRepository,
+                              OwnerRepository ownerRepository,
+                              PropertyContract.View view, Property property) {
+        this.propertyRepository = propertyRepository;
+        this.groundPlanRepository = groundPlanRepository;
+        this.propertyPriceRepository = propertyPriceRepository;
+        this.ownerRepository = ownerRepository;
         this.view = view;
-        this.property = repository.getPropertyById(idProperty);
-        this.propertyListSimilar = repository.getPropertyListSimilar(property);
+        this.property = property;
 
         view.setController(this);
+        propertyRepository.addObserver((observable, o) -> update());
+        groundPlanRepository.addObserver((observable, o) -> update());
+        propertyPriceRepository.addObserver(((observable1, o1) -> update()));
+        ownerRepository.addObserver((observable, o) -> update());
+
+        update();
+    }
+
+    public void update() {
+        System.out.println("update " + this.getClass().getSimpleName());
+
+        property = propertyRepository.getProperty(property);
+        List<Property> propertyListSimilar = propertyRepository.getPropertyListSimilarByGroundPlans(property.getGroundPlans());
 
         if (property == null) {
             view.showError("Could not load property");
@@ -47,7 +75,7 @@ public class PropertyController implements PropertyContract.Controller {
 
     @Override
     public void deleteProperty() {
-        if (repository.deleteProperty(property)) {
+        if (propertyRepository.deleteProperty(property)) {
             view.showMessage("Property deleted");
             view.hide();
         } else {
@@ -56,101 +84,76 @@ public class PropertyController implements PropertyContract.Controller {
     }
 
     @Override
+    public void deleteOwner() {
+        if (!ownerRepository.deleteOwnerOfProperty(property.getOwnerCurrent(), property)) {
+            view.showError("Could not delete owner from property");
+        }
+    }
+
+    @Override
     public void savePropertyName(String name) {
-        property.setName(name);
-        if (repository.saveProperty(property)) {
-            view.showProperty(property);
-        } else {
+        if (!propertyRepository.saveProperty(property)) {
             view.showError("Could not save property");
         }
     }
 
     @Override
     public void savePropertyDescription(String description) {
-        property.setDescription(description);
-        if (repository.saveProperty(property)) {
-            view.showProperty(property);
-        } else {
+        if (!propertyRepository.saveProperty(property)) {
             view.showError("Could not save property");
         }
     }
 
     @Override
     public void savePropertyCurrentPrice(String currentPrice) {
-        List<PropertyPrice> priceHistory = property.getPriceHistory();
-        priceHistory.add(new PropertyPrice(42, property.getIdProperty(), Double.parseDouble(currentPrice), new Date(), new Date())); // TODO
-        if (repository.saveProperty(property)) {
-            view.showProperty(property);
-        } else {
-            view.showError("Could not save property");
+        PropertyPrice propertyPrice = new PropertyPrice(42, property.getIdProperty(), Double.parseDouble(currentPrice), new Date(), new Date()); // TODO
+        if (!propertyPriceRepository.savePropertyPrice(propertyPrice)) {
+            view.showError("Could not save property price");
         }
     }
 
     @Override
-    public void savePropertyImage(File file) {
-        // TODO set property image
-        if (repository.saveProperty(property)) {
-            view.showProperty(property);
+    public void createGroundPlan(String fileName) {
+        File file = new File(fileName);
+        try {
+            byte[] fileContent = Files.readAllBytes(file.toPath());
 
-            // load new property
-            property = repository.getProperty(property);
-            if (property == null) {
-                view.showError("Could not load property");
-                return;
+            GroundPlan newGroundPlan = new GroundPlan();
+            newGroundPlan.setImage(fileContent);
+            newGroundPlan.setIdProperty(property.getIdProperty());
+
+            if (!groundPlanRepository.createGroundPlan(newGroundPlan)) {
+                view.showError("Could not update ground plan");
             }
-
-            // load new similar property list
-            propertyListSimilar = repository.getPropertyListSimilar(property);
-            view.showPropertyListSimilar(propertyListSimilar);
-        } else {
-            view.showError("Could not save property");
+        } catch (IOException e) {
+            view.showError("Could not load selected file");
         }
     }
 
     @Override
-    public void rotatePropertyImageRight() {
-        if (repository.rotatePropertyImageRight(property)) {
-            view.showProperty(property);
-
-            // load new property
-            property = repository.getProperty(property);
-            if (property == null) {
-                view.showError("Could not load property");
-                return;
-            }
-
-            // load new similar property list
-            propertyListSimilar = repository.getPropertyListSimilar(property);
-            view.showPropertyListSimilar(propertyListSimilar);
-        } else {
-            view.showError("Could not rotate image");
+    public void deleteGroundPlan(GroundPlan groundPlan) {
+        if (!groundPlanRepository.deleteGroundPlan(groundPlan)) {
+            view.showError("Could not delete ground plan");
         }
     }
 
     @Override
-    public void rotatePropertyImageLeft() {
-        if (repository.rotatePropertyImageLeft(property)) {
-            view.showProperty(property);
+    public void rotateGroundPlanRight(GroundPlan groundPlan) {
+        if (!groundPlanRepository.rotateGroundPlanRight(groundPlan)) {
+            view.showError("Could not rotate ground plan");
+        }
+    }
 
-            // load new property
-            property = repository.getProperty(property);
-            if (property == null) {
-                view.showError("Could not load property");
-                return;
-            }
-
-            // load new similar property list
-            propertyListSimilar = repository.getPropertyListSimilar(property);
-            view.showPropertyListSimilar(propertyListSimilar);
-        } else {
-            view.showError("Could not rotate image");
+    @Override
+    public void rotateGroundPlanLeft(GroundPlan groundPlan) {
+        if (!groundPlanRepository.rotateGroundPlanLeft(groundPlan)) {
+            view.showError("Could not rotate ground plan");
         }
     }
 
     @Override
     public void getPropertySimilar(Property property) {
         PropertyWindow propertyWindow = new PropertyWindow();
-        PropertyRepository propertyRepository = new PropertyRepository(App.getDataSource());
-        new PropertyController(propertyRepository, propertyWindow, property.getIdProperty());
+        new PropertyController(propertyRepository, groundPlanRepository, propertyPriceRepository, ownerRepository, propertyWindow, property);
     }
 }

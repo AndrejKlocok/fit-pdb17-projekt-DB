@@ -26,9 +26,17 @@ public class OwnersController implements OwnersContract.Controller {
     public OwnersController(OwnerRepository repository, OwnersContract.View view) {
         this.repository = repository;
         this.view = view;
-        this.ownersList = repository.getOwnersList();
 
         view.setController(this);
+        repository.addObserver((observable, o) -> update());
+
+        update();
+    }
+
+    public void update() {
+        System.out.println("update " + this.getClass().getSimpleName());
+
+        ownersList = repository.getOwnersList();
         view.showOwnersList(ownersList);
     }
 

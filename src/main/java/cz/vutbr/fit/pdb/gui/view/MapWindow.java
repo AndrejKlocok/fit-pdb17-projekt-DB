@@ -27,7 +27,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -153,7 +152,14 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         searchButton.setMinimumSize(searchButton.getPreferredSize());
         searchButton.setMaximumSize(searchButton.getPreferredSize());
         searchButton.addActionListener(e ->
-                Platform.runLater(() -> controller.searchPropertyList(searchNameInput.getText(), Double.parseDouble(searchPriceInput.getText()), searchHasOwnerCheckbox.isSelected()))
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.searchPropertyList(searchNameInput.getText(), Double.parseDouble(searchPriceInput.getText()), searchHasOwnerCheckbox.isSelected());
+
+                        return null;
+                    }
+                })
         );
 
         propertyListPanel.setLayout(new BoxLayout(propertyListPanel, BoxLayout.Y_AXIS));
@@ -198,22 +204,52 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         JMenu mHelp = new JMenu("Help");
 
         JMenuItem mMainMenuOwnerList = new JMenuItem("Owners list");
-        mMainMenuOwnerList.addActionListener(actionEvent -> controller.getOwners());
+        mMainMenuOwnerList.addActionListener(actionEvent -> runSwingWorker(new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                controller.getOwners();
+
+                return null;
+            }
+        }));
+
+        JMenuItem mMainMenuRefresh = new JMenuItem("Refresh");
+        mMainMenuRefresh.addActionListener(actionEvent -> runSwingWorker(new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                controller.refresh();
+
+                return null;
+            }
+        }));
 
         JMenuItem mMainMenuExecuteSQLFile = new JMenuItem("Execute SQL file");
         mMainMenuExecuteSQLFile.addActionListener(actionEvent -> {
-            final JFileChooser fc = new JFileChooser();
+            final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
             int returnVal = fc.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = fc.getSelectedFile();
-                controller.executeSqlFile(file);
+
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.executeSqlFile(fc.getSelectedFile().getAbsolutePath());
+
+                        return null;
+                    }
+                });
             }
         });
 
         JMenuItem mMainMenuResetDB = new JMenuItem("Reset database");
-        mMainMenuResetDB.addActionListener(actionEvent ->
-                controller.resetDatabase()
+        mMainMenuResetDB.addActionListener(actionEvent -> runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.resetDatabase();
+
+                        return null;
+                    }
+                })
         );
 
         JMenuItem mMainMenuExit = new JMenuItem("Exit");
@@ -230,6 +266,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
 
         mMainMenu.add(mMainMenuOwnerList);
         mMainMenu.addSeparator();
+        mMainMenu.add(mMainMenuRefresh);
         mMainMenu.add(mMainMenuExecuteSQLFile);
         mMainMenu.add(mMainMenuResetDB);
         mMainMenu.addSeparator();
@@ -256,6 +293,29 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
     private void onExit() {
         mainFrame.dispose();
         System.exit(0);
+    }
+
+    private void runSwingWorker(SwingWorker<Void, Void> swingWorker) {
+        final JDialog dialog = new JDialog(mainFrame, "Dialog", Dialog.ModalityType.APPLICATION_MODAL);
+
+        swingWorker.addPropertyChangeListener(evt -> {
+            if (evt.getPropertyName().equals("state")) {
+                if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                    dialog.dispose();
+                }
+            }
+        });
+        swingWorker.execute();
+
+        JProgressBar progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(progressBar, BorderLayout.CENTER);
+        panel.add(new JLabel("Please wait......."), BorderLayout.PAGE_START);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(mainFrame);
+        dialog.setVisible(true);
     }
 
     @Override
@@ -336,11 +396,28 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                     }
 
                     // TODO create dummy geometry and set it to newProperty
-                    controller.createProperty(newProperty);
-                    controller.getProperty(newProperty);
+                    runSwingWorker(new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            Platform.runLater(() -> {
+                                controller.createProperty(newProperty);
+                                controller.getProperty(newProperty);
+
+                            });
+
+                            return null;
+                        }
+                    });
 
                 } else if (menuEvent.getActionCommand().equalsIgnoreCase("Find nearest property")) {
-                    controller.findNearestProperty(position.getLatitude(), position.getLongitude());
+                    runSwingWorker(new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            Platform.runLater(() -> controller.findNearestProperty(position.getLatitude(), position.getLongitude()));
+
+                            return null;
+                        }
+                    });
                 }
             };
 
@@ -456,15 +533,43 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                             shape.setDraggable(false);
 
                             // TODO
-                            controller.savePropertyGeometry(property, JGeometry.createLinearPolygon(new double[2], 2, 2));
+                            runSwingWorker(new SwingWorker<Void, Void>() {
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    controller.savePropertyGeometry(property, JGeometry.createLinearPolygon(new double[2], 2, 2));
+
+                                    return null;
+                                }
+                            });
                             System.out.println("save: " + (shape instanceof com.lynden.gmapsfx.shapes.Polygon ? ((Polygon) shape).getPath().getArray().getSlot(0).toString() : shape.getBounds().toString()));
                         });
                     } else if (event.getActionCommand().equalsIgnoreCase("Find nearest property")) {
-                        controller.findNearestProperty(property);
+                        runSwingWorker(new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                controller.findNearestProperty(property);
+
+                                return null;
+                            }
+                        });
                     } else if (event.getActionCommand().equalsIgnoreCase("Find adjacent property")) {
-                        controller.findAdjacentProperty(property);
+                        runSwingWorker(new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                controller.findAdjacentProperty(property);
+
+                                return null;
+                            }
+                        });
                     } else if (event.getActionCommand().equalsIgnoreCase("Calculate area")) {
-                        controller.calculateArea(property);
+                        runSwingWorker(new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                controller.calculateArea(property);
+
+                                return null;
+                            }
+                        });
                     }
                 };
 
@@ -492,7 +597,14 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                     @Override
                     public void mouseClicked(MouseEvent mouseEvent) {
                         if (SwingUtilities.isLeftMouseButton(mouseEvent)) {
-                            controller.getProperty(property);
+                            runSwingWorker(new SwingWorker<Void, Void>() {
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    controller.getProperty(property);
+
+                                    return null;
+                                }
+                            });
                         }
                     }
 
@@ -535,7 +647,14 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                 map.addUIEventHandler(shape, UIEventType.click, (JSObject) -> {
                     System.out.println("Property: " + property.getName());
                     if (!propertyPopupMenu.isShowing()) {
-                        controller.getProperty(property);
+                        runSwingWorker(new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                controller.getProperty(property);
+
+                                return null;
+                            }
+                        });
                     }
                 });
                 map.addUIEventHandler(shape, UIEventType.mouseover, (JSObject object) -> {
@@ -555,6 +674,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             }
 
             propertyListPanel.revalidate();
+            propertyListPanel.repaint();
         });
     }
 

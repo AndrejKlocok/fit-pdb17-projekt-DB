@@ -31,7 +31,11 @@ public class Property {
 
     private String description;
 
+    private List<GroundPlan> groundPlans;
+
     private List<PropertyPrice> priceHistory;
+
+    private List<Owner> ownerHistory;
 
     private JGeometry geometry;
 
@@ -92,12 +96,28 @@ public class Property {
         this.description = description;
     }
 
+    public List<GroundPlan> getGroundPlans() {
+        return groundPlans;
+    }
+
+    public void setGroundPlans(List<GroundPlan> groundPlans) {
+        this.groundPlans = groundPlans;
+    }
+
     public List<PropertyPrice> getPriceHistory() {
         return priceHistory;
     }
 
     public void setPriceHistory(List<PropertyPrice> priceHistory) {
         this.priceHistory = priceHistory;
+    }
+
+    public List<Owner> getOwnerHistory() {
+        return ownerHistory;
+    }
+
+    public void setOwnerHistory(List<Owner> ownerHistory) {
+        this.ownerHistory = ownerHistory;
     }
 
     public JGeometry getGeometry() {
@@ -108,8 +128,11 @@ public class Property {
         this.geometry = geometry;
     }
 
-    public Double getPriceCurrent() {
-        // TODO return last price from price history
-        return 4200d;
+    public PropertyPrice getPriceCurrent() {
+        return priceHistory.size() > 0 ? priceHistory.get(priceHistory.size() - 1) : null;
+    }
+
+    public Owner getOwnerCurrent() {
+        return ownerHistory.size() > 0 ? ownerHistory.get(ownerHistory.size() - 1) : null;
     }
 }

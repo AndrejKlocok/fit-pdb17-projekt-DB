@@ -11,7 +11,6 @@ package cz.vutbr.fit.pdb.gui.controller;
 import cz.vutbr.fit.pdb.core.model.Property;
 import oracle.spatial.geometry.JGeometry;
 
-import java.io.File;
 import java.util.List;
 
 public class MapContract {
@@ -31,9 +30,11 @@ public class MapContract {
 
     public interface Controller {
 
+        void refresh();
+
         void resetDatabase();
 
-        void executeSqlFile(File file);
+        void executeSqlFile(String fileName);
 
         void createProperty(Property property);
 
