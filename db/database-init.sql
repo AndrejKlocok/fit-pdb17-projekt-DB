@@ -215,12 +215,13 @@ GROUP BY O.id_owner, P.lastname, P.firstname
 ORDER BY Area DESC;
 
 -- Returns owner of N properties with SUM of all land area in that time interval
-SELECT P.lastname, P.firstname, COUNT(*) as PropertiesCount, ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')), 1) as Area
+SELECT P.id_person, COUNT(*) as PropertiesCount, ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')), 1) as Area
 FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) 
-WHERE CURRENT_DATE  BETWEEN O.valid_from AND O.valid_to AND CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to
-GROUP BY O.id_owner, P.lastname, P.firstname
-ORDER BY Area, PropertiesCount DESC;
+WHERE (TO_DATE('2010-1-1','yyyy-mm-dd') <= O.valid_from) AND (TO_DATE('2017-8-1','yyyy-mm-dd') >= O.valid_to)
+GROUP BY P.id_person
+ORDER BY Area DESC, PropertiesCount DESC;
 
+-- Finding closest property to PR1(actual position on map), which is available right now
 SELECT P.id_property, ROUND(P.distance,1) as PropertyDistance
 FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance
         FROM property PR1, property PR2

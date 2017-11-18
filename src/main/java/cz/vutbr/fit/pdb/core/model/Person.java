@@ -8,6 +8,9 @@
 
 package cz.vutbr.fit.pdb.core.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Person {
 
     protected int idPerson;
@@ -24,6 +27,7 @@ public class Person {
 
     protected String email;
 
+    protected List<Owner> propertyHistory;
 
     public Person() {
         idPerson = 0;
@@ -33,9 +37,11 @@ public class Person {
         city = "";
         psc = "";
         email = "";
+        propertyHistory = new LinkedList<Owner>() ;
     }
 
-    public Person(int id, String firstName, String lastName, String street, String city, String psc, String email) {
+    public Person(int id, String firstName, String lastName, String street,
+                  String city, String psc, String email, LinkedList<Owner> propertyHistory) {
         this.idPerson = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -43,6 +49,7 @@ public class Person {
         this.city = city;
         this.psc = psc;
         this.email = email;
+        this.propertyHistory = propertyHistory;
     }
 
     public int getIdPerson() {
@@ -99,5 +106,13 @@ public class Person {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Owner> getPropertyHistory() {
+        return propertyHistory;
+    }
+
+    public void setPropertyHistory(List<Owner> propertyHistory) {
+        this.propertyHistory = propertyHistory;
     }
 }

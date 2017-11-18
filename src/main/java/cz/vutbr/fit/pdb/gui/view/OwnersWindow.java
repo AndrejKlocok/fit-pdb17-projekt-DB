@@ -8,8 +8,8 @@
 
 package cz.vutbr.fit.pdb.gui.view;
 
-import cz.vutbr.fit.pdb.core.model.Owner;
-import cz.vutbr.fit.pdb.gui.controller.OwnersContract;
+import cz.vutbr.fit.pdb.core.model.Person;
+import cz.vutbr.fit.pdb.gui.controller.PersonsContract;
 import net.sourceforge.jdatepicker.JDatePicker;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
@@ -22,12 +22,14 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-public class OwnersWindow implements OwnersContract.View {
+public class OwnersWindow implements PersonsContract.View {
 
-    private OwnersContract.Controller controller;
+    private PersonsContract.Controller controller;
 
     // Window components
     private final JFrame mainFrame;
@@ -117,7 +119,7 @@ public class OwnersWindow implements OwnersContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    controller.getOwnersListOfDate(selectedDate);
+                    controller.getOwnersListOfDate(selectedDate, selectedDate);
 
                     return null;
                 }
@@ -184,7 +186,7 @@ public class OwnersWindow implements OwnersContract.View {
     }
 
     @Override
-    public void setController(OwnersContract.Controller controller) {
+    public void setController(PersonsContract.Controller controller) {
         this.controller = controller;
     }
 
@@ -203,7 +205,7 @@ public class OwnersWindow implements OwnersContract.View {
     }
 
     @Override
-    public void showOwnersList(List<Owner> ownersList) {
+    public void showOwnersList(List<Person> personList, HashMap<Integer, ArrayList<Integer>> countSum) {
         SwingUtilities.invokeLater(() -> {
             String[] columnNames = {"First Name",
                     "Last Name",
@@ -214,20 +216,30 @@ public class OwnersWindow implements OwnersContract.View {
                     "Property count",
                     "Land property area sum"};
 
-            Object[][] data = new Object[ownersList.size()][8];
+            Object[][] data = new Object[personList.size()][8];
 
-            System.out.println("There are " + ownersList.size() + " owners");
+            System.out.println("There are " + personList.size() + " owners");
 
-            for (int i = 0; i < ownersList.size(); i++) {
-                data[i][0] = ownersList.get(i).getFirstName();
-                data[i][1] = ownersList.get(i).getLastName();
-                data[i][2] = ownersList.get(i).getStreet();
-                data[i][3] = ownersList.get(i).getCity();
-                data[i][4] = ownersList.get(i).getPsc();
-                data[i][5] = ownersList.get(i).getEmail();
-                data[i][6] = ownersList.get(i).getPropertyCurrentCount();
-                data[i][7] = ownersList.get(i).getPropertyCurrentLandAreaSum() + " m\u00B2";
+            for (int i = 0; i < personList.size(); i++) {
+                data[i][0] = personList.get(i).getFirstName();
+                data[i][1] = personList.get(i).getLastName();
+                data[i][2] = personList.get(i).getStreet();
+                data[i][3] = personList.get(i).getCity();
+                data[i][4] = personList.get(i).getPsc();
+                data[i][5] = personList.get(i).getEmail();
+                if( countSum.containsKey(personList.get(i).getIdPerson())){
+                   ArrayList<Integer> tmp = countSum.get(personList.get(i).getIdPerson());
+                    data[i][6] = tmp.get(0);    // Cout of properties
+                    data[i][7] = tmp.get(1);    // Sum of land area
+                }
+                else{
+                    data[i][6] = 0;
+                    data[i][7] = 0;
+                }
             }
+
+            //skuska
+            controller.getPersonDurationList();
 
             ownersTable.setFillsViewportHeight(true);
             ownersTable.setModel(new DefaultTableModel(data, columnNames) {

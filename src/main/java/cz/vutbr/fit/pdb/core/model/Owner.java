@@ -11,46 +11,51 @@ package cz.vutbr.fit.pdb.core.model;
 import java.util.HashMap;
 import java.util.Date;
 
-public class Owner extends Person {
+public class Owner {
 
-    protected int idOwner;
+    //protected int idOwner;
 
-    protected int idProperty;
+    //protected int idProperty;
+    protected Person person;
+
+    protected Property property;
 
     protected Date validFrom;
 
     protected Date validTo;
 
-    protected HashMap<String, Property> propertyHistory;
+   // protected HashMap<String, Property> propertyHistory;
 
 
     public Owner() {
-        idOwner = 0;
+        /*idOwner = 0;
         idProperty = 0;
-        propertyHistory = new HashMap<>();
+        */
+        person = new Person();
+        property = new Property();
     }
 
-    public Owner(int idOwner, int idProperty, Date validFrom, Date validTo) {
-        this.idOwner = idOwner;
-        this.idProperty = idProperty;
+    public Owner(Person person, Property property, Date validFrom, Date validTo) {
+        this.person = person;
+        this.property = property;
         this.validFrom = validFrom;
         this.validTo = validTo;
     }
 
-    public int getIdOwner() {
-        return idOwner;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setIdOwner(int idOwner) {
-        this.idOwner = idOwner;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
-    public int getIdProperty() {
-        return idProperty;
+    public Property getProperty() {
+        return property;
     }
 
-    public void setIdProperty(int idProperty) {
-        this.idProperty = idProperty;
+    public void setProperty(Property property) {
+        this.property = property;
     }
 
     public Date getValidTo() {
@@ -67,14 +72,6 @@ public class Owner extends Person {
 
     public void setValidFrom(Date validFrom) {
         this.validFrom = validFrom;
-    }
-
-    public HashMap<String, Property> getPropertyHistory() {
-        return propertyHistory;
-    }
-
-    public void setPropertyHistory(HashMap<String, Property> propertyHistory) {
-        this.propertyHistory = propertyHistory;
     }
 
     public Property getPropertyCurrent() {

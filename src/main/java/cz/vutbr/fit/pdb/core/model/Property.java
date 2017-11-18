@@ -10,6 +10,8 @@ package cz.vutbr.fit.pdb.core.model;
 
 import oracle.spatial.geometry.JGeometry;
 
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -129,10 +131,29 @@ public class Property {
     }
 
     public PropertyPrice getPriceCurrent() {
-        return priceHistory.size() > 0 ? priceHistory.get(priceHistory.size() - 1) : null;
+        PropertyPrice propertyPrice = priceHistory.size() > 0 ? priceHistory.get(priceHistory.size() - 1) : null;
+        if(propertyPrice == null)
+            return null;
+
+        for (PropertyPrice pp : priceHistory) {
+            if (pp.getValidTo().after(propertyPrice.getValidTo())) {
+                propertyPrice = pp;
+            }
+        }
+        return propertyPrice;
     }
 
     public Owner getOwnerCurrent() {
-        return ownerHistory.size() > 0 ? ownerHistory.get(ownerHistory.size() - 1) : null;
+        Owner owner = ownerHistory.size() > 0 ? ownerHistory.get(ownerHistory.size() - 1) : null;
+        if(owner == null)
+            return null;
+        //TODO -> nemusi mat ziadneho teraz -> moze byt Last owner
+        for (Owner owner_tmp : ownerHistory) {
+            if (owner_tmp.getValidTo().after(owner.getValidTo())) {
+                owner = owner_tmp;
+            }
+        }
+        return owner;
+
     }
 }

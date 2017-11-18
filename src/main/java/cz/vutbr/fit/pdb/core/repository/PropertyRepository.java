@@ -8,10 +8,7 @@
 
 package cz.vutbr.fit.pdb.core.repository;
 
-import cz.vutbr.fit.pdb.core.model.GroundPlan;
-import cz.vutbr.fit.pdb.core.model.Owner;
-import cz.vutbr.fit.pdb.core.model.Property;
-import cz.vutbr.fit.pdb.core.model.PropertyPrice;
+import cz.vutbr.fit.pdb.core.model.*;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
 
@@ -54,7 +51,10 @@ public class PropertyRepository extends Observable {
 
                 // load property price history
                 PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(dataSource);
-                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                //List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                PropertyPrice pp = new PropertyPrice();
+                pp.setProperty(property);
+                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(pp);
                 property.setPriceHistory(propertyPriceList);
 
                 // load property owner history
@@ -99,10 +99,13 @@ public class PropertyRepository extends Observable {
 
                 // load property price history
                 PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(dataSource);
-                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                //List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                PropertyPrice pp = new PropertyPrice();
+                pp.setProperty(property);
+                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(pp);
                 newProperty.setPriceHistory(propertyPriceList);
 
-                // load property owner history
+                // load property owner history TODO
                 OwnerRepository ownerRepository = new OwnerRepository(dataSource);
                 List<Owner> ownerList = ownerRepository.getOwnersListOfProperty(property);
                 newProperty.setOwnerHistory(ownerList);
@@ -151,7 +154,10 @@ public class PropertyRepository extends Observable {
 
                 // load property price history
                 PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(dataSource);
-                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                //List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                PropertyPrice pp = new PropertyPrice();
+                pp.setProperty(property);
+                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(pp);
                 property.setPriceHistory(propertyPriceList);
 
                 // load property owner history
@@ -317,7 +323,10 @@ public class PropertyRepository extends Observable {
 
                 // load property price history
                 PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(dataSource);
-                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                //List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                PropertyPrice pp = new PropertyPrice();
+                pp.setProperty(property);
+                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(pp);
                 property.setPriceHistory(propertyPriceList);
 
                 // load property owner history
@@ -339,6 +348,7 @@ public class PropertyRepository extends Observable {
 
     public LinkedList<Property> searchPropertyList(String name, Double price, boolean hasOwner) {
         // TODO
+
         return new LinkedList<>();
     }
 
@@ -360,6 +370,41 @@ public class PropertyRepository extends Observable {
     public double getPropertyArea(Property property) {
         // TODO
         return 42;
+    }
+    public  List<Property> getPropertyListWithoutOwnerInCurrentDate() {
+
+        //TODO aj iny cas?
+        String query = "SELECT P.id_property FROM property P where p.id_property IN(\n" +
+                "SELECT DISTINCT PR.id_property\n" +
+                "    FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) WHERE (CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to AND\n" +
+                "        CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR (O.id_owner IS NULL))";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            LinkedList<Integer> idProperties = new LinkedList<>();
+            LinkedList<Property> propertyLinkedList = new LinkedList<>();
+
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                idProperties.add(resultSet.getInt("id_property"));
+            }
+            connection.close();
+            statement.close();
+
+            //properties
+            for (Integer id:idProperties) {
+                propertyLinkedList.add(this.getPropertyById(id));
+            }
+
+            return  propertyLinkedList;
+
+        } catch (SQLException exception) {
+            System.err.println("Error getPropertiesWithoutOwner " + exception.getMessage());
+
+            return null;
+        }
     }
 
     public String toDbType(Property.Type type) {
