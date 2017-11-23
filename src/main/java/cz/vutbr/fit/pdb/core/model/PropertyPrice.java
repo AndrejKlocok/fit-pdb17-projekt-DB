@@ -15,7 +15,7 @@ public class PropertyPrice {
 
     private int idPropertyPrice;
 
-    private int idProperty;
+    private Property property;
 
     private double price;
 
@@ -26,13 +26,15 @@ public class PropertyPrice {
 
     public PropertyPrice() {
         idPropertyPrice = 0;
-        idProperty = 0;
+        property = new Property();
         price = 0;
+        validFrom = null;
+        validTo = null;
     }
 
-    public PropertyPrice(int idPrice, int idProperty, double price, Date validFrom, Date validTo) {
+    public PropertyPrice(int idPrice, Property property, double price, Date validFrom, Date validTo) {
         this.idPropertyPrice = idPrice;
-        this.idProperty = idProperty;
+        this.property = property;
         this.price = price;
         this.validFrom = validFrom;
         this.validTo = validTo;
@@ -46,12 +48,12 @@ public class PropertyPrice {
         this.idPropertyPrice = id;
     }
 
-    public int getIdProperty() {
-        return idProperty;
+    public Property getProperty() {
+        return property;
     }
 
-    public void setIdProperty(int idProperty) {
-        this.idProperty = idProperty;
+    public void setProperty(Property property) {
+        this.property = property;
     }
 
     public double getPrice() {

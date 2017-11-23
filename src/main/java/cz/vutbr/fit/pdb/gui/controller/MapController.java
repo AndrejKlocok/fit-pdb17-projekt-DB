@@ -12,10 +12,7 @@ import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Property;
 import cz.vutbr.fit.pdb.core.model.ScriptRunner;
-import cz.vutbr.fit.pdb.core.repository.GroundPlanRepository;
-import cz.vutbr.fit.pdb.core.repository.OwnerRepository;
-import cz.vutbr.fit.pdb.core.repository.PropertyPriceRepository;
-import cz.vutbr.fit.pdb.core.repository.PropertyRepository;
+import cz.vutbr.fit.pdb.core.repository.*;
 import cz.vutbr.fit.pdb.gui.view.OwnersWindow;
 import cz.vutbr.fit.pdb.gui.view.PropertyWindow;
 import oracle.spatial.geometry.JGeometry;
@@ -43,6 +40,8 @@ public class MapController extends Observable implements MapContract.Controller 
 
     private OwnerRepository ownerRepository;
 
+    private PersonRepository personRepository;
+
     private MapContract.View view;
 
     private List<Property> propertyList;
@@ -52,11 +51,13 @@ public class MapController extends Observable implements MapContract.Controller 
                          GroundPlanRepository groundPlanRepository,
                          PropertyPriceRepository propertyPriceRepository,
                          OwnerRepository ownerRepository,
+                         PersonRepository personRepository,
                          MapContract.View view) {
         this.propertyRepository = propertyRepository;
         this.groundPlanRepository = groundPlanRepository;
         this.propertyPriceRepository = propertyPriceRepository;
         this.ownerRepository = ownerRepository;
+        this.personRepository = personRepository;
         this.view = view;
 
         view.setController(this);
@@ -170,7 +171,7 @@ public class MapController extends Observable implements MapContract.Controller 
     @Override
     public void getOwners() {
         OwnersWindow ownersWindow = new OwnersWindow();
-        new OwnersController(ownerRepository, ownersWindow);
+        new PersonsController(personRepository, ownersWindow);
     }
 
     @Override
