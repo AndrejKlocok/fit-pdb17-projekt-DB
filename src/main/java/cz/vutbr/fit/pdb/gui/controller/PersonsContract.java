@@ -9,11 +9,8 @@
 package cz.vutbr.fit.pdb.gui.controller;
 
 import cz.vutbr.fit.pdb.core.model.Person;
-import cz.vutbr.fit.pdb.core.model.PersonDuration;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class PersonsContract {
@@ -26,9 +23,7 @@ public class PersonsContract {
 
         void showError(String error);
 
-        void showOwnersList(List<Person> ownerList, HashMap<Integer, ArrayList<Integer>> countSum);
-
-        void showOwnersDurationList(List<PersonDuration> personDurationList);
+        void showOwnersList(List<Person> ownerList);
 
         void hide();
     }
@@ -36,6 +31,11 @@ public class PersonsContract {
     public interface Controller {
         void getOwnersListOfDate(Date date_from, Date date_to);
 
-        void getPersonDurationList();
+        Integer getOwnersCountOfPropertyDate(Integer id_person,Date date_from, Date date_to);
+
+        Integer getOwnersSumOfPropertyDate(Integer id_person, Date date_from, Date date_to);
+
+        Integer getOwnersDurationOfPropertyDate(Integer id_person,Date date_from, Date date_to);
+
     }
 }

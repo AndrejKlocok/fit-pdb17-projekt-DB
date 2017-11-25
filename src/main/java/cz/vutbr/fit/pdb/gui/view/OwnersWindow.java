@@ -9,7 +9,6 @@
 package cz.vutbr.fit.pdb.gui.view;
 
 import cz.vutbr.fit.pdb.core.model.Person;
-import cz.vutbr.fit.pdb.core.model.PersonDuration;
 import cz.vutbr.fit.pdb.gui.controller.PersonsContract;
 import net.sourceforge.jdatepicker.JDatePicker;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
@@ -23,9 +22,7 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 public class OwnersWindow implements PersonsContract.View {
@@ -41,7 +38,8 @@ public class OwnersWindow implements PersonsContract.View {
     private final JPanel rightPanel;
 
     // Top panel components
-    private JDatePicker datePicker;
+    private JDatePicker datePickerFrom;
+    private JDatePicker datePickerTo;
 
     // Center panel components
     private JTable ownersTable;
@@ -118,23 +116,41 @@ public class OwnersWindow implements PersonsContract.View {
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
         bottomPanel.add(statusLabel);
 
-        UtilDateModel datePickerModel = new UtilDateModel();
-        datePickerModel.setValue(new Date());
-        datePickerModel.setSelected(true);
-        JDatePanelImpl datePanel = new JDatePanelImpl(datePickerModel);
-        datePicker = new JDatePickerImpl(datePanel);
-        datePicker.addActionListener(actionEvent -> {
-            Date selectedDate = (Date) datePicker.getModel().getValue();
+        UtilDateModel datePickerModelFrom = new UtilDateModel();
+        datePickerModelFrom.setValue(new Date());
+        datePickerModelFrom.setSelected(true);
+        JDatePanelImpl datePanelFrom = new JDatePanelImpl(datePickerModelFrom);
+        datePickerFrom = new JDatePickerImpl(datePanelFrom);
+        datePickerFrom.addActionListener(actionEvent -> {
+            Date selectedDate = (Date) datePickerFrom.getModel().getValue();
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    controller.getOwnersListOfDate(selectedDate, selectedDate);
-
+                    controller.getOwnersListOfDate(selectedDate, (Date) datePickerTo.getModel().getValue());
                     return null;
                 }
             });
         });
-        topPanel.add((JComponent) (datePicker));
+
+
+        UtilDateModel datePickerModelTo = new UtilDateModel();
+        datePickerModelTo.setValue(new Date());
+        datePickerModelTo.setSelected(true);
+        JDatePanelImpl datePanelTo = new JDatePanelImpl(datePickerModelTo);
+        datePickerTo = new JDatePickerImpl(datePanelTo);
+        datePickerTo.addActionListener(actionEvent -> {
+            Date selectedDate = (Date) datePickerTo.getModel().getValue();
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.getOwnersListOfDate((Date) datePickerFrom.getModel().getValue(), selectedDate);
+                    return null;
+                }
+            });
+        });
+        topPanel.add((JComponent) (datePickerFrom));
+        topPanel.add((JComponent) (datePickerTo));
+
 
         ownersTableScrollPane.setViewportView(ownersTable);
         ownersDurationTableScrollPane.setViewportView(ownersDurationTable);
@@ -215,7 +231,7 @@ public class OwnersWindow implements PersonsContract.View {
     }
 
     @Override
-    public void showOwnersList(List<Person> personList, HashMap<Integer, ArrayList<Integer>> countSum) {
+    public void showOwnersList(List<Person> personList) {
         SwingUtilities.invokeLater(() -> {
             String[] columnNames = {"First Name",
                     "Last Name",
@@ -224,9 +240,10 @@ public class OwnersWindow implements PersonsContract.View {
                     "Postcode",
                     "Email",
                     "Property count",
-                    "Land property area sum"};
+                    "Land property area sum",
+                    "Duration [days]"};
 
-            Object[][] data = new Object[personList.size()][8];
+            Object[][] data = new Object[personList.size()][9];
 
             System.out.println("There are " + personList.size() + " owners");
 
@@ -237,50 +254,12 @@ public class OwnersWindow implements PersonsContract.View {
                 data[i][3] = personList.get(i).getCity();
                 data[i][4] = personList.get(i).getPsc();
                 data[i][5] = personList.get(i).getEmail();
-                if( countSum.containsKey(personList.get(i).getIdPerson())){
-                   ArrayList<Integer> tmp = countSum.get(personList.get(i).getIdPerson());
-                    data[i][6] = tmp.get(0);    // Cout of properties
-                    data[i][7] = tmp.get(1);    // Sum of land area
-                }
-                else{
-                    data[i][6] = 0;
-                    data[i][7] = 0;
-                }
+                data[i][6] = this.controller.getOwnersCountOfPropertyDate(personList.get(i).getIdPerson(), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
+                data[i][7] = this.controller.getOwnersSumOfPropertyDate(personList.get(i).getIdPerson(), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
+                data[i][8] = this.controller.getOwnersDurationOfPropertyDate(personList.get(i).getIdPerson(), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
             }
-
             ownersTable.setFillsViewportHeight(true);
             ownersTable.setModel(new DefaultTableModel(data, columnNames) {
-
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    //all cells false
-                    return false;
-                }
-            });
-        });
-    }
-
-    @Override
-    public void showOwnersDurationList(List<PersonDuration> personDurationList) {
-        SwingUtilities.invokeLater(() -> {
-            String[] columnNames = {"First Name",
-                    "Last Name",
-                    "Duration[Days]",
-                    "Properties Count"};
-
-            Object[][] data = new Object[personDurationList.size()][4];
-
-            System.out.println("There are " + personDurationList.size() + " persons");
-
-            for (int i = 0; i < personDurationList.size(); i++) {
-                data[i][0] = personDurationList.get(i).getPerson().getFirstName();
-                data[i][1] = personDurationList.get(i).getPerson().getLastName();
-                data[i][2] = personDurationList.get(i).getDuration();
-                data[i][3] = personDurationList.get(i).getPropertyCount();
-            }
-
-            ownersDurationTable.setFillsViewportHeight(true);
-            ownersDurationTable.setModel(new DefaultTableModel(data, columnNames) {
 
                 @Override
                 public boolean isCellEditable(int row, int column) {

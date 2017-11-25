@@ -18,20 +18,36 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
-
+/**
+ *  Owner repository creates Owner type objects (@see Owner), queries and calls to Oracle database.
+ *  Repository works mainly with table Owner.
+ *  Class extends @see Observable.
+ */
 public class OwnerRepository extends Observable {
 
     private OracleDataSource dataSource;
 
+    /**
+     * Constructor for owner repository @see OwnerRepository.
+     * @param dataSource  @see OracleDataSource
+     */
     public OwnerRepository(OracleDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
+    /**
+     * Method calls query to Oracle database, which returns all records from Owner table according to id of owner and initializes all objects.
+     * @throws  @see SQLException if occurs
+     * @param person @see Person
+     * @return List of @see Owner type objects
+     */
     public List<Owner> getOwnerHistory(Person person){
         String query = "SELECT person.*,  owner.VALID_FROM, owner.VALID_TO, property.* FROM owner JOIN person ON(person.ID_PERSON=owner.id_owner)JOIN property ON(property.id_property=owner.id_property)  WHERE id_owner = ?";
+        Connection connection = null;
+        PreparedStatement statement = null;
         try{
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, person.getIdPerson());
             LinkedList<Owner> ownerLinkedList = new LinkedList<>();
             ResultSet resultSet = statement.executeQuery();
@@ -58,18 +74,34 @@ public class OwnerRepository extends Observable {
             return ownerLinkedList;
 
         } catch (SQLException exception) {
-            System.err.println("Error getOwnerHistoryById " + exception.getMessage());
+            System.err.println("Error getOwnerHistory " + exception.getMessage());
 
             return new LinkedList<>();
         }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error getOwnerHistory " + exception.getMessage());
+            }
+        }
     }
 
+    /**
+     * Method calls query to Oracle database, which returns all records from Owner table according to id of property and initializes all objects.
+     * @throws  @see SQLException if occurs
+     * @param property @see Property
+     * @return List of @see Owner type objects
+     */
     public List<Owner> getOwnersListOfProperty(Property property) {
         String query = "SELECT owner.id_owner, owner.VALID_FROM, owner.VALID_TO, property.*  FROM owner JOIN property ON(property.id_property=owner.id_property) WHERE owner.id_property = ?";
 
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
 
             ResultSet resultSet = statement.executeQuery();
@@ -92,7 +124,6 @@ public class OwnerRepository extends Observable {
             connection.close();
             statement.close();
 
-            //TODO vymysliet propertu lepsie -> cyklicke volanie
 
             //create persons
             for (Owner o:ownersList) {
@@ -106,13 +137,30 @@ public class OwnerRepository extends Observable {
 
             return new LinkedList<>();
         }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error getOwnersListOfProperty " + exception.getMessage());
+            }
+        }
     }
 
+    /**
+     * Method calls query under table Owner to Oracle database, which returns record, according to given parameters.
+     * @throws  @see SQLException if occurs
+     * @param oldOwner @see Owner typed object, which stores attributes for query
+     * @return @see Owner
+     */
     public Owner getOwner(Owner oldOwner){
         String query="Select owner.* from owner where owner.id_owner=? and owner.id_property=? and owner.valid_from=? and owner.valid_to=?";
+
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
 
             statement.setInt(1, oldOwner.getPerson().getIdPerson());
             statement.setInt(2, oldOwner.getProperty().getIdProperty());
@@ -151,14 +199,32 @@ public class OwnerRepository extends Observable {
 
             return null;
         }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error getOwner " + exception.getMessage());
+            }
+        }
 
     }
+
+    /**
+     * Method calls query under table Owner to Oracle database, which creates a record, according to given parameters.
+     * @throws  @see SQLException if occurs
+     * @param owner @see Owner typed object, which stores attributes for query
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean createOwner(Owner owner) {
         String query = "CALL temporal_insert('owner', ?, ?, ?, ?)";
 
+        Connection connection = null;
+        PreparedStatement statement = null;
+
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, owner.getProperty().getIdProperty());
             statement.setInt(2, owner.getPerson().getIdPerson());
             statement.setDate(3, new java.sql.Date(owner.getValidFrom().getTime()));
@@ -179,14 +245,30 @@ public class OwnerRepository extends Observable {
 
             return false;
         }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error createOwner " + exception.getMessage());
+            }
+        }
     }
-
+    /**
+     * Method calls query under table Owner to Oracle database, which updates a record, according to given parameters.
+     * @throws  @see SQLException if occurs
+     * @param owner @see Owner typed object, which stores attributes for query
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean updateOwner(Owner owner) {
         String query = "CALL temporal_update('owner',?,?,?,?)";
 
+        Connection connection = null;
+        PreparedStatement statement = null;
+
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, owner.getProperty().getIdProperty());
             statement.setInt(2, owner.getPerson().getIdPerson());
             statement.setDate(3, new java.sql.Date(owner.getValidFrom().getTime()));
@@ -207,13 +289,30 @@ public class OwnerRepository extends Observable {
 
             return false;
         }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error updateOwner " + exception.getMessage());
+            }
+        }
     }
 
+    /**
+     * Method calls query under table Owner to Oracle database, which deletes a record, according to given parameters.
+     * @throws  @see SQLException if occurs
+     * @param owner @see Owner typed object, which stores attributes for query
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean deleteOwner(Owner owner) {
         String query = "CALL temporal_delete('owner',?,?,?) ";
+
+        Connection connection = null;
+        PreparedStatement statement = null;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, owner.getProperty().getIdProperty());
             statement.setDate(2, new java.sql.Date(owner.getValidFrom().getTime()));
             statement.setDate(3, new java.sql.Date(owner.getValidTo().getTime()));
@@ -233,14 +332,22 @@ public class OwnerRepository extends Observable {
 
             return false;
         }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error deleteOwner " + exception.getMessage());
+            }
+        }
     }
 
     /**
-     * Method returns list of Owner type objects of the same property in the time area
-     * @param id_property
-     * @param from
-     * @param to
-     * @return List<Owner>
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param id_property Integer value, which represents id property
+     * @param from @see java.util.Date value from desired time interval
+     * @param to @see java.util.Date value to desired time interval
+     * @return List of @see Owner typed objects
      */
     public List<Owner> getOwnersListOfFromToDate(Integer id_property, java.util.Date from, java.util.Date to) {
         Owner owner = new Owner();
@@ -249,6 +356,12 @@ public class OwnerRepository extends Observable {
         owner.setValidTo(to);
         return this.getOwnersListOfDate(owner);
     }
+    /**
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param from @see java.util.Date value from desired time interval
+     * @param to @see java.util.Date value to desired time interval
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersListOfFromToDate(java.util.Date from, java.util.Date to) {
         Owner owner = new Owner();
         owner.setValidFrom(from);
@@ -256,44 +369,77 @@ public class OwnerRepository extends Observable {
         return this.getOwnersListOfDate(owner);
     }
 
+    /**
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param id_property Integer value, which represents id property
+     * @param from @see java.util.Date value from desired time interval
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersListOfFromDate(Integer id_property, java.util.Date from) {
         Owner owner = new Owner();
         owner.getProperty().setIdProperty(id_property);
         owner.setValidFrom(from);
         return this.getOwnersListOfDate(owner);
     }
+
+    /**
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param from @see java.util.Date value from desired time interval
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersListOfFromDate(java.util.Date from) {
         Owner owner = new Owner();
         owner.setValidFrom(from);
         return this.getOwnersListOfDate(owner);
     }
 
+    /**
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param id_property Integer value, which represents id property
+     * @param to @see java.util.Date value to desired time interval
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersListOfToDate(Integer id_property, java.util.Date to) {
         Owner owner = new Owner();
         owner.getProperty().setIdProperty(id_property);
         owner.setValidTo(to);
         return this.getOwnersListOfDate(owner);
     }
+    /**
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param to @see java.util.Date value to desired time interval
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersListOfToDate(java.util.Date to) {
         Owner owner = new Owner();
         owner.setValidTo(to);
         return this.getOwnersListOfDate(owner);
     }
-
+    /**
+     * Method creates @see Owner type object with given parameters and calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @param id_property Integer value, which represents id property
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersList(Integer id_property) {
         Owner owner = new Owner();
         owner.getProperty().setIdProperty(id_property);
         return this.getOwnersListOfDate(owner);
     }
+    /**
+     * Method calls @see OwnerRepository#getOwnersListOfDate(Owner owner).
+     * @return List of @see Owner typed objects
+     */
     public List<Owner> getOwnersList() {
         Owner owner = new Owner();
         return this.getOwnersListOfDate(owner);
     }
 
     /**
-     * Method getOwnersListOfDate returns List of Owner objects according to given Owner object and its attributes
-     * @param owner
-     * @return List<Owner>
+     * Method calls query under table Owner to Oracle database, which returns owners according to given @see Owner object and its attributes
+     * @throws  @see SQLException if occurs
+     * @throws  @see NullPointerException if occurs
+     * @param owner @see Owner
+     * @return List of @see Owner objects
      */
     private List<Owner> getOwnersListOfDate(Owner owner) {
 
@@ -327,8 +473,10 @@ public class OwnerRepository extends Observable {
                 "( (? BETWEEN owner.valid_from AND owner.valid_to) )";
 
         String query = "SELECT owner.* FROM owner ";
+
+        Connection connection = null;
         try{
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             PreparedStatement statement;
             if (owner.getProperty().getIdProperty() != 0){
                 if(owner.getValidFrom() != null && owner.getValidTo() != null) {
@@ -423,6 +571,14 @@ public class OwnerRepository extends Observable {
         } catch (NullPointerException exception){
             System.err.println("Error getOwnersListOfDate " + exception.getMessage());
             return  new LinkedList<>();
+        }
+        finally {
+            try {
+                if(connection!= null)
+                    connection.close();
+            }catch (SQLException exception) {
+                System.err.println("Error getOwnersListOfDate " + exception.getMessage());
+            }
         }
     }
 }

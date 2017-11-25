@@ -252,7 +252,7 @@ MDSYS.SDO_RELATE(PR1.geometry, PR2.geometry, 'mask=touch') = 'TRUE';
 SELECT PP.id_property, PP.price, PP.valid_from, PP.valid_to FROM property_price PP WHERE PP.id_property=1;
 
 -- Selects persons with longest stay in descending list
-SELECT P.LASTNAME, P.FIRSTNAME , nvl(SUM(trunc(O.valid_to-O.valid_from)), 0) AS DurationInDays, COUNT(O.id_owner) AS PropertiesCount
+SELECT P.LASTNAME, P.FIRSTNAME , nvl(SUM(trunc(O.valid_to-O.valid_from)), 0) AS DurationInDays
 FROM owner O RIGHT OUTER JOIN person P ON(O.id_owner=P.id_person) 
 GROUP BY O.ID_OWNER, P.LASTNAME, P.FIRSTNAME ORDER BY DurationInDays Desc;
 
