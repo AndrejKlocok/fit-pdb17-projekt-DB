@@ -1,0 +1,185 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[slovak]{babel}
+\usepackage[left=2cm, text={17cm, 24cm},top=3cm]{geometry}
+\usepackage{amssymb}
+\usepackage[fleqn]{amsmath}
+\usepackage{graphicx,xcolor}
+\usepackage{verbatim}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+\textsc{\Huge{Vysoké učení technické v~Brně}\\
+\vspace{\stretch{0.0075}}
+\Large{Fakulta informačních technologií}}\\
+\vspace{\stretch{0.381}}
+\Huge{Realitná kancelária}\\
+\Large{Dokumentácia temporálnych dotazov}\\
+\Large{2017/2018}
+\vspace{\stretch{0.516}}
+\end{center}
+
+
+\begin{equation}
+\begin{aligned}
+\Large{\text{Riešitelia}:} \quad& \Large{\text{Matúš Bútora}}\\ \nonumber
+& \Large{\text{Andrej Klocok}}\\
+& \Large{\text{Tomáš Vlk}}
+\end{aligned}
+\end{equation}
+
+
+\newpage
+\pagestyle{plain}
+\section{Príklady temporálnych dotazov}
+\subsection{Select}
+Dotaz na nájdenie všetkých nehnuteľností, ktoré nemajú aktuálne vlastníka.\\
+
+\textbf{TSQL2}
+
+\begin{center}
+\begin{verbatim}
+    SELECT P.id_property From property P where p.id_property NOT IN(
+    VALIDTIME SELECT PR.id_property 
+    FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property)
+    );
+\end{verbatim}
+\end{center}
+
+\textbf{SQL}
+\begin{center}
+\begin{verbatim}
+    SELECT P.id_property FROM property P where p.id_property IN(
+    SELECT DISTINCT PR.id_property 
+    FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) 
+    WHERE (CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to AND
+    CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR 
+    O.id_owner IS NULL)
+);
+\end{verbatim}
+\end{center}
+
+\subsection{Select}
+Dotaz na nájdenie priemernej ceny zvolenej nehnuteľnosti v sledovanom období.\\
+
+\textbf{TSQL2}
+
+\begin{center}
+\begin{verbatim}
+    VALIDTIME PERIOD[2010/1/1-2017-8-1] SELECT ROUND(AVG(PP.price),0) AS AvgPrice
+    FROM property_price PP RIGHT JOIN property P ON(PP.id_property=P.id_property)  
+    WHERE P.id_property=1
+    GROUP BY PP.id_property;
+\end{verbatim}
+\end{center}
+
+\textbf{SQL}
+\begin{center}
+\begin{verbatim}
+    SELECT  ROUND(AVG(PP.price),0) AS AvgPrice
+    FROM property_price PP RIGHT JOIN property P ON(PP.id_property=P.id_property)  
+    WHERE 
+        ( P.id_property=1 AND (PP.valid_from >= TO_DATE('2010-1-1','yyyy-mm-dd') ) 
+        AND (PP.valid_to <= TO_DATE('2017-8-1','yyyy-mm-dd')) ) OR
+        ( P.id_property=1 AND 
+        ((TO_DATE('2010-1-1','yyyy-mm-dd') BETWEEN PP.valid_from AND PP.valid_to) OR
+        (TO_DATE('2017-8-1','yyyy-mm-dd') BETWEEN PP.valid_from AND PP.valid_to)))
+    GROUP BY PP.id_property;
+
+
+\end{verbatim}
+\end{center}
+\newpage
+\subsection{Select}
+Dotaz na nájdenie celkovej doby vlastníctva nehnuteľností danej osoby v sledovanom období.\\
+
+\textbf{TSQL2}
+
+\begin{center}
+\begin{verbatim}
+    VALIDTIME PERIOD[2010/1/1-2017-11-25] SELECT CAST(VALID(P) AS INTERVAL DAY) 
+    AS DurationInDays
+    FROM owner O RIGHT  JOIN person P ON(O.id_owner=P.id_person)
+    WHERE P.id_person=9
+    GROUP BY P.id_person;
+\end{verbatim}
+\end{center}
+
+\textbf{SQL}
+\begin{center}
+\begin{verbatim}
+    SELECT  nvl(SUM(trunc( (CASE when O.valid_to > TO_DATE('2017-11-25','yyyy-mm-dd')
+    THEN TO_DATE('2017-11-25','yyyy-mm-dd')
+    ELSE O.valid_to END)-(CASE WHEN O.valid_from < TO_DATE('2010-1-1','yyyy-mm-dd') 
+    THEN TO_DATE('2010-1-1','yyyy-mm-dd') ELSE O.valid_from END) )), 0) 
+    AS DurationInDays 
+    FROM owner O RIGHT  JOIN person P ON(O.id_owner=P.id_person) WHERE
+    ( P.id_person=9 AND (O.valid_from >= TO_DATE('2010-1-1','yyyy-mm-dd') ) AND 
+    (O.valid_to <= TO_DATE('2017-11-25','yyyy-mm-dd')) ) OR( P.id_person=9 AND 
+    ( (TO_DATE('2010-1-1','yyyy-mm-dd') BETWEEN O.valid_from AND O.valid_to) OR
+    (TO_DATE('2017-11-25','yyyy-mm-dd') BETWEEN O.valid_from AND O.valid_to)))
+    GROUP BY P.id_person;
+\end{verbatim}
+\end{center}
+
+\subsection{Update}
+Aktualizácia buď ceny alebo vlastníka danej nehnuteľnosti v určitom období. Podrobná implementácia procedúry, ktorá aktualizuje temporálne dáta v určitom období, sa nachádza v adresári \textit{db/database-init\_temporal.sql}.\\
+
+\textbf{TSQL2}
+
+\begin{center}
+\begin{verbatim}
+    VALIDTIME PERIOD[2016/11/6-2017/11/15]
+    UPDATE property_price SET property_price.price=1100000
+    WHERE property_price.id_property=1;
+    
+    VALIDTIME PERIOD[2016/11/6-2017/11/15]
+    UPDATE owner SET owner.id_owner=2
+    WHERE owner.id_property=1;
+    
+\end{verbatim}
+\end{center}
+
+\textbf{SQL}
+\begin{center}
+\begin{verbatim}
+    CALL temporal_update('property_price',1,1100000,
+        TO_DATE('2016-11-6','yyyy-mm-dd'), TO_DATE('2017-11-15','yyyy-mm-dd'));
+    CALL temporal_update('owner',1,2,
+        TO_DATE('2016-11-6','yyyy-mm-dd'), TO_DATE('2017-11-15','yyyy-mm-dd'));
+\end{verbatim}
+\end{center}
+
+\subsection{Delete}
+Zmazanie buď ceny alebo vlastníka danej nehnuteľnosti v určitom období. Podrobná implementácia procedúry, ktorá zmaže temporálne dáta v určitom období, sa nachádza v adresári \textit{db/database-init\_temporal.sql}.\\
+
+\textbf{TSQL2}
+
+\begin{center}
+\begin{verbatim}
+    VALIDTIME PERIOD[2017/8/1-2017/11/6]
+    DELETE FROM property_price 
+    WHERE property_price.id_property=1;
+    
+    VALIDTIME PERIOD[2017/8/1-2017/11/6]
+    DELETE FROM owner 
+    WHERE owner.id_property=1;
+    
+\end{verbatim}
+\end{center}
+
+\textbf{SQL}
+\begin{center}
+\begin{verbatim}
+    CALL temporal_delete('property_price',1,
+        TO_DATE('2017-8-1','yyyy-mm-dd'), TO_DATE('2017-11-6','yyyy-mm-dd'));
+    CALL temporal_delete('owner',1,
+        TO_DATE('2017-8-1','yyyy-mm-dd'), TO_DATE('2017-11-6','yyyy-mm-dd'));
+\end{verbatim}
+\end{center}
+
+\end{document}
