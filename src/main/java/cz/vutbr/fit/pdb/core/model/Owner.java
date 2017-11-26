@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.model;
@@ -12,6 +20,10 @@ import java.util.Date;
 
 /**
  * Model of database table Owner.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class Owner {
 
@@ -33,10 +45,11 @@ public class Owner {
 
     /**
      * Constructor of @see Owner.
-     * @param person @see Person, who owns property in time interval
-     * @param property @see Property, which is owned by person in time interval
+     *
+     * @param person    @see Person, who owns property in time interval
+     * @param property  @see Property, which is owned by person in time interval
      * @param validFrom @see Date, from which the property is owned by person
-     * @param validTo @see Date, into which the property is owned by person
+     * @param validTo   @see Date, into which the property is owned by person
      */
     public Owner(Person person, Property property, Date validFrom, Date validTo) {
         this.person = person;
@@ -47,6 +60,7 @@ public class Owner {
 
     /**
      * Method returns person.
+     *
      * @return @see Person, who owns property in time interval
      */
     public Person getPerson() {
@@ -55,6 +69,7 @@ public class Owner {
 
     /**
      * Method sets person.
+     *
      * @param person @see Person, who owns property in time interval
      */
     public void setPerson(Person person) {
@@ -63,6 +78,7 @@ public class Owner {
 
     /**
      * Method returns property
+     *
      * @return @see Property, which is owned by person in time interval
      */
     public Property getProperty() {
@@ -71,6 +87,7 @@ public class Owner {
 
     /**
      * Method sets property.
+     *
      * @param property @see Property, which is owned by person in time interval
      */
     public void setProperty(Property property) {
@@ -79,6 +96,7 @@ public class Owner {
 
     /**
      * Method returns date to.
+     *
      * @return @see Date, from which the property is owned by person
      */
     public Date getValidTo() {
@@ -87,6 +105,7 @@ public class Owner {
 
     /**
      * Method sets date to.
+     *
      * @param validTo @see Date, into which the property is owned by person
      */
     public void setValidTo(Date validTo) {
@@ -95,6 +114,7 @@ public class Owner {
 
     /**
      * Method returns date from.
+     *
      * @return @see Date, from which the property is owned by person
      */
     public Date getValidFrom() {
@@ -103,9 +123,19 @@ public class Owner {
 
     /**
      * Method sets date from.
+     *
      * @param validFrom @see Date, from which the property is owned by person
      */
     public void setValidFrom(Date validFrom) {
         this.validFrom = validFrom;
+    }
+
+    /**
+     * Convert owner to string
+     *
+     * @return owner string representation
+     */
+    public String toString() {
+        return getPerson().toString() + ": " + getProperty().toString();
     }
 }

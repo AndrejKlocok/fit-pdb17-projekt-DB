@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.model;
@@ -13,6 +21,10 @@ import java.util.List;
 
 /**
  * Model of database table Person.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class Person {
 
@@ -43,18 +55,19 @@ public class Person {
         city = "";
         psc = "";
         email = "";
-        propertyHistory = new LinkedList<Owner>() ;
+        propertyHistory = new LinkedList<>();
     }
 
     /**
      * Constructor of @see Person
-     * @param id Integer value, which represents id of person
-     * @param firstName String value, which represents first name of person
-     * @param lastName String value, which represents last name of person
-     * @param street String value, which represents street, where person lives
-     * @param city String value, which represents city, where person lives
-     * @param psc String value, which represents psc
-     * @param email String value, which represents email address
+     *
+     * @param id              Integer value, which represents id of person
+     * @param firstName       String value, which represents first name of person
+     * @param lastName        String value, which represents last name of person
+     * @param street          String value, which represents street, where person lives
+     * @param city            String value, which represents city, where person lives
+     * @param psc             String value, which represents psc
+     * @param email           String value, which represents email address
      * @param propertyHistory List of @see Owner objects, history of properties, which person owned
      */
     public Person(int id, String firstName, String lastName, String street,
@@ -71,6 +84,7 @@ public class Person {
 
     /**
      * Method returns id of person.
+     *
      * @return Integer value, which represents id of person
      */
     public int getIdPerson() {
@@ -79,6 +93,7 @@ public class Person {
 
     /**
      * Method sets id of person.
+     *
      * @param idPerson Integer value, which represents id of person
      */
     public void setIdPerson(int idPerson) {
@@ -87,6 +102,7 @@ public class Person {
 
     /**
      * Method returns first name of person.
+     *
      * @return String value, which represents first name of person
      */
     public String getFirstName() {
@@ -95,6 +111,7 @@ public class Person {
 
     /**
      * Method sets first name of person.
+     *
      * @param firstName String value, which represents first name of person
      */
     public void setFirstName(String firstName) {
@@ -103,6 +120,7 @@ public class Person {
 
     /**
      * Method gets last name of person.
+     *
      * @return String value, which represents last name of person
      */
     public String getLastName() {
@@ -111,6 +129,7 @@ public class Person {
 
     /**
      * Method sets last name of person.
+     *
      * @param lastName String value, which represents last name of person
      */
     public void setLastName(String lastName) {
@@ -119,6 +138,7 @@ public class Person {
 
     /**
      * Method gets street of person.
+     *
      * @return String value, which represents street, where person lives
      */
     public String getStreet() {
@@ -127,6 +147,7 @@ public class Person {
 
     /**
      * Method sets street of person.
+     *
      * @param street String value, which represents street, where person lives
      */
     public void setStreet(String street) {
@@ -135,6 +156,7 @@ public class Person {
 
     /**
      * Method gets city, where person lives.
+     *
      * @return String value, which represents city, where person lives
      */
     public String getCity() {
@@ -143,6 +165,7 @@ public class Person {
 
     /**
      * Method sets city, where person lives.
+     *
      * @param city String value, which represents city, where person lives
      */
     public void setCity(String city) {
@@ -151,6 +174,7 @@ public class Person {
 
     /**
      * Method gets psc of city, where person lives.
+     *
      * @return String value, which represents psc
      */
     public String getPsc() {
@@ -159,6 +183,7 @@ public class Person {
 
     /**
      * Method sets psc of city, where person lives.
+     *
      * @param psc String value, which represents psc
      */
     public void setPsc(String psc) {
@@ -167,6 +192,7 @@ public class Person {
 
     /**
      * Method gets email address of person.
+     *
      * @return String value, which represents email
      */
     public String getEmail() {
@@ -175,6 +201,7 @@ public class Person {
 
     /**
      * Method sets email address of person.
+     *
      * @param email String value, which represents email
      */
     public void setEmail(String email) {
@@ -183,6 +210,7 @@ public class Person {
 
     /**
      * Method returns list of history of properties, which person owned
+     *
      * @return List of @see Owner objects, history of properties, which person owned
      */
     public List<Owner> getPropertyHistory() {
@@ -191,9 +219,19 @@ public class Person {
 
     /**
      * Method sets list of history of properties, which person owned
+     *
      * @param propertyHistory List of @see Owner objects, history of properties, which person owned
      */
     public void setPropertyHistory(List<Owner> propertyHistory) {
         this.propertyHistory = propertyHistory;
+    }
+
+    /**
+     * Convert person to string
+     *
+     * @return person string representation
+     */
+    public String toString() {
+        return firstName + " " + lastName;
     }
 }

@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.repository;
@@ -13,14 +21,20 @@ import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
 
 import java.sql.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
+import java.util.stream.Collectors;
 
 /**
- *  Property repository creates property type objects (@see Property), queries and calls to Oracle database.
- *  Repository works mainly with table Property.
- *  Class extends @see Observable.
+ * Property repository creates property type objects (@see Property), queries and calls to Oracle database.
+ * Repository works mainly with table Property.
+ * Class extends @see Observable.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class PropertyRepository extends Observable {
 
@@ -28,7 +42,8 @@ public class PropertyRepository extends Observable {
 
     /**
      * Constructor for property repository @see PropertyRepository.
-     * @param dataSource  @see OracleDataSource
+     *
+     * @param dataSource @see OracleDataSource
      */
     public PropertyRepository(OracleDataSource dataSource) {
         this.dataSource = dataSource;
@@ -36,13 +51,13 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Property to Oracle database, which returns all records from table and initializes all objects.
-     * @throws  @see SQLException if occurs
+     *
      * @return List of @see Property objects
      */
     public List<Property> getPropertyList() {
         String query = "SELECT * FROM property";
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -86,9 +101,9 @@ public class PropertyRepository extends Observable {
             return new LinkedList<>();
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPropertyList " + exception.getMessage());
             }
         }
@@ -96,14 +111,14 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Property to Oracle database, which returns record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param property @see Property, which stores attributes for query (id_property)
      * @return @see Property object
      */
     public Property getProperty(Property property) {
         String query = "SELECT * FROM property WHERE id_property = ?";
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -116,7 +131,7 @@ public class PropertyRepository extends Observable {
                 newProperty.setIdProperty(resultSet.getInt("id_property"));
                 newProperty.setType(toPropertyType(resultSet.getString("property_type")));
                 Struct st = (Struct) resultSet.getObject("geometry");
-                property.setGeometry(JGeometry.loadJS(st));
+                newProperty.setGeometry(JGeometry.loadJS(st));
                 newProperty.setName(resultSet.getString("property_name"));
                 newProperty.setDescription(resultSet.getString("property_description"));
 
@@ -130,7 +145,7 @@ public class PropertyRepository extends Observable {
                 List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceList(property.getIdProperty());
                 newProperty.setPriceHistory(propertyPriceList);
 
-                // load property owner history TODO
+                // load property owner history
                 OwnerRepository ownerRepository = new OwnerRepository(dataSource);
                 List<Owner> ownerList = ownerRepository.getOwnersListOfProperty(property);
                 newProperty.setOwnerHistory(ownerList);
@@ -151,9 +166,9 @@ public class PropertyRepository extends Observable {
             return null;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getProperty " + exception.getMessage());
             }
         }
@@ -161,17 +176,16 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Owner to Oracle database, which returns record, according to given parameter.
-     * @throws  @see SQLException if occurs
+     *
      * @param idProperty Integer value, which represents id of property
      * @return @see Property object
      */
-
     public Property getPropertyById(int idProperty) {
         String query = "SELECT * FROM property WHERE id_property = ?";
 
         Property property;
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -218,9 +232,9 @@ public class PropertyRepository extends Observable {
             return null;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPropertyById " + exception.getMessage());
             }
         }
@@ -228,7 +242,7 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Property to Oracle database, which creates a record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param property @see Property typed object, which stores attributes for query
      * @return boolean True if query was successful otherwise False.
      */
@@ -236,7 +250,7 @@ public class PropertyRepository extends Observable {
         String query = "INSERT INTO property(id_property, property_type, geometry, property_name, property_description)"
                 + " values(property_seq.nextval, ?,?,?,?)";
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -264,9 +278,9 @@ public class PropertyRepository extends Observable {
             return false;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error createProperty " + exception.getMessage());
             }
         }
@@ -274,7 +288,7 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Property to Oracle database, which updates a record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param property @see Property typed object, which stores attributes for query
      * @return boolean True if query was successful otherwise False.
      */
@@ -282,7 +296,7 @@ public class PropertyRepository extends Observable {
         String query = "UPDATE property SET property_type = ?, geometry = ?, property_name = ?, property_description = ? WHERE id_property = ? ";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -312,9 +326,9 @@ public class PropertyRepository extends Observable {
             return false;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error saveProperty " + exception.getMessage());
             }
         }
@@ -322,14 +336,14 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Property to Oracle database, which deletes a record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param property @see Property typed object, which stores attributes for query
      * @return boolean True if query was successful otherwise False.
      */
     public boolean deleteProperty(Property property) {
         String query = "DELETE FROM property WHERE id_property = ?";
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -350,12 +364,11 @@ public class PropertyRepository extends Observable {
             System.err.println("Error deleteProperty " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error deleteProperty " + exception.getMessage());
             }
         }
@@ -363,11 +376,11 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query under table Ground_Plan to Oracle database, which finds most similar ground plans of all properties .
-     * @throws  @see SQLException if occurs
+     *
      * @param groundPlans List of @GroundPlan
      * @return List of @see Property typed objects
      */
-    public List<Property> getPropertyListSimilarByGroundPlans(List<GroundPlan> groundPlans) {
+    public List<Property> getPropertyListSimilarByGroundPlans(List<GroundPlan> groundPlans, boolean filterHasOwner) {
         // TODO option to get similar by more ground plans
 
         GroundPlan groundPlan;
@@ -393,7 +406,7 @@ public class PropertyRepository extends Observable {
                 "FETCH FIRST 5 ROWS ONLY";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -433,6 +446,17 @@ public class PropertyRepository extends Observable {
                 property.setOwnerHistory(ownerList);
             }
 
+            if (filterHasOwner) {
+                // owner filter is set
+                for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
+                    Property property = iterator.next();
+                    // remove from list only property without owner
+                    if (!property.hasOwner()) {
+                        iterator.remove();
+                    }
+                }
+            }
+
             connection.close();
             statement.close();
             return propertyList;
@@ -441,38 +465,112 @@ public class PropertyRepository extends Observable {
             System.err.println("Error getPropertyListSimilarByGroundPlans" + exception.getMessage());
 
             return new LinkedList<>();
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPropertyListSimilarByGroundPlans " + exception.getMessage());
             }
         }
     }
 
+    // TODO javadoc
     public LinkedList<Property> searchPropertyList(String name, Double price, boolean hasOwner) {
-        // TODO
 
-        return new LinkedList<>();
+        String query = "SELECT * FROM property"
+                + (!name.isEmpty() ? " WHERE property_name LIKE ? " : "");
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            if (!name.isEmpty()) {
+                statement.setString(1, "%" + name + "%");
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            LinkedList<Property> propertyList = new LinkedList<>();
+            while (resultSet.next()) {
+                Property property = new Property();
+                property.setIdProperty(resultSet.getInt("id_property"));
+                property.setType(toPropertyType(resultSet.getString("property_type")));
+                Struct st = (Struct) resultSet.getObject("geometry");
+                property.setGeometry(JGeometry.loadJS(st));
+                property.setName(resultSet.getString("property_name"));
+                property.setDescription(resultSet.getString("property_description"));
+
+                // load property ground plans
+                GroundPlanRepository groundPlanRepository = new GroundPlanRepository(dataSource);
+                List<GroundPlan> groundPlanList = groundPlanRepository.getGroundPlanListOfProperty(property);
+                property.setGroundPlans(groundPlanList);
+
+                // load property price history
+                PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(dataSource);
+                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceList(property.getIdProperty());
+                property.setPriceHistory(propertyPriceList);
+
+                // load property owner history
+                OwnerRepository ownerRepository = new OwnerRepository(dataSource);
+                List<Owner> ownerList = ownerRepository.getOwnersListOfProperty(property);
+                property.setOwnerHistory(ownerList);
+
+                propertyList.add(property);
+            }
+
+            if (price != 0d) {
+                // price filter is set
+                for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
+                    Property property = iterator.next();
+                    // remove from list only property with price greater than given price
+                    if (property.hasPrice()) {
+                        if (property.getPriceCurrent().getPrice() > price) {
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+
+            if (hasOwner) {
+                // owner filter is set
+                for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
+                    Property property = iterator.next();
+                    // remove from list only property without owner
+                    if (!property.hasOwner()) {
+                        iterator.remove();
+                    }
+                }
+            }
+
+            connection.close();
+            statement.close();
+            return propertyList;
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return new LinkedList<>();
+        }
     }
 
+    // TODO javadoc
     public Property getNearestProperty(double lat, double lng) {
         // TODO
         return null;
     }
 
+    // TODO javadoc
     public Property getPropertyNearestProperty(Property property) {
         // TODO
         return null;
     }
 
+    // TODO javadoc
     public LinkedList<Property> getPropertyAdjacentPropertyList(Property property) {
         // TODO
         return new LinkedList<>();
     }
 
+    // TODO javadoc
     public double getPropertyArea(Property property) {
         // TODO
         return 42;
@@ -480,10 +578,10 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method calls query to Oracle database, which returns properties which are available in current date.
-     * @throws  @see SQLException if occurs
+     *
      * @return List of @see Property objects
      */
-    public  List<Property> getPropertyListWithoutOwnerInCurrentDate() {
+    public List<Property> getPropertyListWithoutOwnerInCurrentDate() {
 
         String query = "SELECT P.id_property FROM property P where p.id_property IN(\n" +
                 "SELECT DISTINCT PR.id_property\n" +
@@ -491,7 +589,7 @@ public class PropertyRepository extends Observable {
                 "        CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR (O.id_owner IS NULL))";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -508,22 +606,19 @@ public class PropertyRepository extends Observable {
             statement.close();
 
             //properties
-            for (Integer id:idProperties) {
-                propertyLinkedList.add(this.getPropertyById(id));
-            }
+            propertyLinkedList.addAll(idProperties.stream().map(this::getPropertyById).collect(Collectors.toList()));
 
-            return  propertyLinkedList;
+            return propertyLinkedList;
 
         } catch (SQLException exception) {
             System.err.println("Error getPropertiesWithoutOwner " + exception.getMessage());
 
             return null;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPropertiesWithoutOwner " + exception.getMessage());
             }
         }
@@ -531,6 +626,7 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method converts Property type (enum) to lowercase.
+     *
      * @param type @see Property type (enum)
      * @return lowercase string
      */
@@ -540,6 +636,7 @@ public class PropertyRepository extends Observable {
 
     /**
      * Method converts String to Property type enum (@see Property)
+     *
      * @param type String, which represents type of property
      * @return enum type of @see Property
      */

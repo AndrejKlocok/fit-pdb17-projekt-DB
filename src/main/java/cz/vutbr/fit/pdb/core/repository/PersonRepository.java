@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.repository;
@@ -17,10 +25,13 @@ import java.util.*;
 import java.util.Date;
 
 /**
- *  Repository creates  person type objects (@see Person), queries and calls to Oracle database.
- *  Repository works mainly with table Person.
- *  Class extends @see Observable.
+ * Repository creates  person type objects (@see Person), queries and calls to Oracle database.
+ * Repository works mainly with table Person.
+ * Class extends @see Observable.
  *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class PersonRepository extends Observable {
 
@@ -28,27 +39,23 @@ public class PersonRepository extends Observable {
 
     /**
      * Constructor for PersonRepository @see PersonRepository.
-     * @param dataSource  @see OracleDataSource
+     *
+     * @param dataSource @see OracleDataSource
      */
     public PersonRepository(OracleDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    //TODO delete this method
-    public OracleDataSource getDataSource() {
-        return dataSource;
-    }
-
     /**
      * Method calls query under table person to Oracle database, which returns all persons from table.
-     * @throws  @see SQLException if occurs
+     *
      * @return List of Person type objects(@see Person)
      */
     public List<Person> getPersonsList() {
         String query = "SELECT * FROM person";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -77,19 +84,19 @@ public class PersonRepository extends Observable {
             System.err.println("Error getPersonsList " + exception.getMessage());
 
             return new LinkedList<>();
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPersonsList " + exception.getMessage());
             }
         }
     }
+
     /**
      * Method calls query under table person to Oracle database, which returns  person from table with desired id.
-     * @throws  @see SQLException if occurs
+     *
      * @param p @see Person person type object
      * @return @see Person
      */
@@ -97,7 +104,7 @@ public class PersonRepository extends Observable {
         String query = "SELECT * FROM person WHERE id_person = ?";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -130,12 +137,11 @@ public class PersonRepository extends Observable {
             System.err.println("Error getPerson " + exception.getMessage());
 
             return null;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPersonById " + exception.getMessage());
             }
         }
@@ -143,7 +149,7 @@ public class PersonRepository extends Observable {
 
     /**
      * Method calls query under table person to Oracle database, which creates person record in database.
-     * @throws  @see SQLException if occurs
+     *
      * @param person @see Person
      * @return boolean True if query was successful otherwise False.
      */
@@ -151,7 +157,7 @@ public class PersonRepository extends Observable {
         String query = "INSERT INTO person(id_person, firstname, lastname, street, city, psc, email) VALUES(person_seq.nextval,?,?,?,?,?,?)";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -176,12 +182,11 @@ public class PersonRepository extends Observable {
             System.err.println("Error createPerson " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error createPerson " + exception.getMessage());
             }
         }
@@ -189,7 +194,7 @@ public class PersonRepository extends Observable {
 
     /**
      * Method calls query under table person to Oracle database, which updates person record in table.
-     * @throws  @see SQLException if occurs
+     *
      * @param person @see Person
      * @return boolean True if query was successful otherwise False.
      */
@@ -197,7 +202,7 @@ public class PersonRepository extends Observable {
         String query = "UPDATE person SET firstname = ?, lastname = ?, street = ?, city = ?, psc = ?, email =? WHERE id_person = ?";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -223,12 +228,11 @@ public class PersonRepository extends Observable {
             System.err.println("Error savePerson " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error savePerson " + exception.getMessage());
             }
         }
@@ -236,13 +240,13 @@ public class PersonRepository extends Observable {
 
     /**
      * Method calls query to Oracle database, which returns count of properties, in which person lived, for desired time interval.
-     * @throws  @see SQLException if occurs
+     *
      * @param id_person Integer value, id of person
      * @param date_from @see Date, Date value from desired time interval
-     * @param date_to @see Date, Date value to desired time interval
+     * @param date_to   @see Date, Date value to desired time interval
      * @return Integer value, which represents count of properties.
      */
-    public  Integer getPersonPropertyCount(Integer id_person, Date date_from, Date date_to) {
+    public Integer getPersonPropertyCount(Integer id_person, Date date_from, Date date_to) {
         String query = "SELECT COUNT(*) as PropertiesCount " +
                 "FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) WHERE" +
                 "                ( P.id_person=? AND (O.valid_from >= ? ) AND (O.valid_to <= ?) ) OR" +
@@ -251,7 +255,7 @@ public class PersonRepository extends Observable {
                 "                GROUP BY P.id_person";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -268,8 +272,7 @@ public class PersonRepository extends Observable {
             if (resultSet.next()) {
                 count = resultSet.getInt("propertiescount");
 
-            }
-            else {
+            } else {
                 count = 0;
             }
             resultSet.close();
@@ -283,9 +286,9 @@ public class PersonRepository extends Observable {
             return 0;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPersonPropertyCount " + exception.getMessage());
             }
         }
@@ -293,13 +296,13 @@ public class PersonRepository extends Observable {
 
     /**
      * Method calls query to Oracle database, which returns summary of geometry area of properties, in which person lived, for desired time interval.
-     * @throws  @see SQLException if occurs
+     *
      * @param id_person Integer value, id of person
      * @param date_from @see Date, Date value from desired time interval
-     * @param date_to @see Date, Date value to desired time interval
+     * @param date_to   @see Date, Date value to desired time interval
      * @return Integer value, which represents summary of geometry area
      */
-    public  Integer getPersonPropertySum(Integer id_person, Date date_from, Date date_to) {
+    public Integer getPersonPropertySum(Integer id_person, Date date_from, Date date_to) {
         String query = "SELECT ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')), 0) as Area " +
                 "FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) WHERE" +
                 "                ( P.id_person=? AND (O.valid_from >= ? ) AND (O.valid_to <= ?) ) OR" +
@@ -308,7 +311,7 @@ public class PersonRepository extends Observable {
                 "                GROUP BY P.id_person";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -319,13 +322,12 @@ public class PersonRepository extends Observable {
             statement.setDate(5, new java.sql.Date(date_from.getTime()));
             statement.setDate(6, new java.sql.Date(date_to.getTime()));
 
-            Integer sum ;
+            Integer sum;
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 sum = resultSet.getInt("area");
-            }
-            else {
+            } else {
                 sum = 0;
             }
             resultSet.close();
@@ -339,9 +341,9 @@ public class PersonRepository extends Observable {
             return 0;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPersonPropertySum " + exception.getMessage());
             }
         }
@@ -349,13 +351,13 @@ public class PersonRepository extends Observable {
 
     /**
      * Method calls query to Oracle database, which returns the length of stay in days of person in desired time interval.
-     * @throws  @see SQLException if occurs
+     *
      * @param id_person Integer value, id of person
      * @param date_from @see Date, Date value from desired time interval
-     * @param date_to @see Date, Date value to desired time interval
+     * @param date_to   @see Date, Date value to desired time interval
      * @return Integer value, which represents days in which person lived in properties
      */
-    public Integer getPersonDuration(Integer id_person, Date date_from, Date date_to){
+    public Integer getPersonDuration(Integer id_person, Date date_from, Date date_to) {
 
         String query = "SELECT nvl(SUM(trunc( (CASE when O.valid_to > ? THEN ? ELSE O.valid_to END)-(CASE WHEN O.valid_from < ? THEN ? ELSE O.valid_from END) )), 0) AS DurationInDays" +
                 "                FROM owner O RIGHT  JOIN person P ON(O.id_owner=P.id_person) WHERE" +
@@ -365,7 +367,7 @@ public class PersonRepository extends Observable {
                 "                GROUP BY P.id_person";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -383,10 +385,9 @@ public class PersonRepository extends Observable {
             Integer durationInDays;
             ResultSet resultSet = statement.executeQuery();
 
-            if(resultSet.next()) {
+            if (resultSet.next()) {
                 durationInDays = resultSet.getInt("DurationInDays");
-            }
-            else{
+            } else {
                 durationInDays = 0;
             }
 
@@ -394,17 +395,16 @@ public class PersonRepository extends Observable {
             statement.close();
             connection.close();
 
-            return  durationInDays;
+            return durationInDays;
 
         } catch (SQLException exception) {
             System.err.println("Error getPersonDuration " + exception.getMessage());
             return 0;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPersonDuration " + exception.getMessage());
             }
         }

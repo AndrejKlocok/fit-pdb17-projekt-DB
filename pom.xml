@@ -142,8 +142,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.0.0-M1</version>
                 <configuration>
-                    <reportOutputDirectory>doc</reportOutputDirectory>
-                    <destDir>doc</destDir>
+                    <reportOutputDirectory>doc/api</reportOutputDirectory>
+                    <destDir>doc/api</destDir>
                 </configuration>
             </plugin>
             <!-- make a deployable archive, see http://stackoverflow.com/a/23986765 -->

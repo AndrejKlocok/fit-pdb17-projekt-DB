@@ -1,25 +1,42 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.repository;
 
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.PropertyPrice;
 import oracle.jdbc.pool.OracleDataSource;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
+
 /**
- *  Property price repository creates Property price type objects (@see PropertyPrice), queries and calls to Oracle database.
- *  Repository works mainly with table Property_Price.
- *  Class extends @see Observable.
+ * Property price repository creates Property price type objects (@see PropertyPrice), queries and calls to Oracle database.
+ * Repository works mainly with table Property_Price.
+ * Class extends @see Observable.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class PropertyPriceRepository extends Observable {
 
@@ -27,7 +44,8 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Constructor for property price repository @see PropertyPriceRepository.
-     * @param dataSource  @see OracleDataSource
+     *
+     * @param dataSource @see OracleDataSource
      */
     public PropertyPriceRepository(OracleDataSource dataSource) {
         this.dataSource = dataSource;
@@ -35,15 +53,16 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param id_property Integer value, which represents id property
-     * @param from @see java.util.Date value from desired time interval
-     * @param to @see java.util.Date value to desired time interval
+     *
+     * @param idProperty Integer value, which represents id property
+     * @param from       @see Date value from desired time interval
+     * @param to         @see Date value to desired time interval
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceListOfFromToDate(Integer id_property, Date from, Date to){
+    public List<PropertyPrice> getPropertyPriceListOfFromToDate(Integer idProperty, Date from, Date to) {
         PropertyPrice propertyPrice = new PropertyPrice();
-        propertyPrice.getProperty().setIdProperty(id_property);
+        propertyPrice.getProperty().setIdProperty(idProperty);
         propertyPrice.setValidFrom(from);
         propertyPrice.setValidTo(to);
         return this.getPropertyPriceListOfProperty(propertyPrice);
@@ -51,12 +70,13 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param from @see java.util.Date value from desired time interval
-     * @param to @see java.util.Date value to desired time interval
+     *
+     * @param from @see Date value from desired time interval
+     * @param to   @see Date value to desired time interval
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceListOfFromToDate(Date from, Date to){
+    public List<PropertyPrice> getPropertyPriceListOfFromToDate(Date from, Date to) {
         PropertyPrice propertyPrice = new PropertyPrice();
         propertyPrice.setValidFrom(from);
         propertyPrice.setValidTo(to);
@@ -65,25 +85,27 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param id_property Integer value, which represents id property
-     * @param from @see java.util.Date value from desired time interval
+     *
+     * @param idProperty Integer value, which represents id property
+     * @param from       @see Date value from desired time interval
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceListOfFromDate(Integer id_property, Date from){
+    public List<PropertyPrice> getPropertyPriceListOfFromDate(Integer idProperty, Date from) {
         PropertyPrice propertyPrice = new PropertyPrice();
-        propertyPrice.getProperty().setIdProperty(id_property);
+        propertyPrice.getProperty().setIdProperty(idProperty);
         propertyPrice.setValidFrom(from);
         return this.getPropertyPriceListOfProperty(propertyPrice);
     }
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param from @see java.util.Date value from desired time interval
+     *
+     * @param from @see Date value from desired time interval
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceListOfFromDate(Date from){
+    public List<PropertyPrice> getPropertyPriceListOfFromDate(Date from) {
         PropertyPrice propertyPrice = new PropertyPrice();
         propertyPrice.setValidFrom(from);
         return this.getPropertyPriceListOfProperty(propertyPrice);
@@ -91,25 +113,27 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param id_property Integer value, which represents id property
-     * @param to @see java.util.Date value to desired time interval
+     *
+     * @param idProperty Integer value, which represents id property
+     * @param to         @see Date value to desired time interval
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceListOfToDate(Integer id_property, Date to){
+    public List<PropertyPrice> getPropertyPriceListOfToDate(Integer idProperty, Date to) {
         PropertyPrice propertyPrice = new PropertyPrice();
-        propertyPrice.getProperty().setIdProperty(id_property);
+        propertyPrice.getProperty().setIdProperty(idProperty);
         propertyPrice.setValidTo(to);
         return this.getPropertyPriceListOfProperty(propertyPrice);
     }
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param to @see java.util.Date value to desired time interval
+     *
+     * @param to @see Date value to desired time interval
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceListOToDate(Date to){
+    public List<PropertyPrice> getPropertyPriceListOToDate(Date to) {
         PropertyPrice propertyPrice = new PropertyPrice();
         propertyPrice.setValidTo(to);
         return this.getPropertyPriceListOfProperty(propertyPrice);
@@ -117,21 +141,23 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method creates @see PropertyPrice type object with given parameters and calls
-     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
-     * @param id_property Integer value, which represents id property
+     *
+     * @param idProperty Integer value, which represents id property
      * @return List of @see PropertyPrice typed objects
+     * @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
      */
-    public List<PropertyPrice> getPropertyPriceList(Integer id_property){
+    public List<PropertyPrice> getPropertyPriceList(Integer idProperty) {
         PropertyPrice propertyPrice = new PropertyPrice();
-        propertyPrice.getProperty().setIdProperty(id_property);
+        propertyPrice.getProperty().setIdProperty(idProperty);
         return this.getPropertyPriceListOfProperty(propertyPrice);
     }
 
     /**
      * Method calls @see PropertyPriceRepository#getPropertyPriceListOfProperty(PropertyPrice propertyPrice).
+     *
      * @return List of @see PropertyPrice typed objects
      */
-    public List<PropertyPrice> getPropertyPriceList(){
+    public List<PropertyPrice> getPropertyPriceList() {
         PropertyPrice propertyPrice = new PropertyPrice();
         return this.getPropertyPriceListOfProperty(propertyPrice);
     }
@@ -139,10 +165,9 @@ public class PropertyPriceRepository extends Observable {
     /**
      * Method calls query under table Property_price to Oracle database, which returns property_price records according
      * to given @see PropertyPrice object and its attributes
-     * @throws  @see SQLException if occurs
-     * @throws  @see NullPointerException if occurs
+     *
      * @param propertyPrice @see PropertyPrice
-     * @return  List of @see PropertyPrice objects
+     * @return List of @see PropertyPrice objects
      */
     private List<PropertyPrice> getPropertyPriceListOfProperty(PropertyPrice propertyPrice) {
 
@@ -181,8 +206,8 @@ public class PropertyPriceRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             PreparedStatement statement;
-            if (propertyPrice.getProperty().getIdProperty() != 0){
-                if(propertyPrice.getValidFrom() != null && propertyPrice.getValidTo() != null) {
+            if (propertyPrice.getProperty().getIdProperty() != 0) {
+                if (propertyPrice.getValidFrom() != null && propertyPrice.getValidTo() != null) {
                     statement = connection.prepareStatement(queryPropertyTime);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
                     statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
@@ -190,60 +215,68 @@ public class PropertyPriceRepository extends Observable {
                     statement.setInt(4, propertyPrice.getProperty().getIdProperty());
                     statement.setDate(5, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
                     statement.setDate(6, new java.sql.Date(propertyPrice.getValidTo().getTime()));
-                    System.out.println("queryPropertyTime");
-                }
-                else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidFrom() != null ){
+                    if (App.isDebug()) {
+                        System.out.println("queryPropertyTime");
+                    }
+                } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidFrom() != null) {
                     statement = connection.prepareStatement(queryPropertyTimeFrom);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
                     statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
                     statement.setInt(3, propertyPrice.getProperty().getIdProperty());
                     statement.setDate(4, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    System.out.println("queryPropertyTimeFrom");
-                }
-                else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidTo() != null){
+                    if (App.isDebug()) {
+                        System.out.println("queryPropertyTimeFrom");
+                    }
+                } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidTo() != null) {
                     statement = connection.prepareStatement(queryPropertyTimeTo);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
                     statement.setDate(2, new java.sql.Date(propertyPrice.getValidTo().getTime()));
                     statement.setInt(3, propertyPrice.getProperty().getIdProperty());
                     statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
-                    System.out.println("queryPropertyTimeTo");
-                }
-                else {
+                    if (App.isDebug()) {
+                        System.out.println("queryPropertyTimeTo");
+                    }
+                } else {
                     statement = connection.prepareStatement(queryProperty);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
-                    System.out.println("queryProperty");
+                    if (App.isDebug()) {
+                        System.out.println("queryProperty");
+                    }
                 }
-            }
-            else{
-                if(propertyPrice.getValidFrom() != null && propertyPrice.getValidTo() != null) {
+            } else {
+                if (propertyPrice.getValidFrom() != null && propertyPrice.getValidTo() != null) {
                     statement = connection.prepareStatement(queryTime);
                     statement.setDate(1, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
                     statement.setDate(2, new java.sql.Date(propertyPrice.getValidTo().getTime()));
                     statement.setDate(3, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
                     statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
-                    System.out.println("queryTime");
-                }
-                else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidFrom() != null ){
+                    if (App.isDebug()) {
+                        System.out.println("queryTime");
+                    }
+                } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidFrom() != null) {
                     statement = connection.prepareStatement(queryTimeFrom);
                     statement.setDate(1, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
                     statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    System.out.println("queryTimeFrom");
-                }
-                else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidTo() != null){
+                    if (App.isDebug()) {
+                        System.out.println("queryTimeFrom");
+                    }
+                } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidTo() != null) {
                     statement = connection.prepareStatement(queryTimeTo);
                     statement.setDate(1, new java.sql.Date(propertyPrice.getValidTo().getTime()));
                     statement.setDate(2, new java.sql.Date(propertyPrice.getValidTo().getTime()));
-                    System.out.println("queryTimeTo");
-                }
-                else {
+                    if (App.isDebug()) {
+                        System.out.println("queryTimeTo");
+                    }
+                } else {
                     statement = connection.prepareStatement(query);
-                    System.out.println("query");
+                    if (App.isDebug()) {
+                        System.out.println("query");
+                    }
                 }
             }
 
 
             ResultSet resultSet = statement.executeQuery();
-            PropertyRepository propertyRepository = new PropertyRepository(dataSource);
             LinkedList<PropertyPrice> propertyPriceList = new LinkedList<>();
 
             while (resultSet.next()) {
@@ -265,16 +298,14 @@ public class PropertyPriceRepository extends Observable {
             System.err.println("Error getPropertyPriceListOfProperty " + exception.getMessage());
 
             return new LinkedList<>();
-        }
-        catch (NullPointerException exception){
+        } catch (NullPointerException exception) {
             System.err.println("Error getPropertyPriceListOfProperty " + exception.getMessage());
-            return  new LinkedList<>();
-        }
-        finally {
+            return new LinkedList<>();
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPropertyPriceListOfProperty " + exception.getMessage());
             }
         }
@@ -283,7 +314,7 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method calls query under table Property_price to Oracle database, which returns record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param propertyPrice @see PropertyPrice object, which stores attributes for query
      * @return @see PropertyPrice
      */
@@ -291,12 +322,11 @@ public class PropertyPriceRepository extends Observable {
         String query = "SELECT * FROM property_price WHERE id_price = ?";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getIdPropertyPrice());
-            PropertyRepository propertyRepository = new PropertyRepository(dataSource);
 
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -323,12 +353,11 @@ public class PropertyPriceRepository extends Observable {
             System.err.println("Error getPropertyPrice " + exception.getMessage());
 
             return null;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getPropertyPrice " + exception.getMessage());
             }
         }
@@ -337,7 +366,7 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method calls query under table Property_price to Oracle database, which inserts record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param propertyPrice @see PropertyPrice object, which stores attributes for query
      * @return boolean True if query was successful otherwise False.
      */
@@ -345,7 +374,7 @@ public class PropertyPriceRepository extends Observable {
         String query = "CALL temporal_insert('property_price', ?, ?, ?, ?)";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -368,12 +397,11 @@ public class PropertyPriceRepository extends Observable {
             System.err.println("Error createPropertyPrice " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error createPropertyPrice " + exception.getMessage());
             }
         }
@@ -381,7 +409,7 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method calls query under table Property_price to Oracle database, which deletes record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param propertyPrice @see PropertyPrice object, which stores attributes for query
      * @return boolean True if query was successful otherwise False.
      */
@@ -389,7 +417,7 @@ public class PropertyPriceRepository extends Observable {
         String query = "CALL temporal_delete('property_price', ?, ?, ?)";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -412,12 +440,11 @@ public class PropertyPriceRepository extends Observable {
             System.err.println("Error deletePropertyPrice " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error deletePropertyPrice " + exception.getMessage());
             }
         }
@@ -425,14 +452,14 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method calls query under table Property_price to Oracle database, which updates record, according to given parameters.
-     * @throws  @see SQLException if occurs
+     *
      * @param propertyPrice @see PropertyPrice object, which stores attributes for query
      * @return boolean True if query was successful otherwise False.
      */
     public boolean savePropertyPrice(PropertyPrice propertyPrice) {
         String query = "CALL temporal_update('property_price',?,?,?,?)";
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
 
         try {
             connection = dataSource.getConnection();
@@ -456,12 +483,11 @@ public class PropertyPriceRepository extends Observable {
             System.err.println("Error savePropertyPrice " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error savePropertyPrice " + exception.getMessage());
             }
         }
@@ -469,14 +495,14 @@ public class PropertyPriceRepository extends Observable {
 
     /**
      * Method calls query to Oracle database, which returns the average price of property in desired time interval.
-     * @throws  @see SQLException if occurs
-     * @param id_property Integer value, id of property
-     * @param date_from @see Date, Date value from desired time interval
-     * @param date_to @see Date, Date value to desired time interval
+     *
+     * @param idProperty Integer value, id of property
+     * @param dateFrom   @see Date, Date value from desired time interval
+     * @param dateTo     @see Date, Date value to desired time interval
      * @return Integer value, which represents average price of property
      */
-    public Double getAvgPropertyPrice(Integer id_property, Date date_from, Date date_to){
-        String query ="SELECT  ROUND(AVG(PP.price),0) AS AvgPrice" +
+    public Double getAvgPropertyPrice(Integer idProperty, Date dateFrom, Date dateTo) {
+        String query = "SELECT  ROUND(AVG(PP.price),0) AS AvgPrice" +
                 "                FROM property_price PP RIGHT JOIN property P ON(PP.id_property=P.id_property)  WHERE" +
                 "                ( P.id_property=? AND (PP.valid_from >= ? ) AND (PP.valid_to <= ?) ) OR" +
                 "                ( P.id_property=? AND ( (? BETWEEN PP.valid_from AND PP.valid_to) OR" +
@@ -484,30 +510,29 @@ public class PropertyPriceRepository extends Observable {
                 "                GROUP BY PP.id_property, P.property_name";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, id_property);
-            statement.setDate(2, new java.sql.Date(date_from.getTime()));
-            statement.setDate(3, new java.sql.Date(date_to.getTime()));
-            statement.setInt(4, id_property);
-            statement.setDate(5, new java.sql.Date(date_from.getTime()));
-            statement.setDate(6, new java.sql.Date(date_to.getTime()));
+            statement.setInt(1, idProperty);
+            statement.setDate(2, new java.sql.Date(dateFrom.getTime()));
+            statement.setDate(3, new java.sql.Date(dateTo.getTime()));
+            statement.setInt(4, idProperty);
+            statement.setDate(5, new java.sql.Date(dateFrom.getTime()));
+            statement.setDate(6, new java.sql.Date(dateTo.getTime()));
 
             Double avgPrice;
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
                 avgPrice = resultSet.getDouble("AvgPrice");
-            }
-            else {
+            } else {
                 avgPrice = 0.0;
             }
             connection.close();
             statement.close();
 
-            return  avgPrice;
+            return avgPrice;
 
         } catch (SQLException exception) {
             System.err.println("Error getAvgPropertyPrice " + exception.getMessage());
@@ -515,9 +540,9 @@ public class PropertyPriceRepository extends Observable {
             return 0.0;
         } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getAvgPropertyPrice " + exception.getMessage());
             }
         }

@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.model;
@@ -13,6 +21,10 @@ import java.util.Date;
 
 /**
  * Model of database table Property_price.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class PropertyPrice {
 
@@ -39,11 +51,12 @@ public class PropertyPrice {
 
     /**
      * Constructor of @see PropertyPrice
-     * @param idPrice Integer value, which represents id of property price
-     * @param property @see Property
-     * @param price Double value, which represents price of property
+     *
+     * @param idPrice   Integer value, which represents id of property price
+     * @param property  @see Property
+     * @param price     Double value, which represents price of property
      * @param validFrom @see Date, Date value from desired time interval
-     * @param validTo @see Date, Date value to desired time interval
+     * @param validTo   @see Date, Date value to desired time interval
      */
     public PropertyPrice(int idPrice, Property property, double price, Date validFrom, Date validTo) {
         this.idPropertyPrice = idPrice;
@@ -55,6 +68,7 @@ public class PropertyPrice {
 
     /**
      * Method returns id of property price.
+     *
      * @return Integer value, which represents id of property price
      */
     public int getIdPropertyPrice() {
@@ -63,6 +77,7 @@ public class PropertyPrice {
 
     /**
      * Method sets price of property price.
+     *
      * @param id Integer value, which represents id of property price
      */
     public void setIdPropertyPrice(int id) {
@@ -71,6 +86,7 @@ public class PropertyPrice {
 
     /**
      * Method returns property of property price.
+     *
      * @return @see Property object of Property price
      */
     public Property getProperty() {
@@ -79,6 +95,7 @@ public class PropertyPrice {
 
     /**
      * Method sets property of property price.
+     *
      * @param property @see Property object of Property price
      */
     public void setProperty(Property property) {
@@ -87,6 +104,7 @@ public class PropertyPrice {
 
     /**
      * Method returns price of property price.
+     *
      * @return Double value, which represents price of property
      */
     public double getPrice() {
@@ -95,6 +113,7 @@ public class PropertyPrice {
 
     /**
      * Method sets price of property price.
+     *
      * @param price Double value, which represents price of property
      */
     public void setPrice(double price) {
@@ -103,6 +122,7 @@ public class PropertyPrice {
 
     /**
      * Method returns date from in time interval of property price.
+     *
      * @return @see Date, Date value from desired time interval
      */
     public Date getValidFrom() {
@@ -111,6 +131,7 @@ public class PropertyPrice {
 
     /**
      * Method sets date from in time interval of property price.
+     *
      * @param validFrom @see Date, Date value from desired time interval
      */
     public void setValidFrom(Date validFrom) {
@@ -119,6 +140,7 @@ public class PropertyPrice {
 
     /**
      * Method returns date to in time interval of property price.
+     *
      * @return @see Date, Date value to desired time interval
      */
     public Date getValidTo() {
@@ -127,7 +149,8 @@ public class PropertyPrice {
 
     /**
      * Method sets date to in time interval of property price.
-     * @param validTo
+     *
+     * @param validTo @see Date, Date value from desired time interval
      */
     public void setValidTo(Date validTo) {
         this.validTo = validTo;
@@ -135,10 +158,20 @@ public class PropertyPrice {
 
     /**
      * Method checks if the price is valid now
-     * @return  boolean True is price is valid now otherwise False.
+     *
+     * @return boolean True is price is valid now otherwise False.
      */
     public boolean isValid() {
         Date today = new Date();
         return this.validTo.after(today);
+    }
+
+    /**
+     * Convert property price to string
+     *
+     * @return property price string representation
+     */
+    public String toString() {
+        return String.valueOf(price);
     }
 }

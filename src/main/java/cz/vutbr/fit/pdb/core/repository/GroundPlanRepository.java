@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.repository;
@@ -25,6 +33,10 @@ import java.util.Observable;
  * Repository creates ground plan typed object (@see GroundPlan), queries and calls to Oracle database.
  * Repository works mainly with table Ground_plan.
  * Class extends @see Observable.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
  */
 public class GroundPlanRepository extends Observable {
 
@@ -32,6 +44,7 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Constructor for ground plan repository @see GroundPlanRepository.
+     *
      * @param dataSource @see OracleDataSource
      */
     public GroundPlanRepository(OracleDataSource dataSource) {
@@ -40,8 +53,7 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and returns ground plan with desired property.
-     * @throws  @see SQLException if occurs
-     * @throws  @see IOException if occurs
+     *
      * @param property @see Property object
      * @return List of @see GroundPlan objects.
      */
@@ -78,12 +90,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error getGroundPlanListOfProperty " + exception.getMessage());
 
             return new LinkedList<>();
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getGroundPlanListOfProperty " + exception.getMessage());
             }
         }
@@ -91,8 +102,7 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and returns ground plan with desired id.
-     * @throws  @see SQLException if occurs
-     * @throws  @see IOException if occurs
+     *
      * @param groundPlan @see GroundPlan
      * @return @see GroundPlan object.
      */
@@ -131,12 +141,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error getGroundPlan " + exception.getMessage());
 
             return null;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getGroundPlan " + exception.getMessage());
             }
         }
@@ -144,8 +153,7 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and returns ground plan with desired id.
-     * @throws  @see SQLException if occurs
-     * @throws  @see IOException if occurs
+     *
      * @param idGroundPlan Integer value, which represents id of ground plan
      * @return @see GroundPlan object.
      */
@@ -184,12 +192,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error getGroundPlanById " + exception.getMessage());
 
             return null;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error getGroundPlanById " + exception.getMessage());
             }
         }
@@ -197,7 +204,7 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and inserts ground plan according to given parameter.
-     * @throws  @see SQLException if occurs
+     *
      * @param groundPlan @see GroundPlan
      * @return boolean True if query was successful otherwise False.
      */
@@ -233,12 +240,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error createGroundPlan " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error createGroundPlan " + exception.getMessage());
             }
         }
@@ -246,9 +252,8 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and updates ground plan according to given parameter.
-     * @throws  @see SQLException if occurs
-     * @throws  @see IOException if occurs
-     * @param groundPlan
+     *
+     * @param groundPlan ground plan
      * @return boolean True if query was successful otherwise False.
      */
     public boolean saveGroundPlan(GroundPlan groundPlan) {
@@ -256,7 +261,7 @@ public class GroundPlanRepository extends Observable {
         String query = "UPDATE ground_plan SET id_property = ? WHERE id_ground_plan = ?";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -332,12 +337,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error saveGroundPlan " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error saveGroundPlan " + exception.getMessage());
             }
         }
@@ -345,15 +349,15 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and deletes ground plan according to given parameter.
-     * @throws  @see SQLException if occurs
-     * @param groundPlan
+     *
+     * @param groundPlan ground plan
      * @return boolean True if query was successful otherwise False.
      */
     public boolean deleteGroundPlan(GroundPlan groundPlan) {
         String query = "DELETE FROM ground_plan WHERE id_ground_plan = ?";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -373,12 +377,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error deleteGroundPlan " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error deleteGroundPlan " + exception.getMessage());
             }
         }
@@ -386,8 +389,8 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and rotates left ground plan according to given parameter.
-     * @throws  @see SQLException if occurs
-     * @param groundPlan
+     *
+     * @param groundPlan ground plan
      * @return boolean True if query was successful otherwise False.
      */
     public boolean rotateGroundPlanLeft(GroundPlan groundPlan) {
@@ -405,7 +408,7 @@ public class GroundPlanRepository extends Observable {
                 "END;";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -476,12 +479,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error rotateGroundPlanLeft " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error rotateGroundPlanLeft " + exception.getMessage());
             }
         }
@@ -489,8 +491,8 @@ public class GroundPlanRepository extends Observable {
 
     /**
      * Method calls query under table Ground plan and rotates right ground plan according to given parameter.
-     * @throws  @see SQLException if occurs
-     * @param groundPlan
+     *
+     * @param groundPlan ground plan
      * @return boolean True if query was successful otherwise False.
      */
     public boolean rotateGroundPlanRight(GroundPlan groundPlan) {
@@ -508,7 +510,7 @@ public class GroundPlanRepository extends Observable {
                 "END;";
 
         Connection connection = null;
-        PreparedStatement statement = null;
+        PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
@@ -579,12 +581,11 @@ public class GroundPlanRepository extends Observable {
             System.err.println("Error rotateGroundPlanRight " + exception.getMessage());
 
             return false;
-        }
-        finally {
+        } finally {
             try {
-                if(connection!= null)
+                if (connection != null)
                     connection.close();
-            }catch (SQLException exception) {
+            } catch (SQLException exception) {
                 System.err.println("Error rotateGroundPlanRight " + exception.getMessage());
             }
         }
