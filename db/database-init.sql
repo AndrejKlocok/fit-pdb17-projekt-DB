@@ -253,7 +253,7 @@ SELECT PP.id_property, PP.price, PP.valid_from, PP.valid_to FROM property_price 
 
 -- Selects persons with longest stay in descending list
 SELECT P.LASTNAME, P.FIRSTNAME , nvl(SUM(trunc(O.valid_to-O.valid_from)), 0) AS DurationInDays
-FROM owner O RIGHT OUTER JOIN person P ON(O.id_owner=P.id_person) 
+FROM owner O RIGHT OUTER JOIN person P ON(O.id_owner=P.id_person)
 GROUP BY O.ID_OWNER, P.LASTNAME, P.FIRSTNAME ORDER BY DurationInDays Desc;
 
 --Select average cost of properies in time period
