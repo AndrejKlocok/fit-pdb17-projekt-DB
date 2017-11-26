@@ -85,7 +85,7 @@ public class PropertyController implements PropertyContract.Controller {
 
     @Override
     public void deleteOwner() {
-        if (!ownerRepository.deleteOwnerOfProperty(property.getOwnerCurrent(), property)) {
+        if (!ownerRepository.deleteOwner(property.getOwnerCurrent())) {
             view.showError("Could not delete owner from property");
         }
     }
@@ -106,7 +106,7 @@ public class PropertyController implements PropertyContract.Controller {
 
     @Override
     public void savePropertyCurrentPrice(String currentPrice) {
-        PropertyPrice propertyPrice = new PropertyPrice(42, property.getIdProperty(), Double.parseDouble(currentPrice), new Date(), new Date()); // TODO
+        PropertyPrice propertyPrice = new PropertyPrice(42, property, Double.parseDouble(currentPrice), new Date(), new Date()); // TODO
         if (!propertyPriceRepository.savePropertyPrice(propertyPrice)) {
             view.showError("Could not save property price");
         }

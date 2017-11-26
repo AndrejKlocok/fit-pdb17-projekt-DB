@@ -366,7 +366,7 @@ public class PropertyWindow implements PropertyContract.View {
             mainFrame.setTitle("Detail of property " + property.getName());
             nameLabel.setText(property.getName());
             priceCurrentLabel.setText(property.getPriceCurrent() != null ? String.valueOf(property.getPriceCurrent().getPrice()) : "no price");
-            ownerLabel.setText(property.getOwnerCurrent() != null ? property.getOwnerCurrent().getFirstName() + " " + property.getOwnerCurrent().getLastName() : "no owner");
+            ownerLabel.setText(property.getOwnerCurrent() != null ? property.getOwnerCurrent().getPerson().getFirstName() + " " + property.getOwnerCurrent().getPerson().getLastName() : "no owner");
             descriptionLabel.setText(property.getDescription());
 
             if (property.getGroundPlans().size() > 0) {
