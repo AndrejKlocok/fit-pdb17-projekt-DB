@@ -91,4 +91,8 @@ public class Owner extends Person {
         // TODO
         return 42d;
     }
+
+    public String toString() {
+        return firstName + " "  +lastName;
+    }
 }

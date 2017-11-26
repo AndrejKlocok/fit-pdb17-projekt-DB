@@ -1,13 +1,22 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.gui.view;
 
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.Owner;
 import cz.vutbr.fit.pdb.gui.controller.OwnersContract;
 import net.sourceforge.jdatepicker.JDatePicker;
@@ -25,6 +34,14 @@ import java.awt.event.WindowEvent;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Window showing list of all persons
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ * @see Owner
+ */
 public class OwnersWindow implements OwnersContract.View {
 
     private OwnersContract.Controller controller;
@@ -49,6 +66,10 @@ public class OwnersWindow implements OwnersContract.View {
     // Bottom panel components
     private JLabel statusLabel;
 
+
+    /**
+     * Default constructor
+     */
     public OwnersWindow() {
 
         // Window components
@@ -73,10 +94,16 @@ public class OwnersWindow implements OwnersContract.View {
         showAsync();
     }
 
+    /**
+     * Show window on asynchronous on UI thread
+     */
     public void showAsync() {
         SwingUtilities.invokeLater(this::initAndShowGUI);
     }
 
+    /**
+     * Initialize window components and show window
+     */
     public void initAndShowGUI() {
 
         // JMenuBar in the Mac OS X menubar
@@ -128,6 +155,9 @@ public class OwnersWindow implements OwnersContract.View {
         ownersTableScrollPane.setViewportView(ownersTable);
 
         statusLabel.setText("status");
+        if (!App.isDebug()) {
+            statusLabel.setVisible(false);
+        }
 
         mainFrame.setTitle("Owners list");
         mainFrame.setSize(1200, 800);
@@ -160,6 +190,11 @@ public class OwnersWindow implements OwnersContract.View {
         mainFrame.dispose();
     }
 
+    /**
+     * Shows loading dialog
+     *
+     * @param swingWorker runnable which will be executed while is dialog showed
+     */
     private void runSwingWorker(SwingWorker<Void, Void> swingWorker) {
         final JDialog dialog = new JDialog(mainFrame, "Dialog", Dialog.ModalityType.APPLICATION_MODAL);
 
@@ -183,16 +218,31 @@ public class OwnersWindow implements OwnersContract.View {
         dialog.setVisible(true);
     }
 
+    /**
+     * Set controller of this view
+     *
+     * @param controller instance of controller
+     */
     @Override
     public void setController(OwnersContract.Controller controller) {
         this.controller = controller;
     }
 
+    /**
+     * Shows dialog with information message
+     *
+     * @param message message
+     */
     @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(mainFrame, message, "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Shows dialog with error message
+     *
+     * @param error message
+     */
     @Override
     public void showError(String error) {
         JOptionPane.showMessageDialog(
@@ -202,6 +252,11 @@ public class OwnersWindow implements OwnersContract.View {
                 JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Show list of all owners in table
+     *
+     * @param ownersList owners list
+     */
     @Override
     public void showOwnersList(List<Owner> ownersList) {
         SwingUtilities.invokeLater(() -> {
@@ -216,7 +271,9 @@ public class OwnersWindow implements OwnersContract.View {
 
             Object[][] data = new Object[ownersList.size()][8];
 
-            System.out.println("There are " + ownersList.size() + " owners");
+            if (App.isDebug()) {
+                System.out.println("There are " + ownersList.size() + " owners");
+            }
 
             for (int i = 0; i < ownersList.size(); i++) {
                 data[i][0] = ownersList.get(i).getFirstName();
@@ -241,6 +298,9 @@ public class OwnersWindow implements OwnersContract.View {
         });
     }
 
+    /**
+     * Hide window
+     */
     @Override
     public void hide() {
         onExit();

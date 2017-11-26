@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -184,5 +185,10 @@ public class PropertyPriceRepository extends Observable {
 
             return false;
         }
+    }
+
+    public int getAvgPropertyPrice(Property property, Date from, Date to) {
+        // TODO
+        return 42;
     }
 }

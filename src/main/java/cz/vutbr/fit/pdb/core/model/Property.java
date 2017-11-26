@@ -135,4 +135,8 @@ public class Property {
     public Owner getOwnerCurrent() {
         return ownerHistory.size() > 0 ? ownerHistory.get(ownerHistory.size() - 1) : null;
     }
+
+    public String toString() {
+        return name;
+    }
 }

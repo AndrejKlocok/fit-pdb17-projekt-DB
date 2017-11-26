@@ -252,6 +252,16 @@ public class OwnerRepository extends Observable {
         return true;
     }
 
+    public boolean deleteOwnerOfPropertyFromDateToDate(Property property, Date from, Date to) {
+        // TODO
+        return true;
+    }
+
+    public boolean saveOwnerOfPropertyFromDateToDate(Property property, Person person, Date from, Date to) {
+        // TODO
+        return true;
+    }
+
     public List<Owner> getOwnersListOfDate(Date date) {
         // TODO
         return new LinkedList<>();

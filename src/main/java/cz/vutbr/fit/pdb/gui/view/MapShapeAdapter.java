@@ -1,24 +1,49 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.gui.view;
 
 import com.lynden.gmapsfx.javascript.object.LatLong;
-import com.lynden.gmapsfx.javascript.object.LatLongBounds;
 import com.lynden.gmapsfx.javascript.object.MVCArray;
 import com.lynden.gmapsfx.javascript.object.MapShape;
-import com.lynden.gmapsfx.shapes.*;
+import com.lynden.gmapsfx.shapes.Circle;
+import com.lynden.gmapsfx.shapes.CircleOptions;
+import com.lynden.gmapsfx.shapes.Polygon;
+import com.lynden.gmapsfx.shapes.PolygonOptions;
 import oracle.spatial.geometry.JGeometry;
 
 import java.util.ArrayList;
 
+/**
+ * Adapter converting from Oracle JGeometry to Google Map Shape
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ * @see MapShape
+ * @see JGeometry
+ */
 public class MapShapeAdapter {
 
+    /**
+     * Convert JGeometry to MapShape
+     *
+     * @param geometry source JGeometry
+     * @return converted MapShape
+     */
     public static MapShape jGeometry2MapShape(JGeometry geometry) {
         // TODO
 
@@ -32,7 +57,7 @@ public class MapShapeAdapter {
                     .fillColor("gray");
             return new Rectangle(rectangleOptions);*/
 
-         if (geometry.isCircle()) {
+        if (geometry.isCircle()) {
             LatLong point = new LatLong(49.191882, 16.606972);
             CircleOptions circleOptions = new CircleOptions()
                     .center(point)
@@ -52,7 +77,7 @@ public class MapShapeAdapter {
             double y = 0;
             for (int i = 0; i < coords.length; i++) {
 
-                if(i % 2 == 0) {
+                if (i % 2 == 0) {
                     y = coords[i];
                     //System.out.println("y " + y);
                 } else {

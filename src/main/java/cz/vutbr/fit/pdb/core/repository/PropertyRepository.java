@@ -16,6 +16,7 @@ import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
 
 import java.sql.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
@@ -88,7 +89,7 @@ public class PropertyRepository extends Observable {
                 newProperty.setIdProperty(resultSet.getInt("id_property"));
                 newProperty.setType(toPropertyType(resultSet.getString("property_type")));
                 Struct st = (Struct) resultSet.getObject("geometry");
-                property.setGeometry(JGeometry.loadJS(st));
+                newProperty.setGeometry(JGeometry.loadJS(st));
                 newProperty.setName(resultSet.getString("property_name"));
                 newProperty.setDescription(resultSet.getString("property_description"));
 
@@ -263,8 +264,9 @@ public class PropertyRepository extends Observable {
         }
     }
 
-    public List<Property> getPropertyListSimilarByGroundPlans(List<GroundPlan> groundPlans) {
+    public List<Property> getPropertyListSimilarByGroundPlans(List<GroundPlan> groundPlans, boolean filterHasOwner) {
         // TODO option to get similar by more ground plans
+        // TODO filterHasOwner
 
         GroundPlan groundPlan;
         if (groundPlans.size() > 0) {
@@ -326,6 +328,17 @@ public class PropertyRepository extends Observable {
                 property.setOwnerHistory(ownerList);
             }
 
+            if (filterHasOwner) {
+                // owner filter is set
+                for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
+                    Property property = iterator.next();
+                    // remove from list only property without owner
+                    if (property.getOwnerCurrent() == null) {
+                        iterator.remove();
+                    }
+                }
+            }
+
             connection.close();
             statement.close();
             return propertyList;
@@ -338,8 +351,79 @@ public class PropertyRepository extends Observable {
     }
 
     public LinkedList<Property> searchPropertyList(String name, Double price, boolean hasOwner) {
-        // TODO
-        return new LinkedList<>();
+
+        String query = "SELECT * FROM property"
+                + (!name.isEmpty() ? " WHERE property_name LIKE ? " : "");
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            if (!name.isEmpty()) {
+                statement.setString(1, "%" + name + "%");
+            }
+
+            ResultSet resultSet = statement.executeQuery();
+            LinkedList<Property> propertyList = new LinkedList<>();
+            while (resultSet.next()) {
+                Property property = new Property();
+                property.setIdProperty(resultSet.getInt("id_property"));
+                property.setType(toPropertyType(resultSet.getString("property_type")));
+                Struct st = (Struct) resultSet.getObject("geometry");
+                property.setGeometry(JGeometry.loadJS(st));
+                property.setName(resultSet.getString("property_name"));
+                property.setDescription(resultSet.getString("property_description"));
+
+                // load property ground plans
+                GroundPlanRepository groundPlanRepository = new GroundPlanRepository(dataSource);
+                List<GroundPlan> groundPlanList = groundPlanRepository.getGroundPlanListOfProperty(property);
+                property.setGroundPlans(groundPlanList);
+
+                // load property price history
+                PropertyPriceRepository propertyPriceRepository = new PropertyPriceRepository(dataSource);
+                List<PropertyPrice> propertyPriceList = propertyPriceRepository.getPropertyPriceListOfProperty(property);
+                property.setPriceHistory(propertyPriceList);
+
+                // load property owner history
+                OwnerRepository ownerRepository = new OwnerRepository(dataSource);
+                List<Owner> ownerList = ownerRepository.getOwnersListOfProperty(property);
+                property.setOwnerHistory(ownerList);
+
+                propertyList.add(property);
+            }
+
+            if (price != 0d) {
+                // price filter is set
+                for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
+                    Property property = iterator.next();
+                    // remove from list only property with price greater than given price
+                    if (property.getPriceCurrent() != null) {
+                        if (property.getPriceCurrent().getPrice() > price) {
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+
+            if (hasOwner) {
+                // owner filter is set
+                for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
+                    Property property = iterator.next();
+                    // remove from list only property without owner
+                    if (property.getOwnerCurrent() == null) {
+                        iterator.remove();
+                    }
+                }
+            }
+
+            connection.close();
+            statement.close();
+            return propertyList;
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return new LinkedList<>();
+        }
     }
 
     public Property getNearestProperty(double lat, double lng) {

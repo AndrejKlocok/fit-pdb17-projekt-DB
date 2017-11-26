@@ -82,4 +82,8 @@ public class PropertyPrice {
         Date today = new Date();
         return this.validTo.after(today);
     }
+
+    public String toString() {
+        return String.valueOf(price);
+    }
 }

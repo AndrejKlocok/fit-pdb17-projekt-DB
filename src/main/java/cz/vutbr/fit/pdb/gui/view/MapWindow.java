@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.gui.view;
@@ -14,6 +22,7 @@ import com.lynden.gmapsfx.javascript.event.GMapMouseEvent;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polygon;
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.Property;
 import cz.vutbr.fit.pdb.gui.controller.MapContract;
 import javafx.application.Platform;
@@ -25,11 +34,22 @@ import oracle.spatial.geometry.JGeometry;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Window showing list of all property on map
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ * @see Property
+ */
 public class MapWindow implements MapContract.View, MapComponentInitializedListener {
 
     private MapContract.Controller controller;
@@ -49,7 +69,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
     private JLabel searchNameLabel;
     private JTextField searchNameInput;
     private JLabel searchPriceLabel;
-    private JTextField searchPriceInput;
+    private JFormattedTextField searchPriceInput;
     private JCheckBox searchHasOwnerCheckbox;
     private JButton searchButton;
 
@@ -69,6 +89,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
     private boolean mapInitialized;
 
 
+    /**
+     * Default constructor
+     */
     public MapWindow() {
 
         // Window components
@@ -84,7 +107,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         searchNameLabel = new JLabel();
         searchNameInput = new JTextField();
         searchPriceLabel = new JLabel();
-        searchPriceInput = new JTextField();
+        searchPriceInput = new JFormattedTextField();
         searchHasOwnerCheckbox = new JCheckBox();
         searchButton = new JButton();
 
@@ -98,10 +121,16 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         showAsync();
     }
 
+    /**
+     * Show window on asynchronous on UI thread
+     */
     public void showAsync() {
         SwingUtilities.invokeLater(this::initAndShowGUI);
     }
 
+    /**
+     * Initialize window components and show window
+     */
     public void initAndShowGUI() {
 
         // JMenuBar in the Mac OS X menubar
@@ -141,30 +170,39 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         searchNameLabel.setText("Name:");
         searchNameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
         searchNameInput.setBorder(new EmptyBorder(10, 10, 10, 10));
-        searchPriceLabel.setText("Price:");
+        searchPriceLabel.setText("Maximal price:");
         searchPriceLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
         searchPriceInput.setBorder(new EmptyBorder(10, 10, 10, 10));
-        searchHasOwnerCheckbox.setText("Has owner");
+        NumberFormat format = NumberFormat.getInstance();
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.setMinimum(0);
+        formatter.setMaximum(Integer.MAX_VALUE);
+        formatter.setAllowsInvalid(false);
+        searchPriceInput.setValue(0);
+        searchPriceInput.setFormatterFactory(new DefaultFormatterFactory(formatter));
+        searchHasOwnerCheckbox.setText("Only which has owner");
         searchHasOwnerCheckbox.setBorder(new EmptyBorder(10, 10, 10, 10));
         searchButton.setText("Search");
         searchButton.setBorder(new EmptyBorder(10, 10, 10, 10));
         searchButton.setPreferredSize(new Dimension(350, searchButton.getPreferredSize().height));
         searchButton.setMinimumSize(searchButton.getPreferredSize());
         searchButton.setMaximumSize(searchButton.getPreferredSize());
-        searchButton.addActionListener(e ->
-                runSwingWorker(new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        controller.searchPropertyList(searchNameInput.getText(), Double.parseDouble(searchPriceInput.getText()), searchHasOwnerCheckbox.isSelected());
+        searchButton.addActionListener(e -> runSwingWorker(new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                controller.filterPropertyList(searchNameInput.getText(), (Integer) searchPriceInput.getValue(), searchHasOwnerCheckbox.isSelected());
 
-                        return null;
-                    }
-                })
-        );
+                return null;
+            }
+        }));
 
         propertyListPanel.setLayout(new BoxLayout(propertyListPanel, BoxLayout.Y_AXIS));
 
         statusLabel.setText("status");
+        if (!App.isDebug()) {
+            statusLabel.setVisible(false);
+        }
 
         initMenuBar();
 
@@ -199,6 +237,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         });
     }
 
+    /**
+     * Initialize window menu bar components
+     */
     public void initMenuBar() {
         JMenu mMainMenu = new JMenu("Main menu");
         JMenu mHelp = new JMenu("Help");
@@ -295,6 +336,11 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         System.exit(0);
     }
 
+    /**
+     * Shows loading dialog
+     *
+     * @param swingWorker runnable which will be executed while is dialog showed
+     */
     private void runSwingWorker(SwingWorker<Void, Void> swingWorker) {
         final JDialog dialog = new JDialog(mainFrame, "Dialog", Dialog.ModalityType.APPLICATION_MODAL);
 
@@ -318,6 +364,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         dialog.setVisible(true);
     }
 
+    /**
+     * Callback when map is initialized and ready to use
+     */
     @Override
     public void mapInitialized() {
 
@@ -361,7 +410,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             markerPopupMenu.add(findNearestItem);
 
             ActionListener menuListener = menuEvent -> {
-                System.out.println("Popup menu item [" + menuEvent.getActionCommand() + "]");
+                if (App.isDebug()) {
+                    System.out.println("Popup menu item [" + menuEvent.getActionCommand() + "]");
+                }
 
                 if (menuEvent.getActionCommand().equalsIgnoreCase("Create new property here")) {
                     String[] options = new String[]{"Land", "House", "Terrace house", "Prefab", "Apartment"};
@@ -376,6 +427,11 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                             options[0]);
 
                     Property newProperty = new Property();
+
+                    if (response == JOptionPane.CLOSED_OPTION) {
+                        // closed window by cross
+                        return;
+                    }
 
                     switch (response) {
                         case 0:
@@ -448,17 +504,31 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         }
     }
 
-
+    /**
+     * Set controller of this view
+     *
+     * @param controller instance of controller
+     */
     @Override
     public void setController(MapContract.Controller controller) {
         this.controller = controller;
     }
 
+    /**
+     * Shows dialog with information message
+     *
+     * @param message message
+     */
     @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(mainFrame, message, "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Shows dialog with error message
+     *
+     * @param error message
+     */
     @Override
     public void showError(String error) {
         JOptionPane.showMessageDialog(
@@ -468,6 +538,11 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                 JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Show list of all property
+     *
+     * @param propertyList list of property
+     */
     @Override
     public void showPropertyList(List<Property> propertyList) {
 
@@ -489,12 +564,16 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             propertyListPanel.removeAll();
             propertyItems.clear();
 
-            System.out.println("show list of size: " + propertyList.size());
+            if (App.isDebug()) {
+                System.out.println("show list of size: " + propertyList.size());
+            }
 
             // add list of properties to map
             for (Property property : propertyList) {
 
-                System.out.println("property: " + property.getName());
+                if (App.isDebug()) {
+                    System.out.println("property: " + property.getName());
+                }
 
                 final MapShape shape = MapShapeAdapter.jGeometry2MapShape(property.getGeometry());
 
@@ -512,7 +591,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                 propertyPopupMenu.add(findNearestItem);
 
                 ActionListener menuListener = event -> {
-                    System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed on " + shape.getVariableName());
+                    if (App.isDebug()) {
+                        System.out.println("Popup menu item [" + event.getActionCommand() + "] was pressed on " + shape.getVariableName());
+                    }
 
                     if (event.getActionCommand().equalsIgnoreCase("edit shape")) {
                         propertyEditItem.setEnabled(false);
@@ -541,7 +622,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                     return null;
                                 }
                             });
-                            System.out.println("save: " + (shape instanceof com.lynden.gmapsfx.shapes.Polygon ? ((Polygon) shape).getPath().getArray().getSlot(0).toString() : shape.getBounds().toString()));
+                            if (App.isDebug()) {
+                                System.out.println("save: " + (shape instanceof com.lynden.gmapsfx.shapes.Polygon ? ((Polygon) shape).getPath().getArray().getSlot(0).toString() : shape.getBounds().toString()));
+                            }
                         });
                     } else if (event.getActionCommand().equalsIgnoreCase("Find nearest property")) {
                         runSwingWorker(new SwingWorker<Void, Void>() {
@@ -640,12 +723,16 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                     LatLong latLng = new LatLong((JSObject) object.getMember("latLng"));
                     Point point = MapUtil.latLng2Point(latLng, map);
 
-                    System.out.println("Point: " + point.getX() + ", " + point.getY());
+                    if (App.isDebug()) {
+                        System.out.println("Point: " + point.getX() + ", " + point.getY());
+                    }
 
                     propertyPopupMenu.show(mapFXPanel, (int) point.getX(), (int) point.getY());
                 });
                 map.addUIEventHandler(shape, UIEventType.click, (JSObject) -> {
-                    System.out.println("Property: " + property.getName());
+                    if (App.isDebug()) {
+                        System.out.println("Property: " + property.getName());
+                    }
                     if (!propertyPopupMenu.isShowing()) {
                         runSwingWorker(new SwingWorker<Void, Void>() {
                             @Override
@@ -678,6 +765,9 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         });
     }
 
+    /**
+     * Hide window
+     */
     @Override
     public void hide() {
         onExit();
