@@ -1,98 +1,141 @@
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package cz.vutbr.fit.pdb.core.model;
+
+import java.util.Date;
+
 /**
- * VUT FIT PDB project
+ * Model of database table Owner.
  *
  * @author Matúš Bútora
  * @author Andrej Klocok
  * @author Tomáš Vlk
  */
+public class Owner {
 
-package cz.vutbr.fit.pdb.core.model;
+    protected Person person;
 
-import java.util.HashMap;
-import java.util.Date;
-
-public class Owner extends Person {
-
-    protected int idOwner;
-
-    protected int idProperty;
+    protected Property property;
 
     protected Date validFrom;
 
     protected Date validTo;
 
-    protected HashMap<String, Property> propertyHistory;
-
-
+    /**
+     * Constructor of @see Owner.
+     */
     public Owner() {
-        idOwner = 0;
-        idProperty = 0;
-        propertyHistory = new HashMap<>();
+        person = new Person();
+        property = new Property();
     }
 
-    public Owner(int idOwner, int idProperty, Date validFrom, Date validTo) {
-        this.idOwner = idOwner;
-        this.idProperty = idProperty;
+    /**
+     * Constructor of @see Owner.
+     *
+     * @param person    @see Person, who owns property in time interval
+     * @param property  @see Property, which is owned by person in time interval
+     * @param validFrom @see Date, from which the property is owned by person
+     * @param validTo   @see Date, into which the property is owned by person
+     */
+    public Owner(Person person, Property property, Date validFrom, Date validTo) {
+        this.person = person;
+        this.property = property;
         this.validFrom = validFrom;
         this.validTo = validTo;
     }
 
-    public int getIdOwner() {
-        return idOwner;
+    /**
+     * Method returns person.
+     *
+     * @return @see Person, who owns property in time interval
+     */
+    public Person getPerson() {
+        return person;
     }
 
-    public void setIdOwner(int idOwner) {
-        this.idOwner = idOwner;
+    /**
+     * Method sets person.
+     *
+     * @param person @see Person, who owns property in time interval
+     */
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
-    public int getIdProperty() {
-        return idProperty;
+    /**
+     * Method returns property
+     *
+     * @return @see Property, which is owned by person in time interval
+     */
+    public Property getProperty() {
+        return property;
     }
 
-    public void setIdProperty(int idProperty) {
-        this.idProperty = idProperty;
+    /**
+     * Method sets property.
+     *
+     * @param property @see Property, which is owned by person in time interval
+     */
+    public void setProperty(Property property) {
+        this.property = property;
     }
 
+    /**
+     * Method returns date to.
+     *
+     * @return @see Date, from which the property is owned by person
+     */
     public Date getValidTo() {
         return validTo;
     }
 
+    /**
+     * Method sets date to.
+     *
+     * @param validTo @see Date, into which the property is owned by person
+     */
     public void setValidTo(Date validTo) {
         this.validTo = validTo;
     }
 
+    /**
+     * Method returns date from.
+     *
+     * @return @see Date, from which the property is owned by person
+     */
     public Date getValidFrom() {
         return validFrom;
     }
 
+    /**
+     * Method sets date from.
+     *
+     * @param validFrom @see Date, from which the property is owned by person
+     */
     public void setValidFrom(Date validFrom) {
         this.validFrom = validFrom;
     }
 
-    public HashMap<String, Property> getPropertyHistory() {
-        return propertyHistory;
-    }
-
-    public void setPropertyHistory(HashMap<String, Property> propertyHistory) {
-        this.propertyHistory = propertyHistory;
-    }
-
-    public Property getPropertyCurrent() {
-        // TODO
-        return new Property();
-    }
-
-    public Double getPropertyCurrentCount() {
-        // TODO
-        return 42d;
-    }
-
-    public Double getPropertyCurrentLandAreaSum() {
-        // TODO
-        return 42d;
-    }
-
+    /**
+     * Convert owner to string
+     *
+     * @return owner string representation
+     */
     public String toString() {
-        return firstName + " "  +lastName;
+        return getPerson().toString() + ": " + getProperty().toString();
     }
 }

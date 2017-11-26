@@ -244,11 +244,11 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         JMenu mMainMenu = new JMenu("Main menu");
         JMenu mHelp = new JMenu("Help");
 
-        JMenuItem mMainMenuOwnerList = new JMenuItem("Owners list");
-        mMainMenuOwnerList.addActionListener(actionEvent -> runSwingWorker(new SwingWorker<Void, Void>() {
+        JMenuItem mMainMenuPersonsList = new JMenuItem("Persons list");
+        mMainMenuPersonsList.addActionListener(actionEvent -> runSwingWorker(new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
-                controller.getOwners();
+                controller.getPersons();
 
                 return null;
             }
@@ -305,7 +305,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                 JOptionPane.showMessageDialog(null, "Project for PDB course", "About PDB app", JOptionPane.INFORMATION_MESSAGE)
         );
 
-        mMainMenu.add(mMainMenuOwnerList);
+        mMainMenu.add(mMainMenuPersonsList);
         mMainMenu.addSeparator();
         mMainMenu.add(mMainMenuRefresh);
         mMainMenu.add(mMainMenuExecuteSQLFile);

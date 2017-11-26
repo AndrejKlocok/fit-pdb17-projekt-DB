@@ -91,7 +91,7 @@ public class PropertyItem extends JPanel {
         name.setMaximumSize(name.getPreferredSize());
         name.setMinimumSize(name.getPreferredSize());
 
-        price.setText(property.getPriceCurrent() != null ? String.valueOf(property.getPriceCurrent().getPrice()) + " Kč" : "no price");
+        price.setText(property.hasPrice() ? String.valueOf(property.getPriceCurrent().getPrice()) + " Kč" : "no price");
         price.setFont(new Font("sans-Serif", Font.PLAIN, 12));
 
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));

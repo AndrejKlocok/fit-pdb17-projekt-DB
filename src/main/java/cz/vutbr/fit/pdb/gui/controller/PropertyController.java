@@ -131,7 +131,7 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void deleteCurrentOwner() {
-        if (!ownerRepository.deleteOwnerOfProperty(property.getOwnerCurrent(), property)) {
+        if (!ownerRepository.deleteOwner(property.getOwnerCurrent())) {
             view.showError("Could not delete owner from property");
         }
     }
@@ -198,7 +198,7 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void savePropertyCurrentPrice(double currentPrice) {
-        PropertyPrice propertyPrice = new PropertyPrice(42, property.getIdProperty(), currentPrice, new Date(), new Date()); // TODO
+        PropertyPrice propertyPrice = new PropertyPrice(42, property, currentPrice, new Date(), new Date()); // TODO
         if (!propertyPriceRepository.savePropertyPrice(propertyPrice)) {
             view.showError("Could not save property price");
         }
@@ -293,7 +293,7 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void calculateAveragePriceFromDateToDate(Date from, Date to) {
-        int averagePrice = propertyPriceRepository.getAvgPropertyPrice(property, from, to);
+        double averagePrice = propertyPriceRepository.getAvgPropertyPrice(property.getIdProperty(), from, to);
         view.showMessage("Average price from " + from + " to " + to + " is " + averagePrice);
     }
 }

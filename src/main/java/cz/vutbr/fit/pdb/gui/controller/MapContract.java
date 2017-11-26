@@ -57,7 +57,7 @@ public class MapContract {
 
         void getProperty(Property property);
 
-        void getOwners();
+        void getPersons();
 
         void filterPropertyList(String name, double maxPrice, boolean hasOwner);
 

@@ -56,7 +56,7 @@ class PersonComboBoxModel extends AbstractListModel implements ComboBoxModel {
     public PersonComboBoxModel() {
 
         PersonRepository personRepository = new PersonRepository(App.getDataSource());
-        personList = personRepository.getPersons();
+        personList = personRepository.getPersonsList();
     }
 
     /**

@@ -16,34 +16,41 @@
 
 package cz.vutbr.fit.pdb.gui.controller;
 
-import cz.vutbr.fit.pdb.core.model.Owner;
+import cz.vutbr.fit.pdb.core.model.Person;
 
 import java.util.Date;
 import java.util.List;
 
 /**
- * Contract specifying interface between owners view and controller
+ * Contract specifying interface between persons view and controller
  *
  * @author Matúš Bútora
  * @author Andrej Klocok
  * @author Tomáš Vlk
  */
-public class OwnersContract {
+public class PersonsContract {
 
     public interface View {
 
-        void setController(OwnersContract.Controller controller);
+        void setController(PersonsContract.Controller controller);
 
         void showMessage(String message);
 
         void showError(String error);
 
-        void showOwnersList(List<Owner> ownerList);
+        void showPersonsList(List<Person> ownerList);
 
         void hide();
     }
 
     public interface Controller {
-        void getOwnersListOfDate(Date date);
+
+        void filterPersonsList(Date date_from, Date date_to);
+
+        Integer getPersonsCountOfPropertyDate(Person person, Date dateFrom, Date dateTo);
+
+        Integer getPersonsSumOfPropertyDate(Person person, Date dateFrom, Date dateTo);
+
+        Integer getPersonsDurationOfPropertyDate(Person person, Date dateFrom, Date dateTo);
     }
 }

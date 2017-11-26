@@ -384,16 +384,14 @@ public class PropertyWindow implements PropertyContract.View {
         propertyListSimilarLabel.setFont(new Font("sans-serif", Font.BOLD, 16));
         propertyListSimilarLabel.setBorder(new EmptyBorder(10, 0, 10, 10));
         propertyListSimilarHasOwnerCheckbox.setText("Filter property which has not owner");
-        propertyListSimilarHasOwnerCheckbox.addActionListener(e -> {
-            runSwingWorker(new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    controller.filterPropertyListSimilar(propertyListSimilarHasOwnerCheckbox.isSelected());
+        propertyListSimilarHasOwnerCheckbox.addActionListener(e -> runSwingWorker(new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                controller.filterPropertyListSimilar(propertyListSimilarHasOwnerCheckbox.isSelected());
 
-                    return null;
-                }
-            });
-        });
+                return null;
+            }
+        }));
         propertyListSimilarScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         propertyListSimilarScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         propertyListSimilarScrollPane.setViewportView(propertyListSimilarPanel);
@@ -595,7 +593,7 @@ public class PropertyWindow implements PropertyContract.View {
             mainFrame.setTitle("Detail of property " + property.getName());
             nameLabel.setText(property.getName());
             priceCurrentTextField.setPropertyPrice(property.getPriceCurrent());
-            ownerLabel.setText(property.getOwnerCurrent() != null ? property.getOwnerCurrent().getFirstName() + " " + property.getOwnerCurrent().getLastName() : "no owner");
+            ownerLabel.setText(property.hasOwner() ? property.getOwnerCurrent().getPerson().getFirstName() + " " + property.getOwnerCurrent().getPerson().getLastName() : "no owner");
             descriptionLabel.setText(property.getDescription());
 
             if (property.getGroundPlans().size() > 0) {
@@ -688,15 +686,15 @@ public class PropertyWindow implements PropertyContract.View {
                     "Owner from",
                     "Owner to"};
 
-            Object[][] data = new Object[property.getOwnerHistory().size()][4];
+            Object[][] data = new Object[property.getOwnerHistory().size()][columnNames.length];
 
             if (App.isDebug()) {
                 System.out.println("There are " + property.getOwnerHistory().size() + " owners");
             }
 
             for (int i = 0; i < property.getOwnerHistory().size(); i++) {
-                data[i][0] = property.getOwnerHistory().get(i).getFirstName();
-                data[i][1] = property.getOwnerHistory().get(i).getLastName();
+                data[i][0] = property.getOwnerHistory().get(i).getPerson().getFirstName();
+                data[i][1] = property.getOwnerHistory().get(i).getPerson().getLastName();
                 data[i][2] = property.getOwnerHistory().get(i).getValidFrom();
                 data[i][3] = property.getOwnerHistory().get(i).getValidTo();
             }

@@ -17,8 +17,8 @@
 package cz.vutbr.fit.pdb.gui.view;
 
 import cz.vutbr.fit.pdb.core.App;
-import cz.vutbr.fit.pdb.core.model.Owner;
-import cz.vutbr.fit.pdb.gui.controller.OwnersContract;
+import cz.vutbr.fit.pdb.core.model.Person;
+import cz.vutbr.fit.pdb.gui.controller.PersonsContract;
 import net.sourceforge.jdatepicker.JDatePicker;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
@@ -40,11 +40,11 @@ import java.util.List;
  * @author Matúš Bútora
  * @author Andrej Klocok
  * @author Tomáš Vlk
- * @see Owner
+ * @see Person
  */
-public class OwnersWindow implements OwnersContract.View {
+public class PersonsWindow implements PersonsContract.View {
 
-    private OwnersContract.Controller controller;
+    private PersonsContract.Controller controller;
 
     // Window components
     private final JFrame mainFrame;
@@ -55,11 +55,14 @@ public class OwnersWindow implements OwnersContract.View {
     private final JPanel rightPanel;
 
     // Top panel components
-    private JDatePicker datePicker;
+    private JLabel datePickerFromLabel;
+    private JDatePicker datePickerFrom;
+    private JLabel datePickerToLabel;
+    private JDatePicker datePickerTo;
 
     // Center panel components
-    private JTable ownersTable;
-    private JScrollPane ownersTableScrollPane;
+    private JTable personsTable;
+    private JScrollPane personsTableScrollPane;
 
     // Right panel components
 
@@ -70,7 +73,7 @@ public class OwnersWindow implements OwnersContract.View {
     /**
      * Default constructor
      */
-    public OwnersWindow() {
+    public PersonsWindow() {
 
         // Window components
         mainFrame = new JFrame();
@@ -81,10 +84,22 @@ public class OwnersWindow implements OwnersContract.View {
         rightPanel = new JPanel();
 
         // Top bar components
+        datePickerFromLabel = new JLabel();
+        UtilDateModel datePickerModelFrom = new UtilDateModel();
+        datePickerModelFrom.setValue(new Date());
+        datePickerModelFrom.setSelected(true);
+        JDatePanelImpl datePanelFrom = new JDatePanelImpl(datePickerModelFrom);
+        datePickerFrom = new JDatePickerImpl(datePanelFrom);
+        datePickerToLabel = new JLabel();
+        UtilDateModel datePickerModelTo = new UtilDateModel();
+        datePickerModelTo.setValue(new Date());
+        datePickerModelTo.setSelected(true);
+        JDatePanelImpl datePanelTo = new JDatePanelImpl(datePickerModelTo);
+        datePickerTo = new JDatePickerImpl(datePanelTo);
 
         // Center panel components
-        ownersTable = new JTable();
-        ownersTableScrollPane = new JScrollPane();
+        personsTable = new JTable();
+        personsTableScrollPane = new JScrollPane();
 
         // Right panel components
 
@@ -126,40 +141,49 @@ public class OwnersWindow implements OwnersContract.View {
 
         centerPanel.setLayout(new BorderLayout());
         centerPanel.setPreferredSize(new Dimension(800, 500));
-        centerPanel.add(ownersTable.getTableHeader(), BorderLayout.PAGE_START);
-        centerPanel.add(ownersTableScrollPane, BorderLayout.CENTER);
+        centerPanel.add(personsTable.getTableHeader(), BorderLayout.PAGE_START);
+        centerPanel.add(personsTableScrollPane, BorderLayout.CENTER);
 
         rightPanel.setVisible(false);
 
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
         bottomPanel.add(statusLabel);
 
-        UtilDateModel datePickerModel = new UtilDateModel();
-        datePickerModel.setValue(new Date());
-        datePickerModel.setSelected(true);
-        JDatePanelImpl datePanel = new JDatePanelImpl(datePickerModel);
-        datePicker = new JDatePickerImpl(datePanel);
-        datePicker.addActionListener(actionEvent -> {
-            Date selectedDate = (Date) datePicker.getModel().getValue();
+        datePickerFromLabel.setText("Select date from");
+        datePickerFrom.addActionListener(actionEvent -> {
+            Date selectedDate = (Date) datePickerFrom.getModel().getValue();
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    controller.getOwnersListOfDate(selectedDate);
-
+                    controller.filterPersonsList(selectedDate, (Date) datePickerTo.getModel().getValue());
                     return null;
                 }
             });
         });
-        topPanel.add((JComponent) (datePicker));
+        datePickerToLabel.setText("Select date to");
+        datePickerTo.addActionListener(actionEvent -> {
+            Date selectedDate = (Date) datePickerTo.getModel().getValue();
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.filterPersonsList((Date) datePickerFrom.getModel().getValue(), selectedDate);
+                    return null;
+                }
+            });
+        });
+        topPanel.add(datePickerFromLabel);
+        topPanel.add((JComponent) (datePickerFrom));
+        topPanel.add(datePickerToLabel);
+        topPanel.add((JComponent) (datePickerTo));
 
-        ownersTableScrollPane.setViewportView(ownersTable);
+        personsTableScrollPane.setViewportView(personsTable);
 
         statusLabel.setText("status");
         if (!App.isDebug()) {
             statusLabel.setVisible(false);
         }
 
-        mainFrame.setTitle("Owners list");
+        mainFrame.setTitle("Persons list");
         mainFrame.setSize(1200, 800);
         mainFrame.setPreferredSize(new Dimension(1200, 800));
         mainFrame.setBounds(100, 100, 500, 400);
@@ -224,7 +248,7 @@ public class OwnersWindow implements OwnersContract.View {
      * @param controller instance of controller
      */
     @Override
-    public void setController(OwnersContract.Controller controller) {
+    public void setController(PersonsContract.Controller controller) {
         this.controller = controller;
     }
 
@@ -253,12 +277,12 @@ public class OwnersWindow implements OwnersContract.View {
     }
 
     /**
-     * Show list of all owners in table
+     * Show list of all persons in table
      *
-     * @param ownersList owners list
+     * @param personList owners list
      */
     @Override
-    public void showOwnersList(List<Owner> ownersList) {
+    public void showPersonsList(List<Person> personList) {
         SwingUtilities.invokeLater(() -> {
             String[] columnNames = {"First Name",
                     "Last Name",
@@ -267,27 +291,29 @@ public class OwnersWindow implements OwnersContract.View {
                     "Postcode",
                     "Email",
                     "Property count",
-                    "Land property area sum"};
+                    "Land property area sum",
+                    "Duration [days]"
+            };
 
-            Object[][] data = new Object[ownersList.size()][8];
+            Object[][] data = new Object[personList.size()][9];
 
             if (App.isDebug()) {
-                System.out.println("There are " + ownersList.size() + " owners");
+                System.out.println("There are " + personList.size() + " persons");
             }
 
-            for (int i = 0; i < ownersList.size(); i++) {
-                data[i][0] = ownersList.get(i).getFirstName();
-                data[i][1] = ownersList.get(i).getLastName();
-                data[i][2] = ownersList.get(i).getStreet();
-                data[i][3] = ownersList.get(i).getCity();
-                data[i][4] = ownersList.get(i).getPsc();
-                data[i][5] = ownersList.get(i).getEmail();
-                data[i][6] = ownersList.get(i).getPropertyCurrentCount();
-                data[i][7] = ownersList.get(i).getPropertyCurrentLandAreaSum() + " m\u00B2";
+            for (int i = 0; i < personList.size(); i++) {
+                data[i][0] = personList.get(i).getFirstName();
+                data[i][1] = personList.get(i).getLastName();
+                data[i][2] = personList.get(i).getStreet();
+                data[i][3] = personList.get(i).getCity();
+                data[i][4] = personList.get(i).getPsc();
+                data[i][5] = personList.get(i).getEmail();
+                data[i][6] = this.controller.getPersonsCountOfPropertyDate(personList.get(i), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
+                data[i][7] = this.controller.getPersonsSumOfPropertyDate(personList.get(i), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue()) + " m\u00B2";
+                data[i][8] = this.controller.getPersonsDurationOfPropertyDate(personList.get(i), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
             }
-
-            ownersTable.setFillsViewportHeight(true);
-            ownersTable.setModel(new DefaultTableModel(data, columnNames) {
+            personsTable.setFillsViewportHeight(true);
+            personsTable.setModel(new DefaultTableModel(data, columnNames) {
 
                 @Override
                 public boolean isCellEditable(int row, int column) {
