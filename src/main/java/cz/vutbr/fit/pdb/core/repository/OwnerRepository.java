@@ -124,7 +124,6 @@ public class OwnerRepository extends Observable {
 
             ResultSet resultSet = statement.executeQuery();
             PropertyRepository propertyRepository = new PropertyRepository(dataSource);
-            PersonRepository personRepository = new PersonRepository(dataSource);
 
             LinkedList<Owner> ownersList = new LinkedList<>();
 
@@ -151,6 +150,8 @@ public class OwnerRepository extends Observable {
 
                 ownersList.add(owner);
             }
+
+
             connection.close();
             statement.close();
 
@@ -279,10 +280,13 @@ public class OwnerRepository extends Observable {
     /**
      * Method calls query under table Owner to Oracle database, which updates a record, according to given parameters.
      *
-     * @param owner @see Owner typed object, which stores attributes for query
+     * @param property property
+     * @param person   person
+     * @param from     from
+     * @param to       to
      * @return boolean True if query was successful otherwise False.
      */
-    public boolean updateOwner(Owner owner) {
+    public boolean updateOwner(Property property, Person person, Date from, Date to) {
         String query = "CALL temporal_update('owner',?,?,?,?)";
 
         Connection connection = null;
@@ -291,10 +295,10 @@ public class OwnerRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, owner.getProperty().getIdProperty());
-            statement.setInt(2, owner.getPerson().getIdPerson());
-            statement.setDate(3, new java.sql.Date(owner.getValidFrom().getTime()));
-            statement.setDate(4, new java.sql.Date(owner.getValidTo().getTime()));
+            statement.setInt(1, property.getIdProperty());
+            statement.setInt(2, person.getIdPerson());
+            statement.setDate(3, new java.sql.Date(from.getTime()));
+            statement.setDate(4, new java.sql.Date(to.getTime()));
 
             statement.executeQuery();
 
@@ -323,10 +327,12 @@ public class OwnerRepository extends Observable {
     /**
      * Method calls query under table Owner to Oracle database, which deletes a record, according to given parameters.
      *
-     * @param owner @see Owner typed object, which stores attributes for query
+     * @param property property
+     * @param from     from
+     * @param to       to
      * @return boolean True if query was successful otherwise False.
      */
-    public boolean deleteOwner(Owner owner) {
+    public boolean deleteOwner(Property property, Date from, Date to) {
         String query = "CALL temporal_delete('owner',?,?,?) ";
 
         Connection connection = null;
@@ -334,9 +340,9 @@ public class OwnerRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, owner.getProperty().getIdProperty());
-            statement.setDate(2, new java.sql.Date(owner.getValidFrom().getTime()));
-            statement.setDate(3, new java.sql.Date(owner.getValidTo().getTime()));
+            statement.setInt(1, property.getIdProperty());
+            statement.setDate(2, new java.sql.Date(from.getTime()));
+            statement.setDate(3, new java.sql.Date(to.getTime()));
 
             statement.executeQuery();
 
@@ -462,7 +468,6 @@ public class OwnerRepository extends Observable {
      * @return List of @see Owner typed objects
      */
     public List<Owner> getOwnersList() {
-        // TODO return current valid owners
         Owner owner = new Owner();
         return this.getOwnersListOfDate(owner);
     }
@@ -598,7 +603,8 @@ public class OwnerRepository extends Observable {
             //get persons and properties
             for (Owner o : ownerLinkedList) {
                 o.setPerson(personRepository.getPerson(o.getPerson()));
-                o.setProperty(propertyRepository.getProperty(o.getProperty()));
+                // currently not necessary
+                //o.setProperty(propertyRepository.getProperty(o.getProperty()));
             }
 
             return ownerLinkedList;
@@ -619,17 +625,5 @@ public class OwnerRepository extends Observable {
                 System.err.println("Error getOwnersListOfDate " + exception.getMessage());
             }
         }
-    }
-
-    // TODO javadoc
-    public boolean deleteOwnerOfPropertyFromDateToDate(Property property, Date from, Date to) {
-        // TODO
-        return true;
-    }
-
-    // TODO javadoc
-    public boolean saveOwnerOfPropertyFromDateToDate(Property property, Person person, Date from, Date to) {
-        // TODO
-        return true;
     }
 }

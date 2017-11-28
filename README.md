@@ -78,7 +78,7 @@ where `ORACLE_DB_LOGIN` and `ORACLE_DB_PASSWORD` are your login credentials to O
 Optionally you can specify:
 
 ```
-debug-true
+debug=true
 ```
 
 for printing debug information to standard output.

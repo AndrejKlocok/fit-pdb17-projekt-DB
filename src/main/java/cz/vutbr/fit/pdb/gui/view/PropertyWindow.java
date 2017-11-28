@@ -72,7 +72,6 @@ public class PropertyWindow implements PropertyContract.View {
     private JPanel editInfoPanel;
     private JButton editPropertyButton;
     private JButton deletePropertyButton;
-    private JButton deleteOwnerButton;
     private JPanel editGroundPlanPanel;
     private JButton createGroundPlanButton;
     private JButton deleteGroundPlanButton;
@@ -136,7 +135,6 @@ public class PropertyWindow implements PropertyContract.View {
         editInfoPanel = new JPanel();
         editPropertyButton = new JButton();
         deletePropertyButton = new JButton();
-        deleteOwnerButton = new JButton();
         editGroundPlanPanel = new JPanel();
         createGroundPlanButton = new JButton();
         deleteGroundPlanButton = new JButton();
@@ -280,7 +278,6 @@ public class PropertyWindow implements PropertyContract.View {
         editInfoPanel.setLayout(new BoxLayout(editInfoPanel, BoxLayout.X_AXIS));
         editInfoPanel.add(editPropertyButton);
         editInfoPanel.add(deletePropertyButton);
-        editInfoPanel.add(deleteOwnerButton);
         editGroundPlanPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         editGroundPlanPanel.setLayout(new BoxLayout(editGroundPlanPanel, BoxLayout.X_AXIS));
         editGroundPlanPanel.setOpaque(false);
@@ -328,25 +325,6 @@ public class PropertyWindow implements PropertyContract.View {
                     @Override
                     protected Void doInBackground() throws Exception {
                         controller.deleteProperty();
-
-                        return null;
-                    }
-                });
-            }
-        });
-        deleteOwnerButton.setText("Delete owner");
-        deleteOwnerButton.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(
-                    mainFrame,
-                    "Do you want delete owner from this property?",
-                    "Delete owner of property " + nameLabel.getText(),
-                    JOptionPane.YES_NO_OPTION);
-
-            if (option == JOptionPane.YES_OPTION) {
-                runSwingWorker(new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        controller.deleteCurrentOwner();
 
                         return null;
                     }
@@ -423,6 +401,7 @@ public class PropertyWindow implements PropertyContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
+                    // TODO control date picker from and to cross
                     controller.calculateAveragePriceFromDateToDate(selectedDateFrom, selectedDateTo);
 
                     return null;
@@ -458,7 +437,7 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPersonComboBoxLabel.setText("Select owner");
         editOwnersHistoryPersonComboBoxLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         editOwnersHistoryPersonComboBox.setBorder(new EmptyBorder(10, 0, 10, 10));
-        editOwnersHistoryEditButton.setText("Save");
+        editOwnersHistoryEditButton.setText("Update");
         editOwnersHistoryEditButton.addActionListener(e -> {
 
             Date selectedDateFrom = (Date) editOwnersHistoryDatePickerFrom.getModel().getValue();
@@ -468,6 +447,7 @@ public class PropertyWindow implements PropertyContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
+                    // TODO control date picker from and to cross
                     controller.saveOwnerFromDateToDate(selectedPerson, selectedDateFrom, selectedDateTo);
 
                     return null;
@@ -483,6 +463,7 @@ public class PropertyWindow implements PropertyContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
+                    // TODO control date picker from and to cross
                     controller.deleteOwnerFromDateToDate(selectedDateFrom, selectedDateTo);
 
                     return null;
