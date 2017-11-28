@@ -404,7 +404,7 @@ BEGIN
                     id_property=old_id_property AND valid_from = old_valid_from AND valid_to=old_valid_to;       
             
                 INSERT INTO owner(id_owner, id_property, valid_from, valid_to)
-                    VALUES(temporal_param, old_id_property, valid_to_param + 1, old_valid_to);
+                    VALUES(old_id, old_id_property, valid_to_param + 1, old_valid_to);
             
                 INSERT INTO owner(id_owner, id_property, valid_from, valid_to)
                     VALUES(temporal_param, old_id_property, valid_from_param, valid_to_param);            

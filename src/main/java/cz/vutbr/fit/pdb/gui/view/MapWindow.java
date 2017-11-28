@@ -22,8 +22,10 @@ import com.lynden.gmapsfx.javascript.event.GMapMouseEvent;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polygon;
+import com.lynden.gmapsfx.shapes.Polyline;
 import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.Property;
+import cz.vutbr.fit.pdb.gui.adapters.ShapePointsAdapter;
 import cz.vutbr.fit.pdb.gui.controller.MapContract;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -41,6 +43,8 @@ import java.awt.event.*;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Window showing list of all property on map
@@ -87,7 +91,6 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
     private Marker actualPosition;
     private List<MapShape> mapShapes;
     private boolean mapInitialized;
-
 
     /**
      * Default constructor
@@ -426,36 +429,57 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                             options,
                             options[0]);
 
-                    Property newProperty = new Property();
-
                     if (response == JOptionPane.CLOSED_OPTION) {
                         // closed window by cross
                         return;
                     }
 
-                    switch (response) {
-                        case 0:
-                            newProperty.setType(Property.Type.LAND);
-                            break;
-                        case 1:
-                            newProperty.setType(Property.Type.HOUSE);
-                            break;
-                        case 2:
-                            newProperty.setType(Property.Type.TERRACE_HOUSE);
-                            break;
-                        case 3:
-                            newProperty.setType(Property.Type.PREFAB);
-                            break;
-                        case 4:
-                            newProperty.setType(Property.Type.APARTMENT);
-                            break;
-                    }
-
-                    // TODO create dummy geometry and set it to newProperty
                     runSwingWorker(new SwingWorker<Void, Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
                             Platform.runLater(() -> {
+
+                                Property newProperty = new Property();
+                                newProperty.setName("new property");
+                                newProperty.setDescription("new property description");
+
+                                Double currentLat = event.getLatLong().getLatitude();
+                                Double currentLng = event.getLatLong().getLongitude();
+
+                                switch (response) {
+                                    case 0:
+                                        newProperty.setType(Property.Type.LAND);
+                                        double coordsLand[] = {currentLng, currentLat, currentLng + 0.0001, currentLat,
+                                                currentLng + 0.0001, currentLat + 0.0001, currentLng,
+                                                currentLat + 0.0001, currentLng, currentLat};
+                                        newProperty.setGeometry(JGeometry.createLinearPolygon(coordsLand, 2, 8307));
+                                        break;
+                                    case 1:
+                                        newProperty.setType(Property.Type.HOUSE);
+                                        double coordsHouse[] = {currentLng, currentLat, currentLng + 0.0001, currentLat,
+                                                currentLng + 0.0001, currentLat + 0.0001, currentLng,
+                                                currentLat + 0.0001, currentLng, currentLat};
+                                        newProperty.setGeometry(JGeometry.createLinearPolygon(coordsHouse, 2, 8307));
+                                        System.out.println(newProperty.getGeometry().getType());
+                                        break;
+                                    case 2:
+                                        newProperty.setType(Property.Type.TERRACE_HOUSE);
+                                        double coordsTerrace[] = {currentLng, currentLat, currentLng + 0.0001, currentLat + 0.0001};
+                                        newProperty.setGeometry(JGeometry.createLinearLineString(coordsTerrace, 2, 8307));
+                                        System.out.println(newProperty.getGeometry().getType());
+                                        break;
+                                    case 3:
+                                        newProperty.setType(Property.Type.PREFAB);
+                                        newProperty.setGeometry(new JGeometry(currentLng, currentLat, currentLng + 0.0001, currentLat + 0.0001, 8307));
+                                        break;
+                                    case 4:
+                                        newProperty.setType(Property.Type.APARTMENT);
+                                        JGeometry j = JGeometry.createCircle(16.608989, 49.187766, 16.612989, 49.191766,
+                                                16.608989, 49.195766, 8307);
+                                        break;
+                                }
+
+                                newProperty.setIdProperty(controller.getNewIdForProperty());
                                 controller.createProperty(newProperty);
                                 controller.getProperty(newProperty);
 
@@ -476,6 +500,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                     });
                 }
             };
+
 
             propertyCreateItem.addActionListener(menuListener);
             findNearestItem.addActionListener(menuListener);
@@ -510,6 +535,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
      * @param controller instance of controller
      */
     @Override
+
     public void setController(MapContract.Controller controller) {
         this.controller = controller;
     }
@@ -571,14 +597,13 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             // add list of properties to map
             for (Property property : propertyList) {
 
+                final MapShape shape = MapShapeAdapter.jGeometry2MapShape(property.getGeometry(), property.getType());
+
                 if (App.isDebug()) {
                     System.out.println("property: " + property.getName());
                 }
 
-                final MapShape shape = MapShapeAdapter.jGeometry2MapShape(property.getGeometry());
-
                 JPopupMenu propertyPopupMenu = new JPopupMenu();
-
                 JMenuItem propertyEditItem = new JMenuItem("Edit shape");
                 JMenuItem propertyMoveItem = new JMenuItem("Move shape");
                 JMenuItem propertySaveItem = new JMenuItem("Save");
@@ -613,18 +638,40 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                             shape.setEditable(false);
                             shape.setDraggable(false);
 
-                            // TODO
+                            double[] newShapeCoordinates;
+                            ShapePointsAdapter shapePointsAdapter = new ShapePointsAdapter();
+                            if (shape instanceof com.lynden.gmapsfx.shapes.Polygon) {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(((Polygon) shape).getPath());
+                            } else if (shape instanceof com.lynden.gmapsfx.shapes.Rectangle) {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(shape.getBounds());
+                            } else if ((shape instanceof com.lynden.gmapsfx.shapes.Polyline)) {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(((Polyline) shape).getPath());
+                            } else {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(shape.getBounds());
+                            }
+
                             runSwingWorker(new SwingWorker<Void, Void>() {
                                 @Override
                                 protected Void doInBackground() throws Exception {
-                                    controller.savePropertyGeometry(property, JGeometry.createLinearPolygon(new double[2], 2, 2));
+                                    JGeometry newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
+                                    ;
+                                    if (property.getType() == Property.Type.PREFAB) {
+                                        newGeometry = new JGeometry(newShapeCoordinates[0], newShapeCoordinates[1],
+                                                newShapeCoordinates[2], newShapeCoordinates[3], 8307);
+                                    } else if (property.getType() == Property.Type.APARTMENT) {
 
+                                    } else if (property.getType() == Property.Type.HOUSE) {
+                                        newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
+                                    } else if (property.getType() == Property.Type.TERRACE_HOUSE) {
+                                        newGeometry = JGeometry.createLinearLineString(newShapeCoordinates, 2, 8307);
+                                    } else if (property.getType() == Property.Type.LAND) {
+                                        newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
+                                    }
+
+                                    controller.savePropertyGeometry(property, newGeometry);
                                     return null;
                                 }
                             });
-                            if (App.isDebug()) {
-                                System.out.println("save: " + (shape instanceof com.lynden.gmapsfx.shapes.Polygon ? ((Polygon) shape).getPath().getArray().getSlot(0).toString() : shape.getBounds().toString()));
-                            }
                         });
                     } else if (event.getActionCommand().equalsIgnoreCase("Find nearest property")) {
                         runSwingWorker(new SwingWorker<Void, Void>() {

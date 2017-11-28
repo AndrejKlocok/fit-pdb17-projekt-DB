@@ -20,6 +20,7 @@ import cz.vutbr.fit.pdb.core.model.*;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -172,6 +173,37 @@ public class PropertyRepository extends Observable {
                 System.err.println("Error getProperty " + exception.getMessage());
             }
         }
+    }
+
+    //TODO: javadoc mozno neni potreba
+    public int getNewIdForProperty() {
+        int lastInsertedId;
+        String query = "select id_property from property where id_property = (select max(id_property) from property)";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                lastInsertedId = resultSet.getInt("id_property") + 1;
+
+                connection.close();
+                statement.close();
+                return lastInsertedId;
+            } else {
+
+                connection.close();
+                statement.close();
+                return 0;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return 0;
+        }
+
     }
 
     /**
@@ -349,7 +381,6 @@ public class PropertyRepository extends Observable {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
-
             statement.executeQuery();
 
             connection.close();
@@ -477,7 +508,6 @@ public class PropertyRepository extends Observable {
 
     // TODO javadoc
     public LinkedList<Property> searchPropertyList(String name, Double price, boolean hasOwner) {
-
         String query = "SELECT * FROM property"
                 + (!name.isEmpty() ? " WHERE property_name LIKE ? " : "");
 
@@ -554,26 +584,146 @@ public class PropertyRepository extends Observable {
 
     // TODO javadoc
     public Property getNearestProperty(double lat, double lng) {
-        // TODO
-        return null;
+        String query = "SELECT P.id_property, P.distance " +
+                "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
+                "FROM property PR2 " +
+                "WHERE MDSYS.SDO_NN(PR2.geometry,SDO_GEOMETRY(2001, 8307, SDO_POINT_TYPE(?,?, NULL), " +
+                " NULL, NULL ) , 'UNIT=meter', 1) = 'TRUE' " +
+                "ORDER BY distance) P, " +
+                "(SELECT DISTINCT PR.id_property " +
+                "FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) " +
+                "WHERE (CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to AND " +
+                "CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR O.id_owner IS NULL ) p_available " +
+                "WHERE P.id_property=p_available.id_property AND ROWNUM = 1 ORDER BY P.distance";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setDouble(1, lng);
+            statement.setDouble(2, lat);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int propertyId = resultSet.getInt("id_property");
+
+                Property nearestProperty = getPropertyById(propertyId);
+                connection.close();
+                statement.close();
+
+                return nearestProperty;
+            } else {
+                connection.close();
+                statement.close();
+
+                return null;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return null;
+        }
     }
 
     // TODO javadoc
     public Property getPropertyNearestProperty(Property property) {
-        // TODO
-        return null;
+        String query = "SELECT P.id_property, ROUND(P.distance,1) as PropertyDistance " +
+                "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
+                "FROM property PR1, property PR2 " +
+                "WHERE PR1.id_property=? AND PR1.id_property <> PR2.id_property AND PR2.property_type <> 'land' AND " +
+                "MDSYS.SDO_NN(PR2.geometry, PR1.geometry, 'UNIT=meter', 1) = 'TRUE' " +
+                "ORDER BY distance) P, " +
+                "(SELECT DISTINCT PR.id_property " +
+                "FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) WHERE (CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to AND " +
+                "CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR O.id_owner IS NULL ) p_available " +
+                "WHERE P.id_property=p_available.id_property AND ROWNUM = 1 " +
+                "ORDER BY P.distance";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, property.getIdProperty());
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                Property nearestProperty = getPropertyById(resultSet.getInt("id_property"));
+
+                connection.close();
+                statement.close();
+                return nearestProperty;
+            } else {
+
+                statement.close();
+                connection.close();
+                return null;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return null;
+        }
     }
 
     // TODO javadoc
     public LinkedList<Property> getPropertyAdjacentPropertyList(Property property) {
-        // TODO
-        return new LinkedList<>();
+        LinkedList<Property> adjacentPropertyList = new LinkedList<>();
+        String query = "select PR2.id_property FROM property PR1, property PR2 WHERE PR1.id_property <> PR2.id_property " +
+                "AND PR1.id_property = ? AND sdo_relate(PR1.geometry, PR2.geometry, 'mask=anyinteract') = 'TRUE'";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, property.getIdProperty());
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int propertyId = resultSet.getInt("id_property");
+                System.out.println("PROPERTY ID " + propertyId);
+                adjacentPropertyList.add(getPropertyById(propertyId));
+            }
+
+            connection.close();
+            statement.close();
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return null;
+        }
+        return adjacentPropertyList;
     }
 
     // TODO javadoc
     public double getPropertyArea(Property property) {
-        // TODO
-        return 42;
+        String query = "SELECT SDO_GEOM.SDO_AREA(geometry, 0.005, 'unit=sq_m') AS area FROM property where id_property = ?";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, property.getIdProperty());
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                double propertyArea = resultSet.getDouble("area");
+
+                connection.close();
+                statement.close();
+                return propertyArea;
+            } else {
+
+                statement.close();
+                connection.close();
+                return 0;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return 0;
+        }
     }
 
     /**
