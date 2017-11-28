@@ -102,13 +102,13 @@ CREATE INDEX property_map_index ON property(geometry) indextype is MDSYS.SPATIAL
 SELECT property_name, SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(geometry, 0.000001) valid FROM PROPERTY;
 
 SELECT p.property_name, p.geometry.ST_IsValid() FROM property p;
--- TODO better house naming and minimal 4 property of type land (due getAdjacentProperty)
+-- TODO better house naming, description and minimal 4 property of type land (due getAdjacentProperty)
 --inserts
 Insert into PROPERTY (ID_PROPERTY,PROPERTY_TYPE,GEOMETRY,PROPERTY_NAME,PROPERTY_DESCRIPTION) values (property_seq.nextval,'house',MDSYS.SDO_GEOMETRY(2003, 8307, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1, 1003, 1), MDSYS.SDO_ORDINATE_ARRAY(16.607206, 49.191432, 16.607436, 49.191344, 16.607542, 49.191457, 16.60731, 49.19155, 16.607206, 49.191432)),'dom1','desc1');
 Insert into PROPERTY (ID_PROPERTY,PROPERTY_TYPE,GEOMETRY,PROPERTY_NAME,PROPERTY_DESCRIPTION) values (property_seq.nextval,'house',MDSYS.SDO_GEOMETRY(2003, 8307, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1, 1003, 1), MDSYS.SDO_ORDINATE_ARRAY(16.603125, 49.203747, 16.603033, 49.2037, 16.603319, 49.203454, 16.603418, 49.2035, 16.603125, 49.203747)),'dom2','desc2');
 Insert into PROPERTY (ID_PROPERTY,PROPERTY_TYPE,GEOMETRY,PROPERTY_NAME,PROPERTY_DESCRIPTION) values (property_seq.nextval,'house',MDSYS.SDO_GEOMETRY(2003, 8307, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1, 1003, 1), MDSYS.SDO_ORDINATE_ARRAY(16.606089, 49.191362, 16.606155, 49.191373, 16.606149, 49.191385, 16.606294, 49.191429, 16.606284, 49.191449, 16.606266, 49.191457, 16.606235, 49.191536, 16.606241, 49.191543, 16.606256, 49.191543, 16.606284, 49.191571, 16.606243, 49.191595, 16.606342, 49.191633, 16.606344, 49.191604, 16.6064, 49.191604, 16.606405, 49.191644, 16.6065, 49.191605, 16.606456, 49.191563, 16.606534, 49.191533, 16.60658, 49.191566, 16.606637, 49.191545, 16.606727, 49.191647, 16.606717, 49.191673, 16.6064, 49.191805, 16.606376, 49.191805, 16.605984, 49.191663, 16.605984, 49.191622, 16.606089, 49.191362)),'dom3','desc3');
 Insert into PROPERTY (ID_PROPERTY,PROPERTY_TYPE,GEOMETRY,PROPERTY_NAME,PROPERTY_DESCRIPTION) values (property_seq.nextval,'house',MDSYS.SDO_GEOMETRY(2003, 8307, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1, 1003, 1, 11, 2003, 1), MDSYS.SDO_ORDINATE_ARRAY(16.605299, 49.192204, 16.605467, 49.191726, 16.60592, 49.191791, 16.605744, 49.192274, 16.605299, 49.192204, 16.6055, 49.192087, 16.605573, 49.191874, 16.605722, 49.191899, 16.605647, 49.192108, 16.6055, 49.192087)),'dom4','diera');
-
+-- TODO street city  psc email
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Jozef','Mak','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Vladimir','Pes','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Milos','Milos','street','city','psc','email');
@@ -118,26 +118,26 @@ Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Monika','Nováková','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Jozef','Starý','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Lucia','Malá','street','city','psc','email');
--- TODO valid to infinity
+
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,1,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2015-1-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,1,TO_DATE('2015-1-2','yyyy-mm-dd'),TO_DATE('2016-12-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,1,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-24','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,1,TO_DATE('2017-6-25','yyyy-mm-dd'),TO_DATE('2017-11-7','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,1,TO_DATE('2017-6-25','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (8,2,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2011-11-17','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,2,TO_DATE('2012-1-1','yyyy-mm-dd'),TO_DATE('2014-8-30','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,2,TO_DATE('2014-1-1','yyyy-mm-dd'),TO_DATE('2015-1-19','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,2,TO_DATE('2015-1-20','yyyy-mm-dd'),TO_DATE('2015-11-30','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,2,TO_DATE('2015-12-22','yyyy-mm-dd'),TO_DATE('2016-8-30','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2016-9-1','yyyy-mm-dd'),TO_DATE('2017-7-11','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2016-9-1','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (9,3,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2012-12-14','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,3,TO_DATE('2013-1-1','yyyy-mm-dd'),TO_DATE('2015-12-28','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,3,TO_DATE('2015-1-1','yyyy-mm-dd'),TO_DATE('2017-6-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,3,TO_DATE('2016-8-1','yyyy-mm-dd'),TO_DATE('2016-12-28','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,3,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-30','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-7-30','yyyy-mm-dd'),TO_DATE('2017-11-7','yyyy-mm-dd'));
--- TODO valid to infinity
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-7-30','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
+
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
                 800000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2011-6-30','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
@@ -157,7 +157,7 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
                 1280000,  TO_DATE('2016-12-2','yyyy-mm-dd'), TO_DATE('2017-6-24','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
-                1380000,  TO_DATE('2017-6-25','yyyy-mm-dd'), TO_DATE('2017-11-7','yyyy-mm-dd'));
+                1380000,  TO_DATE('2017-6-25','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
                 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 2,
                 750000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2012-7-31','yyyy-mm-dd'));
@@ -178,7 +178,7 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 2,
                 1380000,  TO_DATE('2016-12-21','yyyy-mm-dd'), TO_DATE('2017-4-21','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 2,
-                1180000,  TO_DATE('2017-4-22','yyyy-mm-dd'), TO_DATE('2017-11-7','yyyy-mm-dd'));
+                1180000,  TO_DATE('2017-4-22','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
                 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 3,
                 850000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2011-8-28','yyyy-mm-dd'));
@@ -199,7 +199,7 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 3,
                 1280000,  TO_DATE('2016-12-5','yyyy-mm-dd'), TO_DATE('2017-1-18','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 3,
-                1240000,  TO_DATE('2017-1-19','yyyy-mm-dd'), TO_DATE('2017-11-7','yyyy-mm-dd'));
+                1240000,  TO_DATE('2017-1-19','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 -- Spatial selects --------------------------------------------------------------------------------------------------------------
 -- Return land area of property

@@ -16,11 +16,13 @@
 
 package cz.vutbr.fit.pdb.core.repository;
 
-import cz.vutbr.fit.pdb.core.model.*;
+import cz.vutbr.fit.pdb.core.model.GroundPlan;
+import cz.vutbr.fit.pdb.core.model.Owner;
+import cz.vutbr.fit.pdb.core.model.Property;
+import cz.vutbr.fit.pdb.core.model.PropertyPrice;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -56,7 +58,9 @@ public class PropertyRepository extends Observable {
      * @return List of @see Property objects
      */
     public List<Property> getPropertyList() {
-        String query = "SELECT * FROM property";
+        String query = "SELECT * " +
+                "FROM property " +
+                "ORDER BY property_name";
         Connection connection = null;
         PreparedStatement statement;
 
@@ -117,7 +121,9 @@ public class PropertyRepository extends Observable {
      * @return @see Property object
      */
     public Property getProperty(Property property) {
-        String query = "SELECT * FROM property WHERE id_property = ?";
+        String query = "SELECT * " +
+                "FROM property " +
+                "WHERE id_property = ?";
         Connection connection = null;
         PreparedStatement statement;
 
@@ -175,37 +181,6 @@ public class PropertyRepository extends Observable {
         }
     }
 
-    //TODO: javadoc mozno neni potreba
-    public int getNewIdForProperty() {
-        int lastInsertedId;
-        String query = "select id_property from property where id_property = (select max(id_property) from property)";
-
-        try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
-
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()) {
-                lastInsertedId = resultSet.getInt("id_property") + 1;
-
-                connection.close();
-                statement.close();
-                return lastInsertedId;
-            } else {
-
-                connection.close();
-                statement.close();
-                return 0;
-            }
-
-        } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
-
-            return 0;
-        }
-
-    }
-
     /**
      * Method calls query under table Owner to Oracle database, which returns record, according to given parameter.
      *
@@ -213,7 +188,9 @@ public class PropertyRepository extends Observable {
      * @return @see Property object
      */
     public Property getPropertyById(int idProperty) {
-        String query = "SELECT * FROM property WHERE id_property = ?";
+        String query = "SELECT * " +
+                "FROM property " +
+                "WHERE id_property = ?";
 
         Property property;
         Connection connection = null;
@@ -279,8 +256,8 @@ public class PropertyRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean createProperty(Property property) {
-        String query = "INSERT INTO property(id_property, property_type, geometry, property_name, property_description)"
-                + " values(property_seq.nextval, ?,?,?,?)";
+        String query = "INSERT INTO property(id_property, property_type, geometry, property_name, property_description) "
+                + "VALUES(property_seq.nextval, ?,?,?,?)";
         Connection connection = null;
         PreparedStatement statement;
 
@@ -325,7 +302,9 @@ public class PropertyRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean saveProperty(Property property) {
-        String query = "UPDATE property SET property_type = ?, geometry = ?, property_name = ?, property_description = ? WHERE id_property = ? ";
+        String query = "UPDATE property " +
+                "SET property_type = ?, geometry = ?, property_name = ?, property_description = ? " +
+                "WHERE id_property = ? ";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -373,7 +352,9 @@ public class PropertyRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean deleteProperty(Property property) {
-        String query = "DELETE FROM property WHERE id_property = ?";
+        String query = "DELETE " +
+                "FROM property " +
+                "WHERE id_property = ?";
         Connection connection = null;
         PreparedStatement statement;
 
@@ -506,13 +487,24 @@ public class PropertyRepository extends Observable {
         }
     }
 
-    // TODO javadoc
+    /**
+     * Search property list by given search parameters
+     *
+     * @param name     name of property
+     * @param price    current price of property
+     * @param hasOwner if property might has currently owner
+     * @return found property list
+     */
     public LinkedList<Property> searchPropertyList(String name, Double price, boolean hasOwner) {
-        String query = "SELECT * FROM property"
-                + (!name.isEmpty() ? " WHERE property_name LIKE ? " : "");
+        String query = "SELECT * " +
+                "FROM property "
+                + (!name.isEmpty() ? "WHERE property_name LIKE ? " : "") +
+                "ORDER BY property_name";
+
+        Connection connection = null;
 
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             if (!name.isEmpty()) {
                 statement.setString(1, "%" + name + "%");
@@ -579,10 +571,23 @@ public class PropertyRepository extends Observable {
             System.err.println("Error " + exception.getMessage());
 
             return new LinkedList<>();
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error searchPropertyList " + exception.getMessage());
+            }
         }
     }
 
-    // TODO javadoc
+    /**
+     * Search nearest property by given latitude and longitude
+     *
+     * @param lat latitude
+     * @param lng longitude
+     * @return found property
+     */
     public Property getNearestProperty(double lat, double lng) {
         String query = "SELECT P.id_property, P.distance " +
                 "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
@@ -596,8 +601,10 @@ public class PropertyRepository extends Observable {
                 "CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR O.id_owner IS NULL ) p_available " +
                 "WHERE P.id_property=p_available.id_property AND ROWNUM = 1 ORDER BY P.distance";
 
+        Connection connection = null;
+
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setDouble(1, lng);
             statement.setDouble(2, lat);
@@ -623,10 +630,22 @@ public class PropertyRepository extends Observable {
             System.err.println("Error " + exception.getMessage());
 
             return null;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getNearestProperty " + exception.getMessage());
+            }
         }
     }
 
-    // TODO javadoc
+    /**
+     * Search nearest property to given property
+     *
+     * @param property property which will be used to searching
+     * @return found nearest property
+     */
     public Property getPropertyNearestProperty(Property property) {
         String query = "SELECT P.id_property, ROUND(P.distance,1) as PropertyDistance " +
                 "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
@@ -640,8 +659,10 @@ public class PropertyRepository extends Observable {
                 "WHERE P.id_property=p_available.id_property AND ROWNUM = 1 " +
                 "ORDER BY P.distance";
 
+        Connection connection = null;
+
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
 
@@ -663,45 +684,76 @@ public class PropertyRepository extends Observable {
             System.err.println("Error " + exception.getMessage());
 
             return null;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getPropertyNearestProperty " + exception.getMessage());
+            }
         }
     }
 
-    // TODO javadoc
+    /**
+     * Search adjacent property of given property
+     *
+     * @param property property which will be used for searching
+     * @return found adjacent property list
+     */
     public LinkedList<Property> getPropertyAdjacentPropertyList(Property property) {
         LinkedList<Property> adjacentPropertyList = new LinkedList<>();
-        String query = "select PR2.id_property FROM property PR1, property PR2 WHERE PR1.id_property <> PR2.id_property " +
-                "AND PR1.id_property = ? AND sdo_relate(PR1.geometry, PR2.geometry, 'mask=anyinteract') = 'TRUE'";
+        String query = "SELECT PR2.id_property " +
+                "FROM property PR1, property PR2 " +
+                "WHERE PR1.id_property <> PR2.id_property AND PR1.id_property = ? AND sdo_relate(PR1.geometry, PR2.geometry, 'mask=anyinteract') = 'TRUE' " +
+                "ORDER BY PR2.property_name";
+
+        Connection connection = null;
 
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
 
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                int propertyId = resultSet.getInt("id_property");
-                System.out.println("PROPERTY ID " + propertyId);
-                adjacentPropertyList.add(getPropertyById(propertyId));
+                adjacentPropertyList.add(getPropertyById(resultSet.getInt("id_property")));
             }
 
             connection.close();
             statement.close();
 
+            return adjacentPropertyList;
+
         } catch (SQLException exception) {
             System.err.println("Error " + exception.getMessage());
 
             return null;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getPropertyAdjacentPropertyList " + exception.getMessage());
+            }
         }
-        return adjacentPropertyList;
     }
 
-    // TODO javadoc
+    /**
+     * Calculates area of property shape
+     *
+     * @param property property
+     * @return area in square metres
+     */
     public double getPropertyArea(Property property) {
-        String query = "SELECT SDO_GEOM.SDO_AREA(geometry, 0.005, 'unit=sq_m') AS area FROM property where id_property = ?";
+        String query = "SELECT SDO_GEOM.SDO_AREA(geometry, 0.005, 'unit=sq_m') AS area " +
+                "FROM property " +
+                "WHERE id_property = ?";
+
+        Connection connection = null;
 
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
 
@@ -723,6 +775,13 @@ public class PropertyRepository extends Observable {
             System.err.println("Error " + exception.getMessage());
 
             return 0;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getPropertyArea " + exception.getMessage());
+            }
         }
     }
 

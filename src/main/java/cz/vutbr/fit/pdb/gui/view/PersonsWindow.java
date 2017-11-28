@@ -86,14 +86,10 @@ public class PersonsWindow implements PersonsContract.View {
         // Top bar components
         datePickerFromLabel = new JLabel();
         UtilDateModel datePickerModelFrom = new UtilDateModel();
-        datePickerModelFrom.setValue(new Date());
-        datePickerModelFrom.setSelected(true);
         JDatePanelImpl datePanelFrom = new JDatePanelImpl(datePickerModelFrom);
         datePickerFrom = new JDatePickerImpl(datePanelFrom);
         datePickerToLabel = new JLabel();
         UtilDateModel datePickerModelTo = new UtilDateModel();
-        datePickerModelTo.setValue(new Date());
-        datePickerModelTo.setSelected(true);
         JDatePanelImpl datePanelTo = new JDatePanelImpl(datePickerModelTo);
         datePickerTo = new JDatePickerImpl(datePanelTo);
 
@@ -151,22 +147,24 @@ public class PersonsWindow implements PersonsContract.View {
 
         datePickerFromLabel.setText("Select date from");
         datePickerFrom.addActionListener(actionEvent -> {
-            Date selectedDate = (Date) datePickerFrom.getModel().getValue();
+            Date selectedDateFrom = (Date) datePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) datePickerTo.getModel().getValue();
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    controller.filterPersonsList(selectedDate, (Date) datePickerTo.getModel().getValue());
+                    controller.filterPersonsList(selectedDateFrom, selectedDateTo);
                     return null;
                 }
             });
         });
         datePickerToLabel.setText("Select date to");
         datePickerTo.addActionListener(actionEvent -> {
-            Date selectedDate = (Date) datePickerTo.getModel().getValue();
+            Date selectedDateFrom = (Date) datePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) datePickerTo.getModel().getValue();
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    controller.filterPersonsList((Date) datePickerFrom.getModel().getValue(), selectedDate);
+                    controller.filterPersonsList(selectedDateFrom, selectedDateTo);
                     return null;
                 }
             });
@@ -308,9 +306,9 @@ public class PersonsWindow implements PersonsContract.View {
                 data[i][3] = personList.get(i).getCity();
                 data[i][4] = personList.get(i).getPsc();
                 data[i][5] = personList.get(i).getEmail();
-                data[i][6] = this.controller.getPersonsCountOfPropertyDate(personList.get(i), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
-                data[i][7] = this.controller.getPersonsSumOfPropertyDate(personList.get(i), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue()) + " m\u00B2";
-                data[i][8] = this.controller.getPersonsDurationOfPropertyDate(personList.get(i), (Date) datePickerFrom.getModel().getValue(), (Date) datePickerTo.getModel().getValue());
+                data[i][6] = this.controller.getPersonsCountOfProperty(personList.get(i));
+                data[i][7] = this.controller.getPersonsSumOfProperty(personList.get(i)) + " m\u00B2";
+                data[i][8] = this.controller.getPersonsDurationOfProperty(personList.get(i));
             }
             personsTable.setFillsViewportHeight(true);
             personsTable.setModel(new DefaultTableModel(data, columnNames) {

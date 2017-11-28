@@ -57,7 +57,10 @@ public class OwnerRepository extends Observable {
      * @return List of @see Owner type objects
      */
     public List<Owner> getOwnerHistory(Person person) {
-        String query = "SELECT person.*,  owner.VALID_FROM, owner.VALID_TO, property.* FROM owner JOIN person ON(person.ID_PERSON=owner.id_owner)JOIN property ON(property.id_property=owner.id_property)  WHERE id_owner = ?";
+        String query = "SELECT person.*, owner.valid_from, owner.valid_to, property.* " +
+                "FROM owner JOIN person ON(person.ID_PERSON=owner.id_owner) JOIN property ON(property.id_property=owner.id_property) " +
+                "WHERE id_owner = ? " +
+                "ORDER BY owner.valid_from";
         Connection connection = null;
         PreparedStatement statement;
         try {
@@ -109,11 +112,12 @@ public class OwnerRepository extends Observable {
      * @return List of @see Owner type objects
      */
     public List<Owner> getOwnersListOfProperty(Property property) {
-        String query = "SELECT owner.id_owner, owner.VALID_FROM, owner.VALID_TO, property.*, person.*  " +
+        String query = "SELECT owner.id_owner, owner.valid_from, owner.valid_to, property.*, person.*  " +
                 "FROM owner " +
                 "JOIN person ON(owner.id_owner=person.id_person) " +
                 "JOIN property ON(owner.id_property=property.id_property) " +
-                "WHERE owner.id_property = ?";
+                "WHERE owner.id_property = ? " +
+                "ORDER BY owner.valid_from";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -124,7 +128,6 @@ public class OwnerRepository extends Observable {
 
             ResultSet resultSet = statement.executeQuery();
             PropertyRepository propertyRepository = new PropertyRepository(dataSource);
-            PersonRepository personRepository = new PersonRepository(dataSource);
 
             LinkedList<Owner> ownersList = new LinkedList<>();
 
@@ -151,6 +154,8 @@ public class OwnerRepository extends Observable {
 
                 ownersList.add(owner);
             }
+
+
             connection.close();
             statement.close();
 
@@ -177,7 +182,15 @@ public class OwnerRepository extends Observable {
      * @return @see Owner
      */
     public Owner getOwner(Owner oldOwner) {
-        String query = "Select owner.* from owner where owner.id_owner=? and owner.id_property=? and owner.valid_from=? and owner.valid_to=?";
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = oldOwner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(oldOwner.getValidFrom().getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = oldOwner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(oldOwner.getValidTo().getTime());
+
+        String query = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE owner.id_owner=? AND owner.id_property=? AND owner.valid_from=? AND owner.valid_to=?";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -187,8 +200,8 @@ public class OwnerRepository extends Observable {
 
             statement.setInt(1, oldOwner.getPerson().getIdPerson());
             statement.setInt(2, oldOwner.getProperty().getIdProperty());
-            statement.setDate(3, new java.sql.Date(oldOwner.getValidFrom().getTime()));
-            statement.setDate(4, new java.sql.Date(oldOwner.getValidTo().getTime()));
+            statement.setDate(3, sqlDateFrom);
+            statement.setDate(4, sqlDateTo);
 
             ResultSet resultSet = statement.executeQuery();
             PropertyRepository propertyRepository = new PropertyRepository(dataSource);
@@ -239,6 +252,12 @@ public class OwnerRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean createOwner(Owner owner) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = owner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(owner.getValidFrom().getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = owner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(owner.getValidTo().getTime());
+
         String query = "CALL temporal_insert('owner', ?, ?, ?, ?)";
 
         Connection connection = null;
@@ -249,8 +268,8 @@ public class OwnerRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, owner.getProperty().getIdProperty());
             statement.setInt(2, owner.getPerson().getIdPerson());
-            statement.setDate(3, new java.sql.Date(owner.getValidFrom().getTime()));
-            statement.setDate(4, new java.sql.Date(owner.getValidTo().getTime()));
+            statement.setDate(3, sqlDateFrom);
+            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -279,10 +298,19 @@ public class OwnerRepository extends Observable {
     /**
      * Method calls query under table Owner to Oracle database, which updates a record, according to given parameters.
      *
-     * @param owner @see Owner typed object, which stores attributes for query
+     * @param property property
+     * @param person   person
+     * @param from     from
+     * @param to       to
      * @return boolean True if query was successful otherwise False.
      */
-    public boolean updateOwner(Owner owner) {
+    public boolean updateOwner(Property property, Person person, Date from, Date to) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = from == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(from.getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = to == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(to.getTime());
+
         String query = "CALL temporal_update('owner',?,?,?,?)";
 
         Connection connection = null;
@@ -291,10 +319,10 @@ public class OwnerRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, owner.getProperty().getIdProperty());
-            statement.setInt(2, owner.getPerson().getIdPerson());
-            statement.setDate(3, new java.sql.Date(owner.getValidFrom().getTime()));
-            statement.setDate(4, new java.sql.Date(owner.getValidTo().getTime()));
+            statement.setInt(1, property.getIdProperty());
+            statement.setInt(2, person.getIdPerson());
+            statement.setDate(3, sqlDateFrom);
+            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -323,10 +351,18 @@ public class OwnerRepository extends Observable {
     /**
      * Method calls query under table Owner to Oracle database, which deletes a record, according to given parameters.
      *
-     * @param owner @see Owner typed object, which stores attributes for query
+     * @param property property
+     * @param from     from
+     * @param to       to
      * @return boolean True if query was successful otherwise False.
      */
-    public boolean deleteOwner(Owner owner) {
+    public boolean deleteOwner(Property property, Date from, Date to) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = from == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(from.getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = to == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(to.getTime());
+
         String query = "CALL temporal_delete('owner',?,?,?) ";
 
         Connection connection = null;
@@ -334,9 +370,9 @@ public class OwnerRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, owner.getProperty().getIdProperty());
-            statement.setDate(2, new java.sql.Date(owner.getValidFrom().getTime()));
-            statement.setDate(3, new java.sql.Date(owner.getValidTo().getTime()));
+            statement.setInt(1, property.getIdProperty());
+            statement.setDate(2, sqlDateFrom);
+            statement.setDate(3, sqlDateTo);
 
             statement.executeQuery();
 
@@ -462,7 +498,6 @@ public class OwnerRepository extends Observable {
      * @return List of @see Owner typed objects
      */
     public List<Owner> getOwnersList() {
-        // TODO return current valid owners
         Owner owner = new Owner();
         return this.getOwnersListOfDate(owner);
     }
@@ -475,33 +510,53 @@ public class OwnerRepository extends Observable {
      */
     private List<Owner> getOwnersListOfDate(Owner owner) {
 
-        String queryProperty = "SELECT * FROM owner WHERE id_property = ?";
+        String queryProperty = "SELECT * " +
+                "FROM owner WHERE id_property = ? " +
+                "ORDER BY valid.from";
 
-        String queryPropertyTime = "SELECT owner.* FROM owner WHERE \n" +
+        String queryPropertyTime = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE \n" +
                 "( owner.id_property=? AND (owner.valid_from >= ?) AND (owner.valid_to <= ?) ) OR\n" +
                 "( owner.id_property=? AND (? BETWEEN owner.valid_from AND owner.valid_to) OR \n" +
-                "(? BETWEEN owner.valid_from AND owner.valid_to))";
+                "(? BETWEEN owner.valid_from AND owner.valid_to)) " +
+                "ORDER BY owner.valid_from";
 
-        String queryPropertyTimeFrom = "SELECT owner.* FROM owner WHERE \n" +
+        String queryPropertyTimeFrom = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE \n" +
                 "( owner.id_property=? AND (owner.valid_from >= ?)) OR\n" +
-                "( owner.id_property=? AND (? BETWEEN owner.valid_from AND owner.valid_to) )";
+                "( owner.id_property=? AND (? BETWEEN owner.valid_from AND owner.valid_to)) " +
+                "ORDER BY owner.valid_from";
 
-        String queryPropertyTimeTo = "SELECT owner.* FROM owner WHERE \n" +
+        String queryPropertyTimeTo = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE \n" +
                 "( owner.id_property=? AND (owner.valid_to <= ?) ) OR\n" +
-                "( owner.id_property=? AND (? BETWEEN owner.valid_from AND owner.valid_to))";
+                "( owner.id_property=? AND (? BETWEEN owner.valid_from AND owner.valid_to)) " +
+                "ORDER BY owner.valid_from";
 
-        String queryTime = "SELECT owner.* FROM owner WHERE \n" +
+        String queryTime = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE \n" +
                 "( (owner.valid_from >= ?) AND (owner.valid_to <= ?) ) OR\n" +
                 "( ( ? BETWEEN owner.valid_from AND owner.valid_to) OR \n" +
-                "( ? BETWEEN owner.valid_from AND owner.valid_to))";
+                "( ? BETWEEN owner.valid_from AND owner.valid_to)) " +
+                "ORDER BY owner.valid_from";
 
-        String queryTimeFrom = "SELECT owner.* FROM owner WHERE \n" +
+        String queryTimeFrom = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE \n" +
                 "( (owner.valid_from >= ?)) OR\n" +
-                "( (? BETWEEN owner.valid_from AND owner.valid_to) )";
+                "( (? BETWEEN owner.valid_from AND owner.valid_to)) " +
+                "ORDER BY owner.valid_from";
 
-        String queryTimeTo = "SELECT owner.* FROM owner WHERE \n" +
+        String queryTimeTo = "SELECT owner.* " +
+                "FROM owner " +
+                "WHERE \n" +
                 "( (owner.valid_to <= ?)) OR\n" +
-                "( (? BETWEEN owner.valid_from AND owner.valid_to) )";
+                "( (? BETWEEN owner.valid_from AND owner.valid_to)) " +
+                "ORDER BY owner.valid_from";
 
         String query = "SELECT owner.* FROM owner ";
 
@@ -511,31 +566,45 @@ public class OwnerRepository extends Observable {
             PreparedStatement statement;
             if (owner.getProperty().getIdProperty() != 0) {
                 if (owner.getValidFrom() != null && owner.getValidTo() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = owner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(owner.getValidFrom().getTime());
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = owner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(owner.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryPropertyTime);
                     statement.setInt(1, owner.getProperty().getIdProperty());
-                    statement.setDate(2, new java.sql.Date(owner.getValidFrom().getTime()));
-                    statement.setDate(3, new java.sql.Date(owner.getValidTo().getTime()));
+                    statement.setDate(2, sqlDateFrom);
+                    statement.setDate(3, sqlDateTo);
                     statement.setInt(4, owner.getProperty().getIdProperty());
-                    statement.setDate(5, new java.sql.Date(owner.getValidFrom().getTime()));
-                    statement.setDate(6, new java.sql.Date(owner.getValidTo().getTime()));
+                    statement.setDate(5, sqlDateFrom);
+                    statement.setDate(6, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryPropertyTime");
                     }
                 } else if (owner.getProperty().getIdProperty() != 0 && owner.getValidFrom() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = owner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(owner.getValidFrom().getTime());
+
                     statement = connection.prepareStatement(queryPropertyTimeFrom);
                     statement.setInt(1, owner.getProperty().getIdProperty());
-                    statement.setDate(2, new java.sql.Date(owner.getValidFrom().getTime()));
+                    statement.setDate(2, sqlDateFrom);
                     statement.setInt(3, owner.getProperty().getIdProperty());
-                    statement.setDate(4, new java.sql.Date(owner.getValidFrom().getTime()));
+                    statement.setDate(4, sqlDateFrom);
                     if (App.isDebug()) {
                         System.out.println("queryPropertyTimeFrom");
                     }
                 } else if (owner.getProperty().getIdProperty() != 0 && owner.getValidTo() != null) {
+
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = owner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(owner.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryPropertyTimeTo);
                     statement.setInt(1, owner.getProperty().getIdProperty());
-                    statement.setDate(2, new java.sql.Date(owner.getValidTo().getTime()));
+                    statement.setDate(2, sqlDateTo);
                     statement.setInt(3, owner.getProperty().getIdProperty());
-                    statement.setDate(4, new java.sql.Date(owner.getValidTo().getTime()));
+                    statement.setDate(4, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryPropertyTimeTo");
                     }
@@ -548,25 +617,39 @@ public class OwnerRepository extends Observable {
                 }
             } else {
                 if (owner.getValidFrom() != null && owner.getValidTo() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = owner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(owner.getValidFrom().getTime());
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = owner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(owner.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryTime);
-                    statement.setDate(1, new java.sql.Date(owner.getValidFrom().getTime()));
-                    statement.setDate(2, new java.sql.Date(owner.getValidTo().getTime()));
-                    statement.setDate(3, new java.sql.Date(owner.getValidFrom().getTime()));
-                    statement.setDate(4, new java.sql.Date(owner.getValidTo().getTime()));
+                    statement.setDate(1, sqlDateFrom);
+                    statement.setDate(2, sqlDateTo);
+                    statement.setDate(3, sqlDateFrom);
+                    statement.setDate(4, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryTime");
                     }
                 } else if (owner.getProperty().getIdProperty() != 0 && owner.getValidFrom() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = owner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(owner.getValidFrom().getTime());
+
                     statement = connection.prepareStatement(queryTimeFrom);
-                    statement.setDate(1, new java.sql.Date(owner.getValidFrom().getTime()));
-                    statement.setDate(2, new java.sql.Date(owner.getValidFrom().getTime()));
+                    statement.setDate(1, sqlDateFrom);
+                    statement.setDate(2, sqlDateFrom);
                     if (App.isDebug()) {
                         System.out.println("queryTimeFrom");
                     }
                 } else if (owner.getProperty().getIdProperty() != 0 && owner.getValidTo() != null) {
+
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = owner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(owner.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryTimeTo);
-                    statement.setDate(1, new java.sql.Date(owner.getValidTo().getTime()));
-                    statement.setDate(2, new java.sql.Date(owner.getValidTo().getTime()));
+                    statement.setDate(1, sqlDateTo);
+                    statement.setDate(2, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryTimeTo");
                     }
@@ -582,7 +665,7 @@ public class OwnerRepository extends Observable {
             ResultSet resultSet = statement.executeQuery();
 
             PersonRepository personRepository = new PersonRepository(dataSource);
-            PropertyRepository propertyRepository = new PropertyRepository(dataSource);
+            //PropertyRepository propertyRepository = new PropertyRepository(dataSource);
 
             while (resultSet.next()) {
                 Owner o = new Owner();
@@ -598,7 +681,8 @@ public class OwnerRepository extends Observable {
             //get persons and properties
             for (Owner o : ownerLinkedList) {
                 o.setPerson(personRepository.getPerson(o.getPerson()));
-                o.setProperty(propertyRepository.getProperty(o.getProperty()));
+                // currently not necessary
+                //o.setProperty(propertyRepository.getProperty(o.getProperty()));
             }
 
             return ownerLinkedList;
@@ -619,17 +703,5 @@ public class OwnerRepository extends Observable {
                 System.err.println("Error getOwnersListOfDate " + exception.getMessage());
             }
         }
-    }
-
-    // TODO javadoc
-    public boolean deleteOwnerOfPropertyFromDateToDate(Property property, Date from, Date to) {
-        // TODO
-        return true;
-    }
-
-    // TODO javadoc
-    public boolean saveOwnerOfPropertyFromDateToDate(Property property, Person person, Date from, Date to) {
-        // TODO
-        return true;
     }
 }

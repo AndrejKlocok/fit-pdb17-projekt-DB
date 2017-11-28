@@ -58,7 +58,10 @@ public class GroundPlanRepository extends Observable {
      * @return List of @see GroundPlan objects.
      */
     public List<GroundPlan> getGroundPlanListOfProperty(Property property) {
-        String query = "SELECT * FROM ground_plan WHERE id_property = ?";
+        String query = "SELECT * " +
+                "FROM ground_plan " +
+                "WHERE id_property = ? " +
+                "ORDER BY id_ground_plan";
 
         Connection connection = null;
         try {
@@ -107,7 +110,9 @@ public class GroundPlanRepository extends Observable {
      * @return @see GroundPlan object.
      */
     public GroundPlan getGroundPlan(GroundPlan groundPlan) {
-        String query = "SELECT * FROM ground_plan WHERE id_ground_plan = ?";
+        String query = "SELECT * " +
+                "FROM ground_plan " +
+                "WHERE id_ground_plan = ?";
 
         Connection connection = null;
         try {
@@ -158,7 +163,9 @@ public class GroundPlanRepository extends Observable {
      * @return @see GroundPlan object.
      */
     public GroundPlan getGroundPlanById(int idGroundPlan) {
-        String query = "SELECT * FROM ground_plan WHERE id_ground_plan = ?";
+        String query = "SELECT * " +
+                "FROM ground_plan " +
+                "WHERE id_ground_plan = ?";
 
         Connection connection = null;
         try {
@@ -209,7 +216,11 @@ public class GroundPlanRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean createGroundPlan(GroundPlan groundPlan) {
-        String query = "BEGIN INSERT INTO ground_plan(id_ground_plan, id_property, img) VALUES(ground_plan_seq.nextval, ? ,ordsys.ordimage.init()) RETURNING id_ground_plan INTO ?; END;";
+        String query = "BEGIN " +
+                "INSERT INTO ground_plan(id_ground_plan, id_property, img) " +
+                "VALUES(ground_plan_seq.nextval, ? ,ordsys.ordimage.init()) " +
+                "RETURNING id_ground_plan INTO ?; " +
+                "END;";
 
         Connection connection = null;
         try {
@@ -258,7 +269,9 @@ public class GroundPlanRepository extends Observable {
      */
     public boolean saveGroundPlan(GroundPlan groundPlan) {
 
-        String query = "UPDATE ground_plan SET id_property = ? WHERE id_ground_plan = ?";
+        String query = "UPDATE ground_plan " +
+                "SET id_property = ? " +
+                "WHERE id_ground_plan = ?";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -354,7 +367,9 @@ public class GroundPlanRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean deleteGroundPlan(GroundPlan groundPlan) {
-        String query = "DELETE FROM ground_plan WHERE id_ground_plan = ?";
+        String query = "DELETE " +
+                "FROM ground_plan " +
+                "WHERE id_ground_plan = ?";
 
         Connection connection = null;
         PreparedStatement statement;

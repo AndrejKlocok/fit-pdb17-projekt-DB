@@ -127,16 +127,6 @@ public class PropertyController implements PropertyContract.Controller {
     }
 
     /**
-     * Delete current owner of property (only from property, not whole person)
-     */
-    @Override
-    public void deleteCurrentOwner() {
-        if (!ownerRepository.deleteOwner(property.getOwnerCurrent())) {
-            view.showError("Could not delete owner from property");
-        }
-    }
-
-    /**
      * Save owner of property from and to specified date
      *
      * @param person person (owner)
@@ -145,7 +135,14 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void saveOwnerFromDateToDate(Person person, Date from, Date to) {
-        if (!ownerRepository.saveOwnerOfPropertyFromDateToDate(property, person, from, to)) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
+        if (!ownerRepository.updateOwner(property, person, from, to)) {
             view.showError("Could not save owner from date to date");
         }
     }
@@ -158,7 +155,14 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void deleteOwnerFromDateToDate(Date from, Date to) {
-        if (!ownerRepository.deleteOwnerOfPropertyFromDateToDate(property, from, to)) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
+        if (!ownerRepository.deleteOwner(property, from, to)) {
             view.showError("Could not delete owner from date to date");
         }
     }
@@ -293,6 +297,13 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void calculateAveragePriceFromDateToDate(Date from, Date to) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
         double averagePrice = propertyPriceRepository.getAvgPropertyPrice(property.getIdProperty(), from, to);
         view.showMessage("Average price from " + from + " to " + to + " is " + averagePrice);
     }
