@@ -171,36 +171,59 @@ public class PropertyPriceRepository extends Observable {
      */
     private List<PropertyPrice> getPropertyPriceListOfProperty(PropertyPrice propertyPrice) {
 
-        String queryProperty = "SELECT * FROM property_price WHERE id_property = ?";
+        String queryProperty = "SELECT * " +
+                "FROM property_price " +
+                "WHERE id_property = ? " +
+                "ORDER BY property_price.valid_from";
 
-        String queryPropertyTime = "SELECT property_price.* FROM property_price WHERE \n" +
+        String queryPropertyTime = "SELECT property_price.* " +
+                "FROM property_price " +
+                "WHERE \n" +
                 "( property_price.id_property=? AND ( property_price.valid_from >= ? ) AND (property_price.valid_to <= ?) ) OR\n" +
                 "( property_price.id_property=? AND ( ? BETWEEN property_price.valid_from AND property_price.valid_to) OR \n" +
-                "( ? BETWEEN property_price.valid_from AND property_price.valid_to))";
+                "( ? BETWEEN property_price.valid_from AND property_price.valid_to)) " +
+                "ORDER BY property_price.valid_from";
 
-        String queryPropertyTimeFrom = "SELECT property_price.* FROM property_price WHERE \n" +
+        String queryPropertyTimeFrom = "SELECT property_price.* " +
+                "FROM property_price " +
+                "WHERE \n" +
                 "( property_price.id_property=? AND ( property_price.valid_from >= ? )) OR\n" +
-                "( property_price.id_property=? AND ( ? BETWEEN property_price.valid_from AND property_price.valid_to) )";
+                "( property_price.id_property=? AND ( ? BETWEEN property_price.valid_from AND property_price.valid_to)) " +
+                "ORDER BY property_price.valid_from";
 
-        String queryPropertyTimeTo = "SELECT property_price.* FROM property_price WHERE \n" +
+        String queryPropertyTimeTo = "SELECT property_price.* " +
+                "FROM property_price " +
+                "WHERE \n" +
                 "( property_price.id_property=? AND ( property_price.valid_to <= ? ) ) OR\n" +
-                "( property_price.id_property=? AND ( ? BETWEEN property_price.valid_from AND property_price.valid_to))";
+                "( property_price.id_property=? AND ( ? BETWEEN property_price.valid_from AND property_price.valid_to)) " +
+                "ORDER BY property_price.valid_from";
 
 
-        String queryTime = "SELECT property_price.* FROM property_price WHERE \n" +
+        String queryTime = "SELECT property_price.* " +
+                "FROM property_price " +
+                "WHERE \n" +
                 "( ( property_price.valid_from >= ? ) AND (property_price.valid_to <= ? ) ) OR\n" +
                 "( ( ? BETWEEN property_price.valid_from AND property_price.valid_to) OR \n" +
-                "( ? BETWEEN property_price.valid_from AND property_price.valid_to))";
+                "( ? BETWEEN property_price.valid_from AND property_price.valid_to)) " +
+                "ORDER BY property_price.valid_from";
 
-        String queryTimeFrom = "SELECT property_price.* FROM property_price WHERE \n" +
+        String queryTimeFrom = "SELECT property_price.* " +
+                "FROM property_price " +
+                "WHERE \n" +
                 "( ( property_price.valid_from >= ? )) OR\n" +
-                "( ( ? BETWEEN property_price.valid_from AND property_price.valid_to) )";
+                "( ( ? BETWEEN property_price.valid_from AND property_price.valid_to)) " +
+                "ORDER BY property_price.valid_from";
 
-        String queryTimeTo = "SELECT property_price.* FROM property_price WHERE \n" +
+        String queryTimeTo = "SELECT property_price.* " +
+                "FROM property_price " +
+                "WHERE \n" +
                 "( ( property_price.valid_to <= ?) ) OR\n" +
-                "( ( ? BETWEEN property_price.valid_from AND property_price.valid_to))";
+                "( ( ? BETWEEN property_price.valid_from AND property_price.valid_to)) " +
+                "ORDER BY property_price.valid_from";
 
-        String query = "SELECT property_price.* FROM property_price ";
+        String query = "SELECT property_price.* " +
+                "FROM property_price " +
+                "ORDER BY property_price.valid_from";
 
         Connection connection = null;
         try {
@@ -208,31 +231,45 @@ public class PropertyPriceRepository extends Observable {
             PreparedStatement statement;
             if (propertyPrice.getProperty().getIdProperty() != 0) {
                 if (propertyPrice.getValidFrom() != null && propertyPrice.getValidTo() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryPropertyTime);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
-                    statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    statement.setDate(3, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+                    statement.setDate(2, sqlDateFrom);
+                    statement.setDate(3, sqlDateTo);
                     statement.setInt(4, propertyPrice.getProperty().getIdProperty());
-                    statement.setDate(5, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    statement.setDate(6, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+                    statement.setDate(5, sqlDateFrom);
+                    statement.setDate(6, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryPropertyTime");
                     }
                 } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidFrom() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+
                     statement = connection.prepareStatement(queryPropertyTimeFrom);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
-                    statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
+                    statement.setDate(2, sqlDateFrom);
                     statement.setInt(3, propertyPrice.getProperty().getIdProperty());
-                    statement.setDate(4, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
+                    statement.setDate(4, sqlDateFrom);
                     if (App.isDebug()) {
                         System.out.println("queryPropertyTimeFrom");
                     }
                 } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidTo() != null) {
+
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryPropertyTimeTo);
                     statement.setInt(1, propertyPrice.getProperty().getIdProperty());
-                    statement.setDate(2, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+                    statement.setDate(2, sqlDateTo);
                     statement.setInt(3, propertyPrice.getProperty().getIdProperty());
-                    statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+                    statement.setDate(4, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryPropertyTimeTo");
                     }
@@ -245,25 +282,39 @@ public class PropertyPriceRepository extends Observable {
                 }
             } else {
                 if (propertyPrice.getValidFrom() != null && propertyPrice.getValidTo() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryTime);
-                    statement.setDate(1, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    statement.setDate(2, new java.sql.Date(propertyPrice.getValidTo().getTime()));
-                    statement.setDate(3, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+                    statement.setDate(1, sqlDateFrom);
+                    statement.setDate(2, sqlDateTo);
+                    statement.setDate(3, sqlDateFrom);
+                    statement.setDate(4, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryTime");
                     }
                 } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidFrom() != null) {
+
+                    // if from date is not set, than set zero date (1970)
+                    java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+
                     statement = connection.prepareStatement(queryTimeFrom);
-                    statement.setDate(1, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-                    statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
+                    statement.setDate(1, sqlDateFrom);
+                    statement.setDate(2, sqlDateFrom);
                     if (App.isDebug()) {
                         System.out.println("queryTimeFrom");
                     }
                 } else if (propertyPrice.getProperty().getIdProperty() != 0 && propertyPrice.getValidTo() != null) {
+
+                    // if to date is not set, than set maximum SQL date
+                    java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
                     statement = connection.prepareStatement(queryTimeTo);
-                    statement.setDate(1, new java.sql.Date(propertyPrice.getValidTo().getTime()));
-                    statement.setDate(2, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+                    statement.setDate(1, sqlDateTo);
+                    statement.setDate(2, sqlDateTo);
                     if (App.isDebug()) {
                         System.out.println("queryTimeTo");
                     }
@@ -319,7 +370,10 @@ public class PropertyPriceRepository extends Observable {
      * @return @see PropertyPrice
      */
     public PropertyPrice getPropertyPrice(PropertyPrice propertyPrice) {
-        String query = "SELECT * FROM property_price WHERE id_price = ?";
+        String query = "SELECT * " +
+                "FROM property_price " +
+                "WHERE id_price = ? " +
+                "ORDER BY property_price.valid_from";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -371,6 +425,12 @@ public class PropertyPriceRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean createPropertyPrice(PropertyPrice propertyPrice) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
         String query = "CALL temporal_insert('property_price', ?, ?, ?, ?)";
 
         Connection connection = null;
@@ -380,8 +440,8 @@ public class PropertyPriceRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getProperty().getIdProperty());
             statement.setDouble(2, propertyPrice.getPrice());
-            statement.setDate(3, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-            statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+            statement.setDate(3, sqlDateFrom);
+            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -414,6 +474,12 @@ public class PropertyPriceRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean deletePropertyPrice(PropertyPrice propertyPrice) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
         String query = "CALL temporal_delete('property_price', ?, ?, ?)";
 
         Connection connection = null;
@@ -423,8 +489,8 @@ public class PropertyPriceRepository extends Observable {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getProperty().getIdProperty());
-            statement.setDate(2, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-            statement.setDate(3, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+            statement.setDate(2, sqlDateFrom);
+            statement.setDate(3, sqlDateTo);
 
             statement.executeQuery();
 
@@ -457,6 +523,12 @@ public class PropertyPriceRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean savePropertyPrice(PropertyPrice propertyPrice) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = propertyPrice.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(propertyPrice.getValidFrom().getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
+
         String query = "CALL temporal_update('property_price',?,?,?,?)";
         Connection connection = null;
         PreparedStatement statement;
@@ -466,8 +538,8 @@ public class PropertyPriceRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getProperty().getIdProperty());
             statement.setDouble(2, propertyPrice.getPrice());
-            statement.setDate(3, new java.sql.Date(propertyPrice.getValidFrom().getTime()));
-            statement.setDate(4, new java.sql.Date(propertyPrice.getValidTo().getTime()));
+            statement.setDate(3, sqlDateFrom);
+            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -502,6 +574,12 @@ public class PropertyPriceRepository extends Observable {
      * @return Integer value, which represents average price of property
      */
     public Double getAvgPropertyPrice(Integer idProperty, Date dateFrom, Date dateTo) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = dateFrom == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(dateFrom.getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = dateTo == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(dateTo.getTime());
+
         String query = "SELECT  ROUND(AVG(PP.price),0) AS AvgPrice" +
                 "                FROM property_price PP RIGHT JOIN property P ON(PP.id_property=P.id_property)  WHERE" +
                 "                ( P.id_property=? AND (PP.valid_from >= ? ) AND (PP.valid_to <= ?) ) OR" +
@@ -515,11 +593,11 @@ public class PropertyPriceRepository extends Observable {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
             statement.setInt(1, idProperty);
-            statement.setDate(2, new java.sql.Date(dateFrom.getTime()));
-            statement.setDate(3, new java.sql.Date(dateTo.getTime()));
+            statement.setDate(2, sqlDateFrom);
+            statement.setDate(3, sqlDateTo);
             statement.setInt(4, idProperty);
-            statement.setDate(5, new java.sql.Date(dateFrom.getTime()));
-            statement.setDate(6, new java.sql.Date(dateTo.getTime()));
+            statement.setDate(5, sqlDateFrom);
+            statement.setDate(6, sqlDateTo);
 
             Double avgPrice;
             ResultSet resultSet = statement.executeQuery();

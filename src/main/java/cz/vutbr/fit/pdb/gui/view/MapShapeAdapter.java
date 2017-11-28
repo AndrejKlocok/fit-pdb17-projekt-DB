@@ -21,6 +21,7 @@ import com.lynden.gmapsfx.javascript.object.LatLongBounds;
 import com.lynden.gmapsfx.javascript.object.MVCArray;
 import com.lynden.gmapsfx.javascript.object.MapShape;
 import com.lynden.gmapsfx.shapes.*;
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.Property;
 import oracle.spatial.geometry.JGeometry;
 
@@ -45,9 +46,11 @@ public class MapShapeAdapter {
      * @return converted MapShape
      */
     public static MapShape jGeometry2MapShape(JGeometry geometry, Property.Type type) {
-        // TODO
         if (geometry.isCircle()) {
-            System.out.println("CIRCLE");
+            // FIXME circle type
+            if (App.isDebug()) {
+                System.out.println("CIRCLE");
+            }
             /*
             LatLong point = new LatLong(x, y);
             CircleOptions circleOptions = new CircleOptions()
@@ -60,7 +63,7 @@ public class MapShapeAdapter {
             */
             return null;
         } else if (geometry.isRectangle()) {
-            java.util.List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
+            List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
 
             LatLongBounds rb = new LatLongBounds(col.get(0), col.get(1));
             RectangleOptions rectangleOptions = new RectangleOptions()
@@ -72,18 +75,16 @@ public class MapShapeAdapter {
             return new Rectangle(rectangleOptions);
 
         } else if (geometry.getType() == 2) {
-            java.util.List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
+            List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
-            Polyline polyline = new Polyline(new PolylineOptions()
+            return new Polyline(new PolylineOptions()
                     .path(mvc)
                     .strokeColor("blue")
                     .editable(false)
                     .strokeWeight(4));
-
-            return polyline;
         } else {
-            java.util.List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
+            List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
             PolygonOptions polygonOptions = new PolygonOptions()
@@ -98,16 +99,20 @@ public class MapShapeAdapter {
                 polygonOptions.fillColor("white").strokeColor("white");
             }
 
-            Polygon polygon = new Polygon(polygonOptions);
-            return polygon;
+            return new Polygon(polygonOptions);
         }
     }
 
-    //TODO: javadoc
+    /**
+     * Swap lat long to long lat
+     *
+     * @param coordinates coordinates
+     * @return latitude and longitude
+     */
     public static List<LatLong> LatLngToLngLat(double[] coordinates) {
-        java.util.List<LatLong> col = new ArrayList<>();
+        List<LatLong> col = new ArrayList<>();
 
-        double x = 0;
+        double x;
         double y = 0;
         for (int i = 0; i < coordinates.length; i++) {
             if (i % 2 == 0) {

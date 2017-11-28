@@ -44,6 +44,7 @@ public class PropertyPriceTextField extends JTextField {
 
     /**
      * Creates instance right from the PropertyPrice object
+     *
      * @param propertyPrice property price object
      */
     public PropertyPriceTextField(PropertyPrice propertyPrice) {
@@ -53,7 +54,8 @@ public class PropertyPriceTextField extends JTextField {
 
     /**
      * Getter for property price attribute
-     * @return
+     *
+     * @return property price attribute
      */
     public PropertyPrice getPropertyPrice() {
         return propertyPrice;
@@ -61,7 +63,8 @@ public class PropertyPriceTextField extends JTextField {
 
     /**
      * Setter for property price attribute
-     * @param propertyPrice
+     *
+     * @param propertyPrice property price object
      */
     public void setPropertyPrice(PropertyPrice propertyPrice) {
         this.propertyPrice = propertyPrice;
@@ -70,6 +73,7 @@ public class PropertyPriceTextField extends JTextField {
 
     /**
      * Get original unformatted value of property price
+     *
      * @return original unformatted price
      */
     public double getPrice() {

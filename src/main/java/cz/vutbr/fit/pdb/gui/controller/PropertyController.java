@@ -127,12 +127,23 @@ public class PropertyController implements PropertyContract.Controller {
     }
 
     /**
-     * Delete current owner of property (only from property, not whole person)
+     * Insert new owner of property from and to sepcified date
+     *
+     * @param person person (owner)
+     * @param from from date
+     * @param to to date
      */
     @Override
-    public void deleteCurrentOwner() {
-        if (!ownerRepository.deleteOwner(property.getOwnerCurrent())) {
-            view.showError("Could not delete owner from property");
+    public void createOwnerFromDateToDate(Person person, Date from, Date to) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
+        if (!ownerRepository.createOwner(property, person, from, to)) {
+            view.showError("Could not save owner from date to date");
         }
     }
 
@@ -145,7 +156,14 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void saveOwnerFromDateToDate(Person person, Date from, Date to) {
-        if (!ownerRepository.saveOwnerOfPropertyFromDateToDate(property, person, from, to)) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
+        if (!ownerRepository.updateOwner(property, person, from, to)) {
             view.showError("Could not save owner from date to date");
         }
     }
@@ -158,7 +176,14 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void deleteOwnerFromDateToDate(Date from, Date to) {
-        if (!ownerRepository.deleteOwnerOfPropertyFromDateToDate(property, from, to)) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
+        if (!ownerRepository.deleteOwner(property, from, to)) {
             view.showError("Could not delete owner from date to date");
         }
     }
@@ -198,8 +223,13 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void savePropertyCurrentPrice(double currentPrice) {
-        PropertyPrice propertyPrice = new PropertyPrice(42, property, currentPrice, new Date(), new Date()); // TODO
-        if (!propertyPriceRepository.savePropertyPrice(propertyPrice)) {
+        // FIXME new property price is not stored
+        PropertyPrice propertyPrice = new PropertyPrice();
+        propertyPrice.setProperty(property);
+        propertyPrice.setPrice(currentPrice);
+        propertyPrice.setValidFrom(new Date());
+
+        if (!propertyPriceRepository.createPropertyPrice(propertyPrice)) {
             view.showError("Could not save property price");
         }
     }
@@ -293,6 +323,13 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void calculateAveragePriceFromDateToDate(Date from, Date to) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
         double averagePrice = propertyPriceRepository.getAvgPropertyPrice(property.getIdProperty(), from, to);
         view.showMessage("Average price from " + from + " to " + to + " is " + averagePrice);
     }

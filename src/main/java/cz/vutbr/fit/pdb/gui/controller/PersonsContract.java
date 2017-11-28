@@ -47,10 +47,10 @@ public class PersonsContract {
 
         void filterPersonsList(Date date_from, Date date_to);
 
-        Integer getPersonsCountOfPropertyDate(Person person, Date dateFrom, Date dateTo);
+        Integer getPersonsCountOfProperty(Person person);
 
-        Integer getPersonsSumOfPropertyDate(Person person, Date dateFrom, Date dateTo);
+        Integer getPersonsSumOfProperty(Person person);
 
-        Integer getPersonsDurationOfPropertyDate(Person person, Date dateFrom, Date dateTo);
+        Integer getPersonsDurationOfProperty(Person person);
     }
 }

@@ -78,7 +78,7 @@ where `ORACLE_DB_LOGIN` and `ORACLE_DB_PASSWORD` are your login credentials to O
 Optionally you can specify:
 
 ```
-debug-true
+debug=true
 ```
 
 for printing debug information to standard output.
@@ -99,7 +99,7 @@ To clean generated files run:
 
 ## License
 
-    Copyright 2017 Matúš Bútora, Andrej Klocok, Tomáš Vlk
+    Copyright 2017 VUT FIT PDB project authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

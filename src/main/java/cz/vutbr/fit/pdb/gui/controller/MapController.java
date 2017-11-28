@@ -262,7 +262,7 @@ public class MapController extends Observable implements MapContract.Controller 
     @Override
     public void getPersons() {
         PersonsWindow personsWindow = new PersonsWindow();
-        new PersonsController(personRepository, ownerRepository, personsWindow);
+        new PersonsController(personRepository, personsWindow);
     }
 
     /**
@@ -336,10 +336,5 @@ public class MapController extends Observable implements MapContract.Controller 
         } else {
             view.showError("You cannot calculate area of property of this type");
         }
-    }
-
-    @Override
-    public int getNewIdForProperty() {
-        return propertyRepository.getNewIdForProperty();
     }
 }

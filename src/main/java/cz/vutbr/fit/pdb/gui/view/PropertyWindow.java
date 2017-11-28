@@ -72,7 +72,6 @@ public class PropertyWindow implements PropertyContract.View {
     private JPanel editInfoPanel;
     private JButton editPropertyButton;
     private JButton deletePropertyButton;
-    private JButton deleteOwnerButton;
     private JPanel editGroundPlanPanel;
     private JButton createGroundPlanButton;
     private JButton deleteGroundPlanButton;
@@ -105,6 +104,7 @@ public class PropertyWindow implements PropertyContract.View {
     private JDatePicker editOwnersHistoryDatePickerTo;
     private JLabel editOwnersHistoryPersonComboBoxLabel;
     private PersonComboBox editOwnersHistoryPersonComboBox;
+    private JButton editOwnersHistoryCreateButton;
     private JButton editOwnersHistoryEditButton;
     private JButton editOwnersHistoryDeleteButton;
     private JLabel statusLabel;
@@ -136,7 +136,6 @@ public class PropertyWindow implements PropertyContract.View {
         editInfoPanel = new JPanel();
         editPropertyButton = new JButton();
         deletePropertyButton = new JButton();
-        deleteOwnerButton = new JButton();
         editGroundPlanPanel = new JPanel();
         createGroundPlanButton = new JButton();
         deleteGroundPlanButton = new JButton();
@@ -147,14 +146,10 @@ public class PropertyWindow implements PropertyContract.View {
         editPriceHistoryPanel = new JPanel();
         editPriceHistoryDatePickerFromLabel = new JLabel();
         UtilDateModel editPriceHistoryDatePickerFromModel = new UtilDateModel();
-        editPriceHistoryDatePickerFromModel.setValue(new Date());
-        editPriceHistoryDatePickerFromModel.setSelected(true);
         JDatePanelImpl editPriceHistoryDatePickerFromPanel = new JDatePanelImpl(editPriceHistoryDatePickerFromModel);
         editPriceHistoryDatePickerFrom = new JDatePickerImpl(editPriceHistoryDatePickerFromPanel);
         editPriceHistoryDatePickerToLabel = new JLabel();
         UtilDateModel editPriceHistoryDatePickerToModel = new UtilDateModel();
-        editPriceHistoryDatePickerToModel.setValue(new Date());
-        editPriceHistoryDatePickerToModel.setSelected(true);
         JDatePanelImpl editPriceHistoryDatePickerToPanel = new JDatePanelImpl(editPriceHistoryDatePickerToModel);
         editPriceHistoryDatePickerTo = new JDatePickerImpl(editPriceHistoryDatePickerToPanel);
         editPriceHistoryCountAverageButton = new JButton();
@@ -173,18 +168,15 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPanel = new JPanel();
         editOwnersHistoryDatePickerFromLabel = new JLabel();
         UtilDateModel editOwnersHistoryDatePickerFromModel = new UtilDateModel();
-        editOwnersHistoryDatePickerFromModel.setValue(new Date());
-        editOwnersHistoryDatePickerFromModel.setSelected(true);
         JDatePanelImpl editOwnersHistoryDatePickerFromPanel = new JDatePanelImpl(editOwnersHistoryDatePickerFromModel);
         editOwnersHistoryDatePickerFrom = new JDatePickerImpl(editOwnersHistoryDatePickerFromPanel);
         editOwnersHistoryDatePickerToLabel = new JLabel();
         UtilDateModel editOwnersHistoryDatePickerToModel = new UtilDateModel();
-        editOwnersHistoryDatePickerToModel.setValue(new Date());
-        editOwnersHistoryDatePickerToModel.setSelected(true);
         JDatePanelImpl editOwnersHistoryDatePickerToPanel = new JDatePanelImpl(editOwnersHistoryDatePickerToModel);
         editOwnersHistoryDatePickerTo = new JDatePickerImpl(editOwnersHistoryDatePickerToPanel);
         editOwnersHistoryPersonComboBoxLabel = new JLabel();
         editOwnersHistoryPersonComboBox = new PersonComboBox();
+        editOwnersHistoryCreateButton = new JButton();
         editOwnersHistoryEditButton = new JButton();
         editOwnersHistoryDeleteButton = new JButton();
         statusLabel = new JLabel();
@@ -280,7 +272,6 @@ public class PropertyWindow implements PropertyContract.View {
         editInfoPanel.setLayout(new BoxLayout(editInfoPanel, BoxLayout.X_AXIS));
         editInfoPanel.add(editPropertyButton);
         editInfoPanel.add(deletePropertyButton);
-        editInfoPanel.add(deleteOwnerButton);
         editGroundPlanPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         editGroundPlanPanel.setLayout(new BoxLayout(editGroundPlanPanel, BoxLayout.X_AXIS));
         editGroundPlanPanel.setOpaque(false);
@@ -303,16 +294,10 @@ public class PropertyWindow implements PropertyContract.View {
                 priceCurrentTextField.setEditable(false);
                 descriptionLabel.setEditable(false);
                 descriptionLabel.setBackground(null);
-                runSwingWorker(new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
+
                         controller.savePropertyName(nameLabel.getText());
                         controller.savePropertyDescription(descriptionLabel.getText());
                         controller.savePropertyCurrentPrice(priceCurrentTextField.getPrice());
-
-                        return null;
-                    }
-                });
             }
         });
         deletePropertyButton.setText("Delete");
@@ -328,25 +313,6 @@ public class PropertyWindow implements PropertyContract.View {
                     @Override
                     protected Void doInBackground() throws Exception {
                         controller.deleteProperty();
-
-                        return null;
-                    }
-                });
-            }
-        });
-        deleteOwnerButton.setText("Delete owner");
-        deleteOwnerButton.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(
-                    mainFrame,
-                    "Do you want delete owner from this property?",
-                    "Delete owner of property " + nameLabel.getText(),
-                    JOptionPane.YES_NO_OPTION);
-
-            if (option == JOptionPane.YES_OPTION) {
-                runSwingWorker(new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        controller.deleteCurrentOwner();
 
                         return null;
                     }
@@ -449,6 +415,7 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPanel.add((JComponent) (editOwnersHistoryDatePickerTo));
         editOwnersHistoryPanel.add(editOwnersHistoryPersonComboBoxLabel);
         editOwnersHistoryPanel.add(editOwnersHistoryPersonComboBox);
+        editOwnersHistoryPanel.add(editOwnersHistoryCreateButton);
         editOwnersHistoryPanel.add(editOwnersHistoryEditButton);
         editOwnersHistoryPanel.add(editOwnersHistoryDeleteButton);
         editOwnersHistoryDatePickerFromLabel.setText("Select date from");
@@ -458,7 +425,23 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPersonComboBoxLabel.setText("Select owner");
         editOwnersHistoryPersonComboBoxLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         editOwnersHistoryPersonComboBox.setBorder(new EmptyBorder(10, 0, 10, 10));
-        editOwnersHistoryEditButton.setText("Save");
+        editOwnersHistoryCreateButton.setText("Insert");
+        editOwnersHistoryCreateButton.addActionListener(e -> {
+
+            Date selectedDateFrom = (Date) editOwnersHistoryDatePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) editOwnersHistoryDatePickerTo.getModel().getValue();
+            Person selectedPerson = (Person) editOwnersHistoryPersonComboBox.getSelectedItem();
+
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.createOwnerFromDateToDate(selectedPerson, selectedDateFrom, selectedDateTo);
+
+                    return null;
+                }
+            });
+        });
+        editOwnersHistoryEditButton.setText("Update");
         editOwnersHistoryEditButton.addActionListener(e -> {
 
             Date selectedDateFrom = (Date) editOwnersHistoryDatePickerFrom.getModel().getValue();
@@ -696,7 +679,7 @@ public class PropertyWindow implements PropertyContract.View {
                 data[i][0] = property.getOwnerHistory().get(i).getPerson().getFirstName();
                 data[i][1] = property.getOwnerHistory().get(i).getPerson().getLastName();
                 data[i][2] = property.getOwnerHistory().get(i).getValidFrom();
-                data[i][3] = property.getOwnerHistory().get(i).getValidTo();
+                data[i][3] = property.getOwnerHistory().get(i).getValidTo().after(new Date()) ? "presence" : property.getOwnerHistory().get(i).getValidTo();
             }
 
             ownersHistoryTable.setModel(new DefaultTableModel(data, columnNames) {
@@ -758,9 +741,9 @@ public class PropertyWindow implements PropertyContract.View {
                 });
 
                 propertyListSimilarPanel.add(propertyItem);
-                JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
-                seperator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-                propertyListSimilarPanel.add(seperator);
+                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+                separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+                propertyListSimilarPanel.add(separator);
             }
 
             propertyListSimilarPanel.revalidate();
