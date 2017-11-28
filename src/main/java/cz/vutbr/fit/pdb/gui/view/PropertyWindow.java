@@ -104,6 +104,7 @@ public class PropertyWindow implements PropertyContract.View {
     private JDatePicker editOwnersHistoryDatePickerTo;
     private JLabel editOwnersHistoryPersonComboBoxLabel;
     private PersonComboBox editOwnersHistoryPersonComboBox;
+    private JButton editOwnersHistoryCreateButton;
     private JButton editOwnersHistoryEditButton;
     private JButton editOwnersHistoryDeleteButton;
     private JLabel statusLabel;
@@ -175,6 +176,7 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryDatePickerTo = new JDatePickerImpl(editOwnersHistoryDatePickerToPanel);
         editOwnersHistoryPersonComboBoxLabel = new JLabel();
         editOwnersHistoryPersonComboBox = new PersonComboBox();
+        editOwnersHistoryCreateButton = new JButton();
         editOwnersHistoryEditButton = new JButton();
         editOwnersHistoryDeleteButton = new JButton();
         statusLabel = new JLabel();
@@ -292,16 +294,10 @@ public class PropertyWindow implements PropertyContract.View {
                 priceCurrentTextField.setEditable(false);
                 descriptionLabel.setEditable(false);
                 descriptionLabel.setBackground(null);
-                runSwingWorker(new SwingWorker<Void, Void>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
+
                         controller.savePropertyName(nameLabel.getText());
                         controller.savePropertyDescription(descriptionLabel.getText());
                         controller.savePropertyCurrentPrice(priceCurrentTextField.getPrice());
-
-                        return null;
-                    }
-                });
             }
         });
         deletePropertyButton.setText("Delete");
@@ -419,6 +415,7 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPanel.add((JComponent) (editOwnersHistoryDatePickerTo));
         editOwnersHistoryPanel.add(editOwnersHistoryPersonComboBoxLabel);
         editOwnersHistoryPanel.add(editOwnersHistoryPersonComboBox);
+        editOwnersHistoryPanel.add(editOwnersHistoryCreateButton);
         editOwnersHistoryPanel.add(editOwnersHistoryEditButton);
         editOwnersHistoryPanel.add(editOwnersHistoryDeleteButton);
         editOwnersHistoryDatePickerFromLabel.setText("Select date from");
@@ -428,6 +425,22 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPersonComboBoxLabel.setText("Select owner");
         editOwnersHistoryPersonComboBoxLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
         editOwnersHistoryPersonComboBox.setBorder(new EmptyBorder(10, 0, 10, 10));
+        editOwnersHistoryCreateButton.setText("Insert");
+        editOwnersHistoryCreateButton.addActionListener(e -> {
+
+            Date selectedDateFrom = (Date) editOwnersHistoryDatePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) editOwnersHistoryDatePickerTo.getModel().getValue();
+            Person selectedPerson = (Person) editOwnersHistoryPersonComboBox.getSelectedItem();
+
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.createOwnerFromDateToDate(selectedPerson, selectedDateFrom, selectedDateTo);
+
+                    return null;
+                }
+            });
+        });
         editOwnersHistoryEditButton.setText("Update");
         editOwnersHistoryEditButton.addActionListener(e -> {
 
@@ -728,9 +741,9 @@ public class PropertyWindow implements PropertyContract.View {
                 });
 
                 propertyListSimilarPanel.add(propertyItem);
-                JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
-                seperator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-                propertyListSimilarPanel.add(seperator);
+                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+                separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+                propertyListSimilarPanel.add(separator);
             }
 
             propertyListSimilarPanel.revalidate();

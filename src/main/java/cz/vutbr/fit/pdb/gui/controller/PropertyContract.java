@@ -51,6 +51,8 @@ public class PropertyContract {
 
         void deleteProperty();
 
+        void createOwnerFromDateToDate(Person person, Date from, Date to);
+
         void saveOwnerFromDateToDate(Person person, Date from, Date to);
 
         void deleteOwnerFromDateToDate(Date from, Date to);

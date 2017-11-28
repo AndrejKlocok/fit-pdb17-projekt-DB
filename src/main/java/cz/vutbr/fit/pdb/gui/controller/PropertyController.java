@@ -127,6 +127,27 @@ public class PropertyController implements PropertyContract.Controller {
     }
 
     /**
+     * Insert new owner of property from and to sepcified date
+     *
+     * @param person person (owner)
+     * @param from from date
+     * @param to to date
+     */
+    @Override
+    public void createOwnerFromDateToDate(Person person, Date from, Date to) {
+        if (from != null && to != null) {
+            if (to.before(from)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
+        if (!ownerRepository.createOwner(property, person, from, to)) {
+            view.showError("Could not save owner from date to date");
+        }
+    }
+
+    /**
      * Save owner of property from and to specified date
      *
      * @param person person (owner)
@@ -202,8 +223,13 @@ public class PropertyController implements PropertyContract.Controller {
      */
     @Override
     public void savePropertyCurrentPrice(double currentPrice) {
-        PropertyPrice propertyPrice = new PropertyPrice(42, property, currentPrice, new Date(), new Date()); // TODO
-        if (!propertyPriceRepository.savePropertyPrice(propertyPrice)) {
+        // FIXME new property price is not stored
+        PropertyPrice propertyPrice = new PropertyPrice();
+        propertyPrice.setProperty(property);
+        propertyPrice.setPrice(currentPrice);
+        propertyPrice.setValidFrom(new Date());
+
+        if (!propertyPriceRepository.createPropertyPrice(propertyPrice)) {
             view.showError("Could not save property price");
         }
     }

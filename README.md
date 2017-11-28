@@ -99,7 +99,7 @@ To clean generated files run:
 
 ## License
 
-    Copyright 2017 Matúš Bútora, Andrej Klocok, Tomáš Vlk
+    Copyright 2017 VUT FIT PDB project authors
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
