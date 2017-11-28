@@ -52,7 +52,9 @@ public class PersonRepository extends Observable {
      * @return List of Person type objects(@see Person)
      */
     public List<Person> getPersonsList() {
-        String query = "SELECT * FROM person";
+        String query = "SELECT * " +
+                "FROM person " +
+                "ORDER BY person.firstname";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -101,7 +103,9 @@ public class PersonRepository extends Observable {
      * @return @see Person
      */
     public Person getPerson(Person p) {
-        String query = "SELECT * FROM person WHERE id_person = ?";
+        String query = "SELECT * " +
+                "FROM person " +
+                "WHERE id_person = ?";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -154,7 +158,8 @@ public class PersonRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean createPerson(Person person) {
-        String query = "INSERT INTO person(id_person, firstname, lastname, street, city, psc, email) VALUES(person_seq.nextval,?,?,?,?,?,?)";
+        String query = "INSERT INTO person(id_person, firstname, lastname, street, city, psc, email) " +
+                "VALUES(person_seq.nextval,?,?,?,?,?,?)";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -199,7 +204,9 @@ public class PersonRepository extends Observable {
      * @return boolean True if query was successful otherwise False.
      */
     public boolean savePerson(Person person) {
-        String query = "UPDATE person SET firstname = ?, lastname = ?, street = ?, city = ?, psc = ?, email =? WHERE id_person = ?";
+        String query = "UPDATE person " +
+                "SET firstname = ?, lastname = ?, street = ?, city = ?, psc = ?, email =? " +
+                "WHERE id_person = ?";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -241,12 +248,18 @@ public class PersonRepository extends Observable {
     /**
      * Method calls query to Oracle database, which returns count of properties, in which person lived, for desired time interval.
      *
-     * @param id_person Integer value, id of person
-     * @param date_from @see Date, Date value from desired time interval
-     * @param date_to   @see Date, Date value to desired time interval
+     * @param idPerson Integer value, id of person
+     * @param dateFrom @see Date, Date value from desired time interval
+     * @param dateTo   @see Date, Date value to desired time interval
      * @return Integer value, which represents count of properties.
      */
-    public Integer getPersonPropertyCount(Integer id_person, Date date_from, Date date_to) {
+    public Integer getPersonPropertyCount(Integer idPerson, Date dateFrom, Date dateTo) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = dateFrom == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(dateFrom.getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = dateTo == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(dateTo.getTime());
+
         String query = "SELECT COUNT(*) as PropertiesCount " +
                 "FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) WHERE" +
                 "                ( P.id_person=? AND (O.valid_from >= ? ) AND (O.valid_to <= ?) ) OR" +
@@ -255,16 +268,17 @@ public class PersonRepository extends Observable {
                 "                GROUP BY P.id_person";
 
         Connection connection = null;
+
         PreparedStatement statement;
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, id_person);
-            statement.setDate(2, new java.sql.Date(date_from.getTime()));
-            statement.setDate(3, new java.sql.Date(date_to.getTime()));
-            statement.setInt(4, id_person);
-            statement.setDate(5, new java.sql.Date(date_from.getTime()));
-            statement.setDate(6, new java.sql.Date(date_to.getTime()));
+            statement.setInt(1, idPerson);
+            statement.setDate(2, sqlDateFrom);
+            statement.setDate(3, sqlDateTo);
+            statement.setInt(4, idPerson);
+            statement.setDate(5, sqlDateFrom);
+            statement.setDate(6, sqlDateTo);
 
             ResultSet resultSet = statement.executeQuery();
             Integer count;
@@ -297,12 +311,18 @@ public class PersonRepository extends Observable {
     /**
      * Method calls query to Oracle database, which returns summary of geometry area of properties, in which person lived, for desired time interval.
      *
-     * @param id_person Integer value, id of person
-     * @param date_from @see Date, Date value from desired time interval
-     * @param date_to   @see Date, Date value to desired time interval
+     * @param idPerson Integer value, id of person
+     * @param dateFrom @see Date, Date value from desired time interval
+     * @param dateTo   @see Date, Date value to desired time interval
      * @return Integer value, which represents summary of geometry area
      */
-    public Integer getPersonPropertySum(Integer id_person, Date date_from, Date date_to) {
+    public Integer getPersonPropertySum(Integer idPerson, Date dateFrom, Date dateTo) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = dateFrom == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(dateFrom.getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = dateTo == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(dateTo.getTime());
+
         String query = "SELECT ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')), 0) as Area " +
                 "FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) WHERE" +
                 "                ( P.id_person=? AND (O.valid_from >= ? ) AND (O.valid_to <= ?) ) OR" +
@@ -315,12 +335,12 @@ public class PersonRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, id_person);
-            statement.setDate(2, new java.sql.Date(date_from.getTime()));
-            statement.setDate(3, new java.sql.Date(date_to.getTime()));
-            statement.setInt(4, id_person);
-            statement.setDate(5, new java.sql.Date(date_from.getTime()));
-            statement.setDate(6, new java.sql.Date(date_to.getTime()));
+            statement.setInt(1, idPerson);
+            statement.setDate(2, sqlDateFrom);
+            statement.setDate(3, sqlDateTo);
+            statement.setInt(4, idPerson);
+            statement.setDate(5, sqlDateFrom);
+            statement.setDate(6, sqlDateTo);
 
             Integer sum;
             ResultSet resultSet = statement.executeQuery();
@@ -352,12 +372,17 @@ public class PersonRepository extends Observable {
     /**
      * Method calls query to Oracle database, which returns the length of stay in days of person in desired time interval.
      *
-     * @param id_person Integer value, id of person
-     * @param date_from @see Date, Date value from desired time interval
-     * @param date_to   @see Date, Date value to desired time interval
+     * @param idPerson Integer value, id of person
+     * @param dateFrom @see Date, Date value from desired time interval
+     * @param dateTo   @see Date, Date value to desired time interval
      * @return Integer value, which represents days in which person lived in properties
      */
-    public Integer getPersonDuration(Integer id_person, Date date_from, Date date_to) {
+    public Integer getPersonDuration(Integer idPerson, Date dateFrom, Date dateTo) {
+
+        // if from date is not set, than set zero date (1970)
+        java.sql.Date sqlDateFrom = dateFrom == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(dateFrom.getTime());
+        // if to date is not set, than set maximum SQL date
+        java.sql.Date sqlDateTo = dateTo == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(dateTo.getTime());
 
         String query = "SELECT nvl(SUM(trunc( (CASE when O.valid_to > ? THEN ? ELSE O.valid_to END)-(CASE WHEN O.valid_from < ? THEN ? ELSE O.valid_from END) )), 0) AS DurationInDays" +
                 "                FROM owner O RIGHT  JOIN person P ON(O.id_owner=P.id_person) WHERE" +
@@ -371,16 +396,16 @@ public class PersonRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setDate(1, new java.sql.Date(date_to.getTime()));
-            statement.setDate(2, new java.sql.Date(date_to.getTime()));
-            statement.setDate(3, new java.sql.Date(date_from.getTime()));
-            statement.setDate(4, new java.sql.Date(date_from.getTime()));
-            statement.setInt(5, id_person);
-            statement.setDate(6, new java.sql.Date(date_from.getTime()));
-            statement.setDate(7, new java.sql.Date(date_to.getTime()));
-            statement.setInt(8, id_person);
-            statement.setDate(9, new java.sql.Date(date_from.getTime()));
-            statement.setDate(10, new java.sql.Date(date_to.getTime()));
+            statement.setDate(1, sqlDateTo);
+            statement.setDate(2, sqlDateTo);
+            statement.setDate(3, sqlDateFrom);
+            statement.setDate(4, sqlDateFrom);
+            statement.setInt(5, idPerson);
+            statement.setDate(6, sqlDateFrom);
+            statement.setDate(7, sqlDateTo);
+            statement.setInt(8, idPerson);
+            statement.setDate(9, sqlDateFrom);
+            statement.setDate(10, sqlDateTo);
 
             Integer durationInDays;
             ResultSet resultSet = statement.executeQuery();

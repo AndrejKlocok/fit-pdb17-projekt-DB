@@ -118,26 +118,26 @@ Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Monika','Nováková','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Jozef','Starý','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Lucia','Malá','street','city','psc','email');
--- TODO valid to infinity
+
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,1,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2015-1-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,1,TO_DATE('2015-1-2','yyyy-mm-dd'),TO_DATE('2016-12-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,1,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-24','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,1,TO_DATE('2017-6-25','yyyy-mm-dd'),TO_DATE('2017-11-7','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,1,TO_DATE('2017-6-25','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (8,2,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2011-11-17','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,2,TO_DATE('2012-1-1','yyyy-mm-dd'),TO_DATE('2014-8-30','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,2,TO_DATE('2014-1-1','yyyy-mm-dd'),TO_DATE('2015-1-19','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,2,TO_DATE('2015-1-20','yyyy-mm-dd'),TO_DATE('2015-11-30','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,2,TO_DATE('2015-12-22','yyyy-mm-dd'),TO_DATE('2016-8-30','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2016-9-1','yyyy-mm-dd'),TO_DATE('2017-7-11','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2016-9-1','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (9,3,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2012-12-14','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,3,TO_DATE('2013-1-1','yyyy-mm-dd'),TO_DATE('2015-12-28','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,3,TO_DATE('2015-1-1','yyyy-mm-dd'),TO_DATE('2017-6-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,3,TO_DATE('2016-8-1','yyyy-mm-dd'),TO_DATE('2016-12-28','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,3,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-30','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-7-30','yyyy-mm-dd'),TO_DATE('2017-11-7','yyyy-mm-dd'));
--- TODO valid to infinity
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-7-30','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
+
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
                 800000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2011-6-30','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
@@ -157,7 +157,7 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
                 1280000,  TO_DATE('2016-12-2','yyyy-mm-dd'), TO_DATE('2017-6-24','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
-                1380000,  TO_DATE('2017-6-25','yyyy-mm-dd'), TO_DATE('2017-11-7','yyyy-mm-dd'));
+                1380000,  TO_DATE('2017-6-25','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
                 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 2,
                 750000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2012-7-31','yyyy-mm-dd'));
@@ -178,7 +178,7 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 2,
                 1380000,  TO_DATE('2016-12-21','yyyy-mm-dd'), TO_DATE('2017-4-21','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 2,
-                1180000,  TO_DATE('2017-4-22','yyyy-mm-dd'), TO_DATE('2017-11-7','yyyy-mm-dd'));
+                1180000,  TO_DATE('2017-4-22','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
                 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 3,
                 850000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2011-8-28','yyyy-mm-dd'));
@@ -199,7 +199,7 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 3,
                 1280000,  TO_DATE('2016-12-5','yyyy-mm-dd'), TO_DATE('2017-1-18','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 3,
-                1240000,  TO_DATE('2017-1-19','yyyy-mm-dd'), TO_DATE('2017-11-7','yyyy-mm-dd'));
+                1240000,  TO_DATE('2017-1-19','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 -- Spatial selects --------------------------------------------------------------------------------------------------------------
 -- Return land area of property

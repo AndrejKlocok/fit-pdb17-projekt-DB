@@ -86,14 +86,10 @@ public class PersonsWindow implements PersonsContract.View {
         // Top bar components
         datePickerFromLabel = new JLabel();
         UtilDateModel datePickerModelFrom = new UtilDateModel();
-        datePickerModelFrom.setValue(new Date());
-        datePickerModelFrom.setSelected(true);
         JDatePanelImpl datePanelFrom = new JDatePanelImpl(datePickerModelFrom);
         datePickerFrom = new JDatePickerImpl(datePanelFrom);
         datePickerToLabel = new JLabel();
         UtilDateModel datePickerModelTo = new UtilDateModel();
-        datePickerModelTo.setValue(new Date());
-        datePickerModelTo.setSelected(true);
         JDatePanelImpl datePanelTo = new JDatePanelImpl(datePickerModelTo);
         datePickerTo = new JDatePickerImpl(datePanelTo);
 
@@ -157,7 +153,6 @@ public class PersonsWindow implements PersonsContract.View {
                 @Override
                 protected Void doInBackground() throws Exception {
                     controller.filterPersonsList(selectedDateFrom, selectedDateTo);
-                    // TODO control date picker from and to cross
                     return null;
                 }
             });

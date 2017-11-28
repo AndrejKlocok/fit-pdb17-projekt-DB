@@ -43,8 +43,6 @@ import java.awt.event.*;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Window showing list of all property on map
@@ -460,13 +458,17 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                                 currentLng + 0.0001, currentLat + 0.0001, currentLng,
                                                 currentLat + 0.0001, currentLng, currentLat};
                                         newProperty.setGeometry(JGeometry.createLinearPolygon(coordsHouse, 2, 8307));
-                                        System.out.println(newProperty.getGeometry().getType());
+                                        if (App.isDebug()) {
+                                            System.out.println(newProperty.getGeometry().getType());
+                                        }
                                         break;
                                     case 2:
                                         newProperty.setType(Property.Type.TERRACE_HOUSE);
                                         double coordsTerrace[] = {currentLng, currentLat, currentLng + 0.0001, currentLat + 0.0001};
                                         newProperty.setGeometry(JGeometry.createLinearLineString(coordsTerrace, 2, 8307));
-                                        System.out.println(newProperty.getGeometry().getType());
+                                        if (App.isDebug()) {
+                                            System.out.println(newProperty.getGeometry().getType());
+                                        }
                                         break;
                                     case 3:
                                         newProperty.setType(Property.Type.PREFAB);
@@ -479,7 +481,6 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                         break;
                                 }
 
-                                newProperty.setIdProperty(controller.getNewIdForProperty());
                                 controller.createProperty(newProperty);
                                 controller.getProperty(newProperty);
 

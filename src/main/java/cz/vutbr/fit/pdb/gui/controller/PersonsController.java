@@ -18,7 +18,6 @@ package cz.vutbr.fit.pdb.gui.controller;
 
 import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.Person;
-import cz.vutbr.fit.pdb.core.repository.OwnerRepository;
 import cz.vutbr.fit.pdb.core.repository.PersonRepository;
 
 import java.util.Date;
@@ -35,8 +34,6 @@ public class PersonsController implements PersonsContract.Controller {
 
     private PersonRepository personRepository;
 
-    private OwnerRepository ownerRepository;
-
     private PersonsContract.View view;
 
     private List<Person> personList;
@@ -50,19 +47,15 @@ public class PersonsController implements PersonsContract.Controller {
      * Construct controller with personRepository and view
      *
      * @param personRepository person repository
-     * @param ownerRepository  owner repository
      * @param view             view
      */
     public PersonsController(PersonRepository personRepository,
-                             OwnerRepository ownerRepository,
                              PersonsContract.View view) {
         this.personRepository = personRepository;
-        this.ownerRepository = ownerRepository;
         this.view = view;
 
         view.setController(this);
         personRepository.addObserver((observable, o) -> update());
-        ownerRepository.addObserver((observable, o) -> update());
 
         update();
     }
@@ -76,10 +69,16 @@ public class PersonsController implements PersonsContract.Controller {
         }
 
         if (filterDateFrom == null && filterDateTo == null) {
+            if (App.isDebug()) {
+                System.out.println("no filter");
+            }
             // get current valid persons
             personList = personRepository.getPersonsList();
             view.showPersonsList(personList);
         } else {
+            if (App.isDebug()) {
+                System.out.println("update filter: " + filterDateFrom + " " + filterDateTo);
+            }
             // get filtered valid persons
             // currently persons are fixed in time
             personList = personRepository.getPersonsList();
@@ -95,6 +94,13 @@ public class PersonsController implements PersonsContract.Controller {
      */
     @Override
     public void filterPersonsList(Date dateFrom, Date dateTo) {
+        if (dateFrom != null && dateTo != null) {
+            if (dateTo.before(dateFrom)) {
+                view.showError("Date interval is not valid");
+                return;
+            }
+        }
+
         filterDateFrom = dateFrom;
         filterDateTo = dateTo;
         update();
@@ -109,7 +115,7 @@ public class PersonsController implements PersonsContract.Controller {
     public Integer getPersonsCountOfProperty(Person person) {
         if (filterDateFrom == null && filterDateTo == null) {
             // current valid data
-            return this.personRepository.getPersonPropertyCount(person.getIdPerson(), new Date(), new Date());
+            return this.personRepository.getPersonPropertyCount(person.getIdPerson(), new Date(0), new Date());
         } else {
             // filtered data
             return this.personRepository.getPersonPropertyCount(person.getIdPerson(), filterDateFrom, filterDateTo);
@@ -127,11 +133,12 @@ public class PersonsController implements PersonsContract.Controller {
     public Integer getPersonsSumOfProperty(Person person) {
         if (filterDateFrom == null && filterDateTo == null) {
             // current valid data
-            return this.personRepository.getPersonPropertySum(person.getIdPerson(), new Date(), new Date());
+            return this.personRepository.getPersonPropertySum(person.getIdPerson(), new Date(0), new Date());
         } else {
             // filtered data
             return this.personRepository.getPersonPropertySum(person.getIdPerson(), filterDateFrom, filterDateTo);
         }
+        // TODO no return but view method ?
     }
 
     /**
@@ -144,11 +151,11 @@ public class PersonsController implements PersonsContract.Controller {
     public Integer getPersonsDurationOfProperty(Person person) {
         if (filterDateFrom == null && filterDateTo == null) {
             // current valid data
-            return this.personRepository.getPersonDuration(person.getIdPerson(), new Date(), new Date());
+            return this.personRepository.getPersonDuration(person.getIdPerson(), new Date(0), new Date());
         } else {
             // filtered data
             return this.personRepository.getPersonDuration(person.getIdPerson(), filterDateFrom, filterDateTo);
         }
+        // TODO no return but view method ?
     }
-
 }

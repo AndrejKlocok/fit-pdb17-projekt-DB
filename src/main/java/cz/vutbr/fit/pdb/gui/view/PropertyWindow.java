@@ -145,14 +145,10 @@ public class PropertyWindow implements PropertyContract.View {
         editPriceHistoryPanel = new JPanel();
         editPriceHistoryDatePickerFromLabel = new JLabel();
         UtilDateModel editPriceHistoryDatePickerFromModel = new UtilDateModel();
-        editPriceHistoryDatePickerFromModel.setValue(new Date());
-        editPriceHistoryDatePickerFromModel.setSelected(true);
         JDatePanelImpl editPriceHistoryDatePickerFromPanel = new JDatePanelImpl(editPriceHistoryDatePickerFromModel);
         editPriceHistoryDatePickerFrom = new JDatePickerImpl(editPriceHistoryDatePickerFromPanel);
         editPriceHistoryDatePickerToLabel = new JLabel();
         UtilDateModel editPriceHistoryDatePickerToModel = new UtilDateModel();
-        editPriceHistoryDatePickerToModel.setValue(new Date());
-        editPriceHistoryDatePickerToModel.setSelected(true);
         JDatePanelImpl editPriceHistoryDatePickerToPanel = new JDatePanelImpl(editPriceHistoryDatePickerToModel);
         editPriceHistoryDatePickerTo = new JDatePickerImpl(editPriceHistoryDatePickerToPanel);
         editPriceHistoryCountAverageButton = new JButton();
@@ -171,14 +167,10 @@ public class PropertyWindow implements PropertyContract.View {
         editOwnersHistoryPanel = new JPanel();
         editOwnersHistoryDatePickerFromLabel = new JLabel();
         UtilDateModel editOwnersHistoryDatePickerFromModel = new UtilDateModel();
-        editOwnersHistoryDatePickerFromModel.setValue(new Date());
-        editOwnersHistoryDatePickerFromModel.setSelected(true);
         JDatePanelImpl editOwnersHistoryDatePickerFromPanel = new JDatePanelImpl(editOwnersHistoryDatePickerFromModel);
         editOwnersHistoryDatePickerFrom = new JDatePickerImpl(editOwnersHistoryDatePickerFromPanel);
         editOwnersHistoryDatePickerToLabel = new JLabel();
         UtilDateModel editOwnersHistoryDatePickerToModel = new UtilDateModel();
-        editOwnersHistoryDatePickerToModel.setValue(new Date());
-        editOwnersHistoryDatePickerToModel.setSelected(true);
         JDatePanelImpl editOwnersHistoryDatePickerToPanel = new JDatePanelImpl(editOwnersHistoryDatePickerToModel);
         editOwnersHistoryDatePickerTo = new JDatePickerImpl(editOwnersHistoryDatePickerToPanel);
         editOwnersHistoryPersonComboBoxLabel = new JLabel();
@@ -401,7 +393,6 @@ public class PropertyWindow implements PropertyContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    // TODO control date picker from and to cross
                     controller.calculateAveragePriceFromDateToDate(selectedDateFrom, selectedDateTo);
 
                     return null;
@@ -447,7 +438,6 @@ public class PropertyWindow implements PropertyContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    // TODO control date picker from and to cross
                     controller.saveOwnerFromDateToDate(selectedPerson, selectedDateFrom, selectedDateTo);
 
                     return null;
@@ -463,7 +453,6 @@ public class PropertyWindow implements PropertyContract.View {
             runSwingWorker(new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    // TODO control date picker from and to cross
                     controller.deleteOwnerFromDateToDate(selectedDateFrom, selectedDateTo);
 
                     return null;
@@ -677,7 +666,7 @@ public class PropertyWindow implements PropertyContract.View {
                 data[i][0] = property.getOwnerHistory().get(i).getPerson().getFirstName();
                 data[i][1] = property.getOwnerHistory().get(i).getPerson().getLastName();
                 data[i][2] = property.getOwnerHistory().get(i).getValidFrom();
-                data[i][3] = property.getOwnerHistory().get(i).getValidTo();
+                data[i][3] = property.getOwnerHistory().get(i).getValidTo().after(new Date()) ? "presence" : property.getOwnerHistory().get(i).getValidTo();
             }
 
             ownersHistoryTable.setModel(new DefaultTableModel(data, columnNames) {
