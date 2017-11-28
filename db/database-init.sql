@@ -21,7 +21,7 @@ DELETE FROM USER_SDO_GEOM_METADATA WHERE
 CREATE TABLE property(
     id_property NUMBER NOT NULL,
     -- ENUM('dom', panelak, 'apartment', terrace-house')
-    property_type VARCHAR(16) CHECK( property_type in ('house', 'prefab', 'apartment', 'terrace-house', 'land')),
+    property_type VARCHAR(16) CHECK( property_type in ('house', 'prefab', 'apartment', 'terrace_house', 'land')),
     geometry SDO_GEOMETRY,
     property_name VARCHAR(32) NOT NULL,
     property_description VARCHAR(64) NOT NULL,

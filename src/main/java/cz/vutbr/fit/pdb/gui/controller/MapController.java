@@ -240,7 +240,6 @@ public class MapController extends Observable implements MapContract.Controller 
     @Override
     public void savePropertyGeometry(Property property, JGeometry geometry) {
         property.setGeometry(geometry);
-
         if (!propertyRepository.saveProperty(property)) {
             view.showError("Could not save property");
         }
@@ -290,6 +289,7 @@ public class MapController extends Observable implements MapContract.Controller 
     @Override
     public void findNearestProperty(double lat, double lng) {
         Property nearestProperty = propertyRepository.getNearestProperty(lat, lng);
+
         if (nearestProperty == null) {
             view.showError("Could not get nearest property");
             return;
@@ -336,5 +336,10 @@ public class MapController extends Observable implements MapContract.Controller 
         } else {
             view.showError("You cannot calculate area of property of this type");
         }
+    }
+
+    @Override
+    public int getNewIdForProperty() {
+        return propertyRepository.getNewIdForProperty();
     }
 }

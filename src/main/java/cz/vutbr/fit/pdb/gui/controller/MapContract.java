@@ -68,5 +68,7 @@ public class MapContract {
         void findAdjacentProperty(Property property);
 
         void calculateArea(Property property);
+
+        int getNewIdForProperty();
     }
 }
