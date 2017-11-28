@@ -14,21 +14,28 @@ import com.lynden.gmapsfx.javascript.event.GMapMouseEvent;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polygon;
+import com.lynden.gmapsfx.shapes.Polyline;
 import cz.vutbr.fit.pdb.core.model.Property;
+import cz.vutbr.fit.pdb.gui.adapters.ShapePointsAdapter;
 import cz.vutbr.fit.pdb.gui.controller.MapContract;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import netscape.javascript.JSObject;
 import oracle.spatial.geometry.JGeometry;
+import sun.awt.Symbol;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MapWindow implements MapContract.View, MapComponentInitializedListener {
 
@@ -68,6 +75,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
     private List<MapShape> mapShapes;
     private boolean mapInitialized;
 
+    public String actualPositionString;
 
     public MapWindow() {
 
@@ -96,6 +104,10 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         statusLabel = new JLabel();
 
         showAsync();
+    }
+
+    public String getActualPositionString() {
+        return this.actualPositionString;
     }
 
     public void showAsync() {
@@ -340,6 +352,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             LatLong position = event.getLatLong();
             statusLabel.setText(position.toString());
 
+
             if (actualPosition != null) {
                 map.removeMarker(actualPosition);
                 this.refreshMap();
@@ -360,6 +373,8 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             markerPopupMenu.add(propertyCreateItem);
             markerPopupMenu.add(findNearestItem);
 
+            this.actualPositionString = event.getLatLong().toString();
+
             ActionListener menuListener = menuEvent -> {
                 System.out.println("Popup menu item [" + menuEvent.getActionCommand() + "]");
 
@@ -376,30 +391,82 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                             options[0]);
 
                     Property newProperty = new Property();
+                    newProperty.setName("new property");
+                    newProperty.setDescription("new property description");
+
+                    String actualMarkerPosition = getActualPositionString();
+                    System.out.println("actual marker postion "+ actualMarkerPosition);
+
+                    Pattern pattern = Pattern.compile("[+-]?([0-9]*[.][0-9]*)+");
+                    Matcher matcher = pattern.matcher(actualMarkerPosition);
+                    Double currentLat = 0.0;
+                    Double currentLng = 0.0;
+
+                    int count = 0;
+                    while(matcher.find()) {
+                        if(count == 0) {
+                            currentLat = Double.parseDouble(matcher.group(0));
+                        } else if(count == 1)
+                        currentLng = Double.parseDouble(matcher.group(1));
+                        count++;
+                    }
+                    System.out.println("Lat " + currentLat);
+                    System.out.println("Lng " + currentLng);
 
                     switch (response) {
                         case 0:
                             newProperty.setType(Property.Type.LAND);
+                            double coordsLand [] = {currentLng, currentLat, currentLng + 0.0001, currentLat,
+                                    currentLng + 0.0001, currentLat + 0.0001, currentLng,
+                                    currentLat + 0.0001, currentLng, currentLat};
+                            newProperty.setGeometry(JGeometry.createLinearPolygon(coordsLand, 2, 8307 ));
                             break;
                         case 1:
                             newProperty.setType(Property.Type.HOUSE);
+                            double coordsHouse [] = {currentLng, currentLat, currentLng + 0.0001, currentLat,
+                                                currentLng + 0.0001, currentLat + 0.0001, currentLng,
+                                                currentLat + 0.0001, currentLng, currentLat};
+                            newProperty.setGeometry(JGeometry.createLinearPolygon(coordsHouse, 2, 8307 ));
+                            System.out.println(newProperty.getGeometry().getType());
                             break;
                         case 2:
                             newProperty.setType(Property.Type.TERRACE_HOUSE);
+                            double coordsTerrace [] = {currentLng, currentLat, currentLng+0.0001, currentLat+0.0001};
+                            newProperty.setGeometry(JGeometry.createLinearLineString(coordsTerrace, 2, 8307 ));
+                            System.out.println(newProperty.getGeometry().getType());
                             break;
                         case 3:
                             newProperty.setType(Property.Type.PREFAB);
+                            //double coordsPrefab [] = {currentLng, currentLat, currentLng + 0.0001, currentLat+0.0001};
+                            newProperty.setGeometry(new JGeometry(currentLng, currentLat, currentLng + 0.0001, currentLat+0.0001, 8307 ));
                             break;
                         case 4:
                             newProperty.setType(Property.Type.APARTMENT);
+                            //49.192384, 16.608537
+                            //currentLng, currentLat+0.004
+                            //currentLng, currentLat-0.004
+                            //currentLng+0.004, currentLat
+                            JGeometry j = JGeometry.createCircle(16.608989, 49.187766, 16.612989, 49.191766,
+                                    16.608989, 49.195766, 8307);
+
+                            for(int i =0; i < j.getOrdinatesArray().length; i++)
+                            {
+                                System.out.println("ORD " + j.getOrdinatesArray()[i]);
+                            }
+                            for(int i =0; i < j.getElemInfo().length; i++)
+                            {
+                                System.out.println("ELEM " + j.getElemInfo()[i]);
+                            }
+                            newProperty.setGeometry(JGeometry.createCircle(currentLng, currentLat,
+                                    20, 8307));
                             break;
                     }
 
-                    // TODO create dummy geometry and set it to newProperty
                     runSwingWorker(new SwingWorker<Void, Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
                             Platform.runLater(() -> {
+                                newProperty.setIdProperty(controller.getNewIdForProperty());
                                 controller.createProperty(newProperty);
                                 controller.getProperty(newProperty);
 
@@ -420,6 +487,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                     });
                 }
             };
+
 
             propertyCreateItem.addActionListener(menuListener);
             findNearestItem.addActionListener(menuListener);
@@ -447,6 +515,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             showPropertyList(propertyList);
         }
     }
+
 
 
     @Override
@@ -495,8 +564,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
             for (Property property : propertyList) {
 
                 System.out.println("property: " + property.getName());
-
-                final MapShape shape = MapShapeAdapter.jGeometry2MapShape(property.getGeometry());
+                final MapShape shape = MapShapeAdapter.jGeometry2MapShape(property.getGeometry(), property.getType());
 
                 JPopupMenu propertyPopupMenu = new JPopupMenu();
 
@@ -532,16 +600,41 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                             shape.setEditable(false);
                             shape.setDraggable(false);
 
-                            // TODO
+                            double [] newShapeCoordinates;
+                            ShapePointsAdapter shapePointsAdapter =  new ShapePointsAdapter();
+                            if(shape instanceof com.lynden.gmapsfx.shapes.Polygon) {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(((Polygon) shape).getPath());
+                            } else if(shape instanceof com.lynden.gmapsfx.shapes.Rectangle) {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(shape.getBounds());
+                            } else if((shape instanceof com.lynden.gmapsfx.shapes.Polyline)) {
+                                newShapeCoordinates =  shapePointsAdapter.getNewCoordinates(((Polyline) shape).getPath());
+                            } else {
+                                newShapeCoordinates = shapePointsAdapter.getNewCoordinates(shape.getBounds());
+                            }
+
                             runSwingWorker(new SwingWorker<Void, Void>() {
                                 @Override
                                 protected Void doInBackground() throws Exception {
-                                    controller.savePropertyGeometry(property, JGeometry.createLinearPolygon(new double[2], 2, 2));
+                                    JGeometry newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);;
+                                    if(property.getType() == Property.Type.PREFAB) {
+                                        newGeometry = new JGeometry(newShapeCoordinates[0], newShapeCoordinates[1],
+                                                newShapeCoordinates[2], newShapeCoordinates[3], 8307);
+                                    } else if(property.getType() == Property.Type.APARTMENT) {
 
+                                    } else if(property.getType() == Property.Type.HOUSE) {
+                                        newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
+                                    } else if(property.getType() == Property.Type.TERRACE_HOUSE) {
+                                        newGeometry = JGeometry.createLinearLineString(newShapeCoordinates, 2,8307);
+                                    } else if(property.getType() == Property.Type.LAND) {
+                                        newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
+                                    }
+
+                                    controller.savePropertyGeometry(property, newGeometry);
                                     return null;
                                 }
                             });
-                            System.out.println("save: " + (shape instanceof com.lynden.gmapsfx.shapes.Polygon ? ((Polygon) shape).getPath().getArray().getSlot(0).toString() : shape.getBounds().toString()));
+
+
                         });
                     } else if (event.getActionCommand().equalsIgnoreCase("Find nearest property")) {
                         runSwingWorker(new SwingWorker<Void, Void>() {

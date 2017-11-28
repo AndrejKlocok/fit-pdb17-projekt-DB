@@ -13,27 +13,21 @@ import com.lynden.gmapsfx.javascript.object.LatLongBounds;
 import com.lynden.gmapsfx.javascript.object.MVCArray;
 import com.lynden.gmapsfx.javascript.object.MapShape;
 import com.lynden.gmapsfx.shapes.*;
+import cz.vutbr.fit.pdb.core.model.Property;
 import oracle.spatial.geometry.JGeometry;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapShapeAdapter {
 
-    public static MapShape jGeometry2MapShape(JGeometry geometry) {
+    public static MapShape jGeometry2MapShape(JGeometry geometry, Property.Type type) {
         // TODO
 
-        /*if (geometry.isCircle()) {
-            /*LatLongBounds rb = new LatLongBounds(new LatLong(geometry.getOrdinatesArray()[1], geometry.getOrdinatesArray()[0]),
-                    new LatLong(geometry.getOrdinatesArray()[3], geometry.getOrdinatesArray()[2]));
-            RectangleOptions rectangleOptions = new RectangleOptions()
-                    .bounds(rb)
-                    .strokeColor("black")
-                    .strokeWeight(2)
-                    .fillColor("gray");
-            return new Rectangle(rectangleOptions);*/
-
          if (geometry.isCircle()) {
-            LatLong point = new LatLong(49.191882, 16.606972);
+             System.out.println("CIRCLE");
+            /*
+            LatLong point = new LatLong(x, y);
             CircleOptions circleOptions = new CircleOptions()
                     .center(point)
                     .radius(20)
@@ -41,43 +35,71 @@ public class MapShapeAdapter {
                     .strokeWeight(2)
                     .fillColor("gray")
                     .fillOpacity(0.3);
+            */
+             return null;
+         }else if (geometry.isRectangle()) {
+             System.out.println("RECTANGLE SHAPE");
+             java.util.List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
 
-            return new Circle(circleOptions);
+             LatLongBounds rb = new LatLongBounds(col.get(0), col.get(1));
+             RectangleOptions rectangleOptions = new RectangleOptions()
+                     .bounds(rb)
+                     .strokeColor("green")
+                     .strokeWeight(2)
+                     .fillColor("green");
+             return new Rectangle(rectangleOptions);
+         } else if(geometry.getType() == 2) {
+             System.out.println("POLYLINE SHAPE");
+             java.util.List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
+             MVCArray mvc = new MVCArray(col.toArray());
 
-        } else {
-            java.util.List<LatLong> col = new ArrayList<>();
+             Polyline polyline = new Polyline(new PolylineOptions()
+                     .path(mvc)
+                     .strokeColor("blue")
+                     .editable(false)
+                     .strokeWeight(4));
 
-            double coords[] = geometry.getOrdinatesArray();
-            double x = 0;
-            double y = 0;
-            for (int i = 0; i < coords.length; i++) {
-
-                if(i % 2 == 0) {
-                    y = coords[i];
-                    //System.out.println("y " + y);
-                } else {
-                    x = coords[i];
-                    //System.out.println("x " + x);
-                    //System.out.println("col add: " + x + " " +y);
-                    col.add(new LatLong(x, y));
-                }
-            }
-            /*col.add(new LatLong(geometry.getOrdinatesArray()[1], geometry.getOrdinatesArray()[0])); //TR
-            col.add(new LatLong(geometry.getOrdinatesArray()[3], geometry.getOrdinatesArray()[2])); //TL
-            col.add(new LatLong(geometry.getOrdinatesArray()[5], geometry.getOrdinatesArray()[4])); //BL
-            col.add(new LatLong(geometry.getOrdinatesArray()[7], geometry.getOrdinatesArray()[6])); //BR*/
-
+             return polyline;
+         } else {
+            System.out.println("POLYGON SHAPE");
+            java.util.List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
-            Polygon polygon = new Polygon(new PolygonOptions()
+
+            PolygonOptions polygonOptions = new PolygonOptions()
                     .paths(mvc)
                     .strokeColor("black")
                     .strokeWeight(2)
                     .editable(false)
                     .fillColor("gray")
-                    .fillOpacity(0.5));
+                    .fillOpacity(0.5);
 
+            if(type == Property.Type.LAND) {
+                polygonOptions.fillColor("white").strokeColor("white");
+            }
+
+            Polygon polygon = new Polygon(polygonOptions);
             return polygon;
         }
+    }
+
+    public static List<LatLong> LatLngToLngLat(double[] coordinates) {
+        java.util.List<LatLong> col = new ArrayList<>();
+
+        double x = 0;
+        double y = 0;
+        for (int i = 0; i < coordinates.length; i++) {
+            if(i % 2 == 0) {
+                y = coordinates[i];
+                //System.out.println("y " + y);
+            } else {
+                x = coordinates[i];
+                //System.out.println("x " + x);
+                //System.out.println("col add: " + x + " " +y);
+                col.add(new LatLong(x, y));
+            }
+        }
+
+        return col;
     }
 }

@@ -64,6 +64,15 @@ public class Property {
         this.description = description;
     }
 
+    public Property(JGeometry geometry)
+    {
+        this.idProperty = 0;
+        this.type = null;
+        this.description = "temporary";
+        this.name = "current point";
+        this.geometry = geometry;
+    }
+
     public int getIdProperty() {
         return idProperty;
     }
