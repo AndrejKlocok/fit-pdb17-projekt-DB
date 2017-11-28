@@ -248,15 +248,18 @@ public class OwnerRepository extends Observable {
     /**
      * Method calls query under table Owner to Oracle database, which creates a record, according to given parameters.
      *
-     * @param owner @see Owner typed object, which stores attributes for query
+     * @param property property
+     * @param person   person
+     * @param from     from
+     * @param to       to
      * @return boolean True if query was successful otherwise False.
      */
-    public boolean createOwner(Owner owner) {
+    public boolean createOwner(Property property, Person person, Date from, Date to) {
 
         // if from date is not set, than set zero date (1970)
-        java.sql.Date sqlDateFrom = owner.getValidFrom() == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(owner.getValidFrom().getTime());
+        java.sql.Date sqlDateFrom = from == null ? new java.sql.Date((new Date(0)).getTime()) : new java.sql.Date(from.getTime());
         // if to date is not set, than set maximum SQL date
-        java.sql.Date sqlDateTo = owner.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(owner.getValidTo().getTime());
+        java.sql.Date sqlDateTo = to == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(to.getTime());
 
         String query = "CALL temporal_insert('owner', ?, ?, ?, ?)";
 
@@ -266,8 +269,8 @@ public class OwnerRepository extends Observable {
         try {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
-            statement.setInt(1, owner.getProperty().getIdProperty());
-            statement.setInt(2, owner.getPerson().getIdPerson());
+            statement.setInt(1, property.getIdProperty());
+            statement.setInt(2, person.getIdPerson());
             statement.setDate(3, sqlDateFrom);
             statement.setDate(4, sqlDateTo);
 
