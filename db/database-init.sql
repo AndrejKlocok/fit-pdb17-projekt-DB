@@ -102,7 +102,7 @@ CREATE INDEX property_map_index ON property(geometry) indextype is MDSYS.SPATIAL
 SELECT property_name, SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT(geometry, 0.000001) valid FROM PROPERTY;
 
 SELECT p.property_name, p.geometry.ST_IsValid() FROM property p;
-
+-- TODO better house naming and minimal 4 property of type land (due getAdjacentProperty)
 --inserts
 Insert into PROPERTY (ID_PROPERTY,PROPERTY_TYPE,GEOMETRY,PROPERTY_NAME,PROPERTY_DESCRIPTION) values (property_seq.nextval,'house',MDSYS.SDO_GEOMETRY(2003, 8307, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1, 1003, 1), MDSYS.SDO_ORDINATE_ARRAY(16.607206, 49.191432, 16.607436, 49.191344, 16.607542, 49.191457, 16.60731, 49.19155, 16.607206, 49.191432)),'dom1','desc1');
 Insert into PROPERTY (ID_PROPERTY,PROPERTY_TYPE,GEOMETRY,PROPERTY_NAME,PROPERTY_DESCRIPTION) values (property_seq.nextval,'house',MDSYS.SDO_GEOMETRY(2003, 8307, NULL, MDSYS.SDO_ELEM_INFO_ARRAY(1, 1003, 1), MDSYS.SDO_ORDINATE_ARRAY(16.603125, 49.203747, 16.603033, 49.2037, 16.603319, 49.203454, 16.603418, 49.2035, 16.603125, 49.203747)),'dom2','desc2');
@@ -113,12 +113,12 @@ Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Vladimir','Pes','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Milos','Milos','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Karol','Zeman','street','city','psc','email');
-Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Aneta','Nováová','street','city','psc','email');
+Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Aneta','Nová','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Jana','Navrátilová','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Monika','Nováková','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Jozef','Starý','street','city','psc','email');
 Insert into PERSON (ID_PERSON,FIRSTNAME,LASTNAME,STREET,CITY,PSC,EMAIL) values (person_seq.nextval,'Lucia','Malá','street','city','psc','email');
-
+-- TODO valid to infinity
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,1,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2015-1-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,1,TO_DATE('2015-1-2','yyyy-mm-dd'),TO_DATE('2016-12-1','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,1,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-24','yyyy-mm-dd'));
@@ -137,7 +137,7 @@ Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,3,TO_DATE
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,3,TO_DATE('2016-8-1','yyyy-mm-dd'),TO_DATE('2016-12-28','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,3,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-30','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-7-30','yyyy-mm-dd'),TO_DATE('2017-11-7','yyyy-mm-dd'));
-
+-- TODO valid to infinity
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
                 800000,  TO_DATE('2010-1-1','yyyy-mm-dd'), TO_DATE('2011-6-30','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 1,
@@ -209,21 +209,20 @@ SELECT SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M') FROM property PR WHERE id_pr
 SELECT SDO_GEOM.SDO_LENGTH(PR.geometry,1,'unit=M') FROM property PR WHERE id_property=1;
 
 -- Retrun SUM of all land areas of properties which are owned by one person
-SELECT O.id_owner, P.lastname, P.firstname, SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M') )
+SELECT P.lastname, P.firstname, ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')),1) AS Area
 FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) 
 GROUP BY O.id_owner, P.lastname, P.firstname
-ORDER BY P.lastname, P.firstname;
+ORDER BY Area DESC;
 
 -- Returns owner of N properties with SUM of all land area in that time interval
-SELECT O.id_owner, P.lastname, P.firstname, COUNT(*) as properties, SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M') ) as area
+SELECT P.id_person, COUNT(*) as PropertiesCount, ROUND(SUM(SDO_GEOM.SDO_AREA(PR.geometry,1,'unit=SQ_M')), 1) as Area
 FROM property PR JOIN owner O ON (PR.id_property=O.id_property) JOIN person P ON (P.id_person=O.id_owner) 
-WHERE CURRENT_DATE  BETWEEN O.valid_from AND O.valid_to AND CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to
-GROUP BY O.id_owner, P.lastname, P.firstname
-ORDER BY P.lastname, P.firstname;
-
+WHERE (TO_DATE('2010-1-1','yyyy-mm-dd') <= O.valid_from) AND (TO_DATE('2017-8-1','yyyy-mm-dd') >= O.valid_to)
+GROUP BY P.id_person
+ORDER BY Area DESC, PropertiesCount DESC;
 
 -- Finding closest property to PR1(actual position on map), which is available right now
-SELECT P.id_property, P.distance
+SELECT P.id_property, ROUND(P.distance,1) as PropertyDistance
 FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance
         FROM property PR1, property PR2
         WHERE PR1.id_property=2 AND PR1.id_property <> PR2.id_property AND PR2.property_type <> 'land' AND
@@ -234,8 +233,6 @@ FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANC
         CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to) OR O.id_owner IS NULL ) p_available
 WHERE P.id_property=p_available.id_property AND ROWNUM = 1
 ORDER BY P.distance ;
-
-
 
 -- Finding closest properties to PR1(actual position on map)
 SELECT /*+ ORDERED */ PR1.id_property, PR2.id_property, MDSYS.SDO_NN_DISTANCE(1) as distance
@@ -254,6 +251,17 @@ MDSYS.SDO_RELATE(PR1.geometry, PR2.geometry, 'mask=touch') = 'TRUE';
 -- Selects history of one property
 SELECT PP.id_property, PP.price, PP.valid_from, PP.valid_to FROM property_price PP WHERE PP.id_property=1;
 
+-- Selects persons with longest stay in descending list
+SELECT P.LASTNAME, P.FIRSTNAME , nvl(SUM(trunc(O.valid_to-O.valid_from)), 0) AS DurationInDays
+FROM owner O RIGHT OUTER JOIN person P ON(O.id_owner=P.id_person)
+GROUP BY O.ID_OWNER, P.LASTNAME, P.FIRSTNAME ORDER BY DurationInDays Desc;
+
+--Select average cost of properies in time period
+SELECT  P.property_name , ROUND(AVG(PP.price),0) AS AvgPrice 
+FROM property_price PP JOIN property P ON(PP.id_property=P.id_property) 
+WHERE (TO_DATE('2014-1-1','yyyy-mm-dd') < PP.valid_from) AND (TO_DATE('2017-8-1','yyyy-mm-dd') > PP.valid_to)
+GROUP BY PP.id_property, P.property_name
+ORDER BY AvgPrice;
 
 -- Selects properties, which are available in current date
 SELECT P.id_property FROM property P where p.id_property IN(

@@ -75,6 +75,14 @@ jbdc=ORACLE_DB_JDBC
 
 where `ORACLE_DB_LOGIN` and `ORACLE_DB_PASSWORD` are your login credentials to Oracle database. With `ORACLE_DB_JDBC` you can specify JDBC connection string.
 
+Optionally you can specify:
+
+```
+debug-true
+```
+
+for printing debug information to standard output.
+
 ## Run
 
 In project root run:

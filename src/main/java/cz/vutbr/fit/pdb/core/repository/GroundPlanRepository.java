@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.repository;
@@ -21,20 +29,40 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
+/**
+ * Repository creates ground plan typed object (@see GroundPlan), queries and calls to Oracle database.
+ * Repository works mainly with table Ground_plan.
+ * Class extends @see Observable.
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ */
 public class GroundPlanRepository extends Observable {
 
     private OracleDataSource dataSource;
 
+    /**
+     * Constructor for ground plan repository @see GroundPlanRepository.
+     *
+     * @param dataSource @see OracleDataSource
+     */
     public GroundPlanRepository(OracleDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-
+    /**
+     * Method calls query under table Ground plan and returns ground plan with desired property.
+     *
+     * @param property @see Property object
+     * @return List of @see GroundPlan objects.
+     */
     public List<GroundPlan> getGroundPlanListOfProperty(Property property) {
         String query = "SELECT * FROM ground_plan WHERE id_property = ?";
 
+        Connection connection = null;
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             OraclePreparedStatement statement = (OraclePreparedStatement) connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
 
@@ -55,21 +83,35 @@ public class GroundPlanRepository extends Observable {
             return groundPlanList;
 
         } catch (IOException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error getGroundPlanListOfProperty " + exception.getMessage());
 
             return null;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error getGroundPlanListOfProperty " + exception.getMessage());
 
             return new LinkedList<>();
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getGroundPlanListOfProperty " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and returns ground plan with desired id.
+     *
+     * @param groundPlan @see GroundPlan
+     * @return @see GroundPlan object.
+     */
     public GroundPlan getGroundPlan(GroundPlan groundPlan) {
         String query = "SELECT * FROM ground_plan WHERE id_ground_plan = ?";
 
+        Connection connection = null;
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             OraclePreparedStatement statement = (OraclePreparedStatement) connection.prepareStatement(query);
             statement.setInt(1, groundPlan.getIdGroundPlan());
 
@@ -92,21 +134,35 @@ public class GroundPlanRepository extends Observable {
             }
 
         } catch (IOException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error getGroundPlan " + exception.getMessage());
 
             return null;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error getGroundPlan " + exception.getMessage());
 
             return null;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getGroundPlan " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and returns ground plan with desired id.
+     *
+     * @param idGroundPlan Integer value, which represents id of ground plan
+     * @return @see GroundPlan object.
+     */
     public GroundPlan getGroundPlanById(int idGroundPlan) {
         String query = "SELECT * FROM ground_plan WHERE id_ground_plan = ?";
 
+        Connection connection = null;
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             OraclePreparedStatement statement = (OraclePreparedStatement) connection.prepareStatement(query);
             statement.setInt(1, idGroundPlan);
 
@@ -129,21 +185,35 @@ public class GroundPlanRepository extends Observable {
             }
 
         } catch (IOException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error getGroundPlanById " + exception.getMessage());
 
             return null;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error getGroundPlanById " + exception.getMessage());
 
             return null;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getGroundPlanById " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and inserts ground plan according to given parameter.
+     *
+     * @param groundPlan @see GroundPlan
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean createGroundPlan(GroundPlan groundPlan) {
         String query = "BEGIN INSERT INTO ground_plan(id_ground_plan, id_property, img) VALUES(ground_plan_seq.nextval, ? ,ordsys.ordimage.init()) RETURNING id_ground_plan INTO ?; END;";
 
+        Connection connection = null;
         try {
-            Connection connection = dataSource.getConnection();
+            connection = dataSource.getConnection();
             CallableStatement statement = connection.prepareCall(query);
             statement.setInt(1, groundPlan.getIdProperty());
             statement.registerOutParameter(2, Types.NUMERIC);
@@ -167,19 +237,34 @@ public class GroundPlanRepository extends Observable {
                 return false;
             }
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error createGroundPlan " + exception.getMessage());
 
             return false;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error createGroundPlan " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and updates ground plan according to given parameter.
+     *
+     * @param groundPlan ground plan
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean saveGroundPlan(GroundPlan groundPlan) {
 
         String query = "UPDATE ground_plan SET id_property = ? WHERE id_ground_plan = ?";
 
+        Connection connection = null;
+        PreparedStatement statement;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, groundPlan.getIdProperty());
             statement.setInt(2, groundPlan.getIdGroundPlan());
 
@@ -245,22 +330,37 @@ public class GroundPlanRepository extends Observable {
 
             return true;
         } catch (IOException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error saveGroundPlan " + exception.getMessage());
 
             return false;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error saveGroundPlan " + exception.getMessage());
 
             return false;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error saveGroundPlan " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and deletes ground plan according to given parameter.
+     *
+     * @param groundPlan ground plan
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean deleteGroundPlan(GroundPlan groundPlan) {
         String query = "DELETE FROM ground_plan WHERE id_ground_plan = ?";
 
+        Connection connection = null;
+        PreparedStatement statement;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, groundPlan.getIdGroundPlan());
 
             statement.executeQuery();
@@ -274,12 +374,25 @@ public class GroundPlanRepository extends Observable {
 
             return true;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error deleteGroundPlan " + exception.getMessage());
 
             return false;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error deleteGroundPlan " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and rotates left ground plan according to given parameter.
+     *
+     * @param groundPlan ground plan
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean rotateGroundPlanLeft(GroundPlan groundPlan) {
         String query = "" +
                 "DECLARE" +
@@ -294,9 +407,11 @@ public class GroundPlanRepository extends Observable {
                 "       DBMS_OUTPUT.PUT_LINE('Data is not local');" +
                 "END;";
 
+        Connection connection = null;
+        PreparedStatement statement;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, groundPlan.getIdGroundPlan());
             statement.setInt(2, groundPlan.getIdGroundPlan());
 
@@ -361,12 +476,25 @@ public class GroundPlanRepository extends Observable {
 
             return true;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error rotateGroundPlanLeft " + exception.getMessage());
 
             return false;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error rotateGroundPlanLeft " + exception.getMessage());
+            }
         }
     }
 
+    /**
+     * Method calls query under table Ground plan and rotates right ground plan according to given parameter.
+     *
+     * @param groundPlan ground plan
+     * @return boolean True if query was successful otherwise False.
+     */
     public boolean rotateGroundPlanRight(GroundPlan groundPlan) {
         String query = "" +
                 "DECLARE" +
@@ -381,9 +509,11 @@ public class GroundPlanRepository extends Observable {
                 "       DBMS_OUTPUT.PUT_LINE('Data is not local');" +
                 "END;";
 
+        Connection connection = null;
+        PreparedStatement statement;
         try {
-            Connection connection = dataSource.getConnection();
-            PreparedStatement statement = connection.prepareStatement(query);
+            connection = dataSource.getConnection();
+            statement = connection.prepareStatement(query);
             statement.setInt(1, groundPlan.getIdGroundPlan());
             statement.setInt(2, groundPlan.getIdGroundPlan());
 
@@ -448,9 +578,16 @@ public class GroundPlanRepository extends Observable {
 
             return true;
         } catch (SQLException exception) {
-            System.err.println("Error " + exception.getMessage());
+            System.err.println("Error rotateGroundPlanRight " + exception.getMessage());
 
             return false;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error rotateGroundPlanRight " + exception.getMessage());
+            }
         }
     }
 }

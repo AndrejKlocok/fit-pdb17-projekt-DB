@@ -1,18 +1,35 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.core.model;
 
 import oracle.spatial.geometry.JGeometry;
 
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Model of database table Property
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ */
 public class Property {
 
     public enum Type {
@@ -39,7 +56,9 @@ public class Property {
 
     private JGeometry geometry;
 
-
+    /**
+     * Constructor of @see Property.
+     */
     public Property() {
         idProperty = 0;
         type = null;
@@ -49,6 +68,15 @@ public class Property {
         geometry = null;
     }
 
+    /**
+     * Constructor od @see property
+     *
+     * @param id          Integer value, which represents id of property.
+     * @param type        enum value, which represents type of property.
+     * @param name        String value, which represents full name of property.
+     * @param description String value, which represents description of property.
+     * @param geometry    @see JGeometry geometry for spatial operations.
+     */
     public Property(int id, Type type, String name, String description, JGeometry geometry) {
         this.idProperty = id;
         this.type = type;
@@ -57,6 +85,14 @@ public class Property {
         this.geometry = geometry;
     }
 
+    /**
+     * Constructor od @see property
+     *
+     * @param id          Integer value, which represents id of property.
+     * @param type        enum value, which represents type of property.
+     * @param name        String value, which represents full name of property.
+     * @param description String value, which represents description of property.
+     */
     public Property(int id, Type type, String name, String description) {
         this.idProperty = id;
         this.type = type;
@@ -64,84 +100,231 @@ public class Property {
         this.description = description;
     }
 
-    public Property(JGeometry geometry)
-    {
-        this.idProperty = 0;
-        this.type = null;
-        this.description = "temporary";
-        this.name = "current point";
-        this.geometry = geometry;
-    }
-
+    /**
+     * Method returns Id of property
+     *
+     * @return Integer value, which represents id of property.
+     */
     public int getIdProperty() {
         return idProperty;
     }
 
+    /**
+     * Method sets Id of property
+     *
+     * @param idProperty Integer value, which represents id of property.
+     */
     public void setIdProperty(int idProperty) {
         this.idProperty = idProperty;
     }
 
+    /**
+     * Method returns type of Property
+     *
+     * @return enum value, which represents type of property.
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Method sets type of Property
+     *
+     * @param type enum value, which represents type of property.
+     */
     public void setType(Type type) {
         this.type = type;
     }
 
+    /**
+     * Method returns name of Property
+     *
+     * @return String value, which represents full name of property.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Method sets name of Property
+     *
+     * @param name String value, which represents full name of property.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Method returns description of Property
+     *
+     * @return String value, which represents description of property.
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Method sets description of Property
+     *
+     * @param description String value, which represents description of property.
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Method returns list of ground plans of Property
+     *
+     * @return List of @see GroundPlan objects.
+     */
     public List<GroundPlan> getGroundPlans() {
         return groundPlans;
     }
 
+    /**
+     * Method sets ground plans of Property
+     *
+     * @param groundPlans List of @see GroundPlan objects.
+     */
     public void setGroundPlans(List<GroundPlan> groundPlans) {
         this.groundPlans = groundPlans;
     }
 
+    /**
+     * Method returns prices of Property
+     *
+     * @return List of @see PropertyPrice objects.
+     */
     public List<PropertyPrice> getPriceHistory() {
         return priceHistory;
     }
 
+    /**
+     * Method sets prices of Property
+     *
+     * @param priceHistory List of @see PropertyPrice objects.
+     */
     public void setPriceHistory(List<PropertyPrice> priceHistory) {
         this.priceHistory = priceHistory;
     }
 
+    /**
+     * Method returns owners of Property
+     *
+     * @return List of @see Owner objects.
+     */
     public List<Owner> getOwnerHistory() {
         return ownerHistory;
     }
 
+    /**
+     * Method sets owners of property.
+     *
+     * @param ownerHistory List of @see Owner objects.
+     */
     public void setOwnerHistory(List<Owner> ownerHistory) {
         this.ownerHistory = ownerHistory;
     }
 
+    /**
+     * Method returns geometry of property.
+     *
+     * @return @see JGeometry geometry for spatial operations.
+     */
     public JGeometry getGeometry() {
         return geometry;
     }
 
+    /**
+     * Method sets geometry of property.
+     *
+     * @param geometry @see JGeometry geometry for spatial operations.
+     */
     public void setGeometry(JGeometry geometry) {
         this.geometry = geometry;
     }
 
+    /**
+     * Method returns price, which is valid in current date or null.
+     *
+     * @return @see PropertyPrice object or null
+     */
     public PropertyPrice getPriceCurrent() {
-        return priceHistory.size() > 0 ? priceHistory.get(priceHistory.size() - 1) : null;
+        PropertyPrice propertyPrice = priceHistory.size() > 0 ? priceHistory.get(priceHistory.size() - 1) : null;
+        if (propertyPrice == null)
+            return null;
+
+        for (PropertyPrice pp : priceHistory) {
+            if (pp.getValidTo().after(propertyPrice.getValidTo())) {
+                propertyPrice = pp;
+            }
+        }
+        return propertyPrice;
     }
 
+    /**
+     * Method returns owner, who owns property in current date or null.
+     *
+     * @return @see Owner object or null
+     */
     public Owner getOwnerCurrent() {
-        return ownerHistory.size() > 0 ? ownerHistory.get(ownerHistory.size() - 1) : null;
+        Owner owner = this.getOwnerLast();
+        Date currentDate = new Date();
+
+        if (owner == null)
+            return null;
+
+        //If last owner of property is valid in current time
+        if (currentDate.after(owner.getValidFrom()) && currentDate.before(owner.getValidTo()))
+            return owner;
+
+        return null;
+
+    }
+
+    /**
+     * Method returns last owner, who owned property in current date or null.
+     *
+     * @return @see Owner object or null
+     */
+    public Owner getOwnerLast() {
+        Owner owner = ownerHistory.size() > 0 ? ownerHistory.get(ownerHistory.size() - 1) : null;
+        if (owner == null)
+            return null;
+
+        for (Owner owner_tmp : ownerHistory) {
+            if (owner_tmp.getValidTo().after(owner.getValidTo())) {
+                owner = owner_tmp;
+            }
+        }
+        return owner;
+
+    }
+
+    /**
+     * Check whether property has owner
+     *
+     * @return true if property has owner, false otherwise
+     */
+    public boolean hasOwner() {
+        return getOwnerCurrent() != null;
+    }
+
+    /**
+     * Check whether property has price
+     *
+     * @return true if property has price, false otherwise
+     */
+    public boolean hasPrice() {
+        return getPriceCurrent() != null;
+    }
+
+    /**
+     * Convert property to string
+     *
+     * @return property string representation
+     */
+    public String toString() {
+        return name;
     }
 }

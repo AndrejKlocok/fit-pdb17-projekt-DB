@@ -1,29 +1,52 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.gui.view;
 
-import cz.vutbr.fit.pdb.core.model.GroundPlan;
-import cz.vutbr.fit.pdb.core.model.Property;
-import cz.vutbr.fit.pdb.core.model.PropertyPrice;
+import cz.vutbr.fit.pdb.core.App;
+import cz.vutbr.fit.pdb.core.model.*;
 import cz.vutbr.fit.pdb.gui.controller.PropertyContract;
+import net.sourceforge.jdatepicker.JDatePicker;
+import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
+import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
+import net.sourceforge.jdatepicker.impl.UtilDateModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Date;
 import java.util.List;
 
+/**
+ * Window showing detail of property
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ * @see Property
+ */
 public class PropertyWindow implements PropertyContract.View {
 
     private PropertyContract.Controller controller;
@@ -43,7 +66,7 @@ public class PropertyWindow implements PropertyContract.View {
     private GroundPlanPanel groundPlanPanel;
     private JPanel infoPanel;
     private JTextField nameLabel;
-    private JTextField priceCurrentLabel;
+    private PropertyPriceTextField priceCurrentTextField;
     private JTextField ownerLabel;
     private JTextPane descriptionLabel;
     private JPanel editInfoPanel;
@@ -55,17 +78,41 @@ public class PropertyWindow implements PropertyContract.View {
     private JButton deleteGroundPlanButton;
     private JButton rotateLeftGroundPlanButton;
     private JButton rotateRightGroundPlanButton;
+    private JLabel priceHistoryLabel;
     private JPanel priceHistoryPanel;
+    private JPanel editPriceHistoryPanel;
+    private JLabel editPriceHistoryDatePickerFromLabel;
+    private JDatePicker editPriceHistoryDatePickerFrom;
+    private JLabel editPriceHistoryDatePickerToLabel;
+    private JDatePicker editPriceHistoryDatePickerTo;
+    private JButton editPriceHistoryCountAverageButton;
 
     // Right panel components
-    private JLabel similarLabel;
-    private JCheckBox hasOwnerCheckbox;
-    private JScrollPane propertyListScrollPane;
-    private JPanel propertyListPanel;
+    private JLabel propertyListSimilarLabel;
+    private JCheckBox propertyListSimilarHasOwnerCheckbox;
+    private JScrollPane propertyListSimilarScrollPane;
+    private JPanel propertyListSimilarPanel;
 
     // Bottom panel components
+    private JLabel ownerHistoryLabel;
+    private JTable ownersHistoryTable;
+    private JScrollPane ownersHistoryTableScrollPane;
+    private JLabel editOwnersHistoryLabel;
+    private JPanel editOwnersHistoryPanel;
+    private JLabel editOwnersHistoryDatePickerFromLabel;
+    private JDatePicker editOwnersHistoryDatePickerFrom;
+    private JLabel editOwnersHistoryDatePickerToLabel;
+    private JDatePicker editOwnersHistoryDatePickerTo;
+    private JLabel editOwnersHistoryPersonComboBoxLabel;
+    private PersonComboBox editOwnersHistoryPersonComboBox;
+    private JButton editOwnersHistoryEditButton;
+    private JButton editOwnersHistoryDeleteButton;
     private JLabel statusLabel;
 
+
+    /**
+     * Default constructor
+     */
     public PropertyWindow() {
 
         // Window components
@@ -83,7 +130,7 @@ public class PropertyWindow implements PropertyContract.View {
         groundPlanPanel = new GroundPlanPanel();
         infoPanel = new JPanel();
         nameLabel = new JTextField();
-        priceCurrentLabel = new JTextField();
+        priceCurrentTextField = new PropertyPriceTextField();
         ownerLabel = new JTextField();
         descriptionLabel = new JTextPane();
         editInfoPanel = new JPanel();
@@ -95,24 +142,66 @@ public class PropertyWindow implements PropertyContract.View {
         deleteGroundPlanButton = new JButton();
         rotateLeftGroundPlanButton = new JButton();
         rotateRightGroundPlanButton = new JButton();
+        priceHistoryLabel = new JLabel();
         priceHistoryPanel = new JPanel();
+        editPriceHistoryPanel = new JPanel();
+        editPriceHistoryDatePickerFromLabel = new JLabel();
+        UtilDateModel editPriceHistoryDatePickerFromModel = new UtilDateModel();
+        editPriceHistoryDatePickerFromModel.setValue(new Date());
+        editPriceHistoryDatePickerFromModel.setSelected(true);
+        JDatePanelImpl editPriceHistoryDatePickerFromPanel = new JDatePanelImpl(editPriceHistoryDatePickerFromModel);
+        editPriceHistoryDatePickerFrom = new JDatePickerImpl(editPriceHistoryDatePickerFromPanel);
+        editPriceHistoryDatePickerToLabel = new JLabel();
+        UtilDateModel editPriceHistoryDatePickerToModel = new UtilDateModel();
+        editPriceHistoryDatePickerToModel.setValue(new Date());
+        editPriceHistoryDatePickerToModel.setSelected(true);
+        JDatePanelImpl editPriceHistoryDatePickerToPanel = new JDatePanelImpl(editPriceHistoryDatePickerToModel);
+        editPriceHistoryDatePickerTo = new JDatePickerImpl(editPriceHistoryDatePickerToPanel);
+        editPriceHistoryCountAverageButton = new JButton();
 
         // Right panel components
-        similarLabel = new JLabel();
-        hasOwnerCheckbox = new JCheckBox();
-        propertyListScrollPane = new JScrollPane();
-        propertyListPanel = new JPanel();
+        propertyListSimilarLabel = new JLabel();
+        propertyListSimilarHasOwnerCheckbox = new JCheckBox();
+        propertyListSimilarScrollPane = new JScrollPane();
+        propertyListSimilarPanel = new JPanel();
 
         // Bottom bar components
+        ownerHistoryLabel = new JLabel();
+        ownersHistoryTable = new JTable();
+        ownersHistoryTableScrollPane = new JScrollPane();
+        editOwnersHistoryLabel = new JLabel();
+        editOwnersHistoryPanel = new JPanel();
+        editOwnersHistoryDatePickerFromLabel = new JLabel();
+        UtilDateModel editOwnersHistoryDatePickerFromModel = new UtilDateModel();
+        editOwnersHistoryDatePickerFromModel.setValue(new Date());
+        editOwnersHistoryDatePickerFromModel.setSelected(true);
+        JDatePanelImpl editOwnersHistoryDatePickerFromPanel = new JDatePanelImpl(editOwnersHistoryDatePickerFromModel);
+        editOwnersHistoryDatePickerFrom = new JDatePickerImpl(editOwnersHistoryDatePickerFromPanel);
+        editOwnersHistoryDatePickerToLabel = new JLabel();
+        UtilDateModel editOwnersHistoryDatePickerToModel = new UtilDateModel();
+        editOwnersHistoryDatePickerToModel.setValue(new Date());
+        editOwnersHistoryDatePickerToModel.setSelected(true);
+        JDatePanelImpl editOwnersHistoryDatePickerToPanel = new JDatePanelImpl(editOwnersHistoryDatePickerToModel);
+        editOwnersHistoryDatePickerTo = new JDatePickerImpl(editOwnersHistoryDatePickerToPanel);
+        editOwnersHistoryPersonComboBoxLabel = new JLabel();
+        editOwnersHistoryPersonComboBox = new PersonComboBox();
+        editOwnersHistoryEditButton = new JButton();
+        editOwnersHistoryDeleteButton = new JButton();
         statusLabel = new JLabel();
 
         showAsync();
     }
 
+    /**
+     * Show window on asynchronous on UI thread
+     */
     public void showAsync() {
         SwingUtilities.invokeLater(this::initAndShowGUI);
     }
 
+    /**
+     * Initialize window components and show window
+     */
     public void initAndShowGUI() {
 
         // JMenuBar in the Mac OS X menubar
@@ -134,15 +223,23 @@ public class PropertyWindow implements PropertyContract.View {
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setPreferredSize(new Dimension(800, 500));
         centerPanel.add(propertyPanel);
+        centerPanel.add(priceHistoryLabel);
         centerPanel.add(priceHistoryPanel);
+        centerPanel.add(editPriceHistoryPanel);
 
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
         rightPanel.setPreferredSize(new Dimension(350, 0));
-        rightPanel.add(similarLabel);
-        rightPanel.add(hasOwnerCheckbox);
-        rightPanel.add(propertyListScrollPane);
+        rightPanel.add(propertyListSimilarLabel);
+        rightPanel.add(propertyListSimilarHasOwnerCheckbox);
+        rightPanel.add(propertyListSimilarScrollPane);
 
-        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        bottomPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        bottomPanel.add(ownerHistoryLabel);
+        bottomPanel.add(ownersHistoryTable.getTableHeader());
+        bottomPanel.add(ownersHistoryTableScrollPane);
+        bottomPanel.add(editOwnersHistoryLabel);
+        bottomPanel.add(editOwnersHistoryPanel);
         bottomPanel.add(statusLabel);
 
         propertyPanel.setLayout(new BoxLayout(propertyPanel, BoxLayout.X_AXIS));
@@ -157,7 +254,7 @@ public class PropertyWindow implements PropertyContract.View {
         infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         infoPanel.add(nameLabel);
-        infoPanel.add(priceCurrentLabel);
+        infoPanel.add(priceCurrentTextField);
         infoPanel.add(ownerLabel);
         infoPanel.add(descriptionLabel);
         infoPanel.add(editInfoPanel);
@@ -168,14 +265,17 @@ public class PropertyWindow implements PropertyContract.View {
         nameLabel.setFont(new Font("sans-serif", Font.BOLD, 18));
         nameLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         nameLabel.setEditable(false);
-        // TODO add option to specify price date
-        priceCurrentLabel.setFont(new Font("sans-Serif", Font.PLAIN, 12));
-        priceCurrentLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        priceCurrentLabel.setEditable(false);
+        nameLabel.setBorder(null);
+        priceCurrentTextField.setFont(new Font("sans-Serif", Font.PLAIN, 12));
+        priceCurrentTextField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+        priceCurrentTextField.setEditable(false);
         ownerLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
         ownerLabel.setEditable(false);
+        ownerLabel.setBorder(null);
         descriptionLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         descriptionLabel.setEditable(false);
+        descriptionLabel.setBorder(null);
+        descriptionLabel.setBackground(null);
         editInfoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
         editInfoPanel.setLayout(new BoxLayout(editInfoPanel, BoxLayout.X_AXIS));
         editInfoPanel.add(editPropertyButton);
@@ -194,19 +294,21 @@ public class PropertyWindow implements PropertyContract.View {
             if (editPropertyButton.getText().equalsIgnoreCase("edit")) {
                 editPropertyButton.setText("Save");
                 nameLabel.setEditable(true);
-                priceCurrentLabel.setEditable(true);
+                priceCurrentTextField.setEditable(true);
                 descriptionLabel.setEditable(true);
+                descriptionLabel.setBackground(Color.WHITE);
             } else {
                 editPropertyButton.setText("Edit");
                 nameLabel.setEditable(false);
-                priceCurrentLabel.setEditable(false);
+                priceCurrentTextField.setEditable(false);
                 descriptionLabel.setEditable(false);
+                descriptionLabel.setBackground(null);
                 runSwingWorker(new SwingWorker<Void, Void>() {
                     @Override
                     protected Void doInBackground() throws Exception {
                         controller.savePropertyName(nameLabel.getText());
                         controller.savePropertyDescription(descriptionLabel.getText());
-                        controller.savePropertyCurrentPrice(priceCurrentLabel.getText());
+                        controller.savePropertyCurrentPrice(priceCurrentTextField.getPrice());
 
                         return null;
                     }
@@ -244,7 +346,7 @@ public class PropertyWindow implements PropertyContract.View {
                 runSwingWorker(new SwingWorker<Void, Void>() {
                     @Override
                     protected Void doInBackground() throws Exception {
-                        controller.deleteOwner();
+                        controller.deleteCurrentOwner();
 
                         return null;
                     }
@@ -257,7 +359,9 @@ public class PropertyWindow implements PropertyContract.View {
             int returnVal = fc.showOpenDialog(null);
 
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                System.out.println(fc.getSelectedFile().getAbsolutePath());
+                if (App.isDebug()) {
+                    System.out.println(fc.getSelectedFile().getAbsolutePath());
+                }
                 runSwingWorker(new SwingWorker<Void, Void>() {
                     @Override
                     protected Void doInBackground() throws Exception {
@@ -275,25 +379,123 @@ public class PropertyWindow implements PropertyContract.View {
         rotateRightGroundPlanButton.setText("\u21B7");
         rotateRightGroundPlanButton.setEnabled(false);
 
+        propertyListSimilarLabel.setText("Property with similar ground plan");
+        propertyListSimilarLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+        propertyListSimilarLabel.setFont(new Font("sans-serif", Font.BOLD, 16));
+        propertyListSimilarLabel.setBorder(new EmptyBorder(10, 0, 10, 10));
+        propertyListSimilarHasOwnerCheckbox.setText("Filter property which has not owner");
+        propertyListSimilarHasOwnerCheckbox.addActionListener(e -> runSwingWorker(new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                controller.filterPropertyListSimilar(propertyListSimilarHasOwnerCheckbox.isSelected());
+
+                return null;
+            }
+        }));
+        propertyListSimilarScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        propertyListSimilarScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        propertyListSimilarScrollPane.setViewportView(propertyListSimilarPanel);
+        propertyListSimilarPanel.setLayout(new BoxLayout(propertyListSimilarPanel, BoxLayout.Y_AXIS));
+
+        priceHistoryLabel.setText("Price history");
+        priceHistoryLabel.setBorder(new EmptyBorder(10, 10, 0, 10));
+        priceHistoryLabel.setMinimumSize(new Dimension(Integer.MAX_VALUE, priceHistoryLabel.getPreferredSize().height));
+        priceHistoryLabel.setFont(new Font("sans-serif", Font.BOLD, 16));
         priceHistoryPanel.setLayout(new BorderLayout());
+        editPriceHistoryPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+        editPriceHistoryPanel.setBorder(new EmptyBorder(0, 10, 0, 10));
+        editPriceHistoryPanel.setLayout(new BoxLayout(editPriceHistoryPanel, BoxLayout.X_AXIS));
+        editPriceHistoryPanel.add(editPriceHistoryDatePickerFromLabel);
+        editPriceHistoryPanel.add((JComponent) (editPriceHistoryDatePickerFrom));
+        editPriceHistoryPanel.add(editPriceHistoryDatePickerToLabel);
+        editPriceHistoryPanel.add((JComponent) (editPriceHistoryDatePickerTo));
+        editPriceHistoryPanel.add(editPriceHistoryCountAverageButton);
+        editPriceHistoryDatePickerFromLabel.setText("Select date from");
+        editPriceHistoryDatePickerFromLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
+        editPriceHistoryDatePickerToLabel.setText("Select date to");
+        editPriceHistoryDatePickerToLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
+        editPriceHistoryCountAverageButton.setText("Count average price");
+        editPriceHistoryCountAverageButton.addActionListener(e -> {
 
-        similarLabel.setText("Property with similar ground plan");
-        similarLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-        similarLabel.setFont(new Font("sans-serif", Font.PLAIN, 14));
-        similarLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        hasOwnerCheckbox.setText("Filter property which has not owner");
-        propertyListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        propertyListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        propertyListScrollPane.setViewportView(propertyListPanel);
-        propertyListPanel.setLayout(new BoxLayout(propertyListPanel, BoxLayout.Y_AXIS));
+            Date selectedDateFrom = (Date) editPriceHistoryDatePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) editPriceHistoryDatePickerTo.getModel().getValue();
 
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.calculateAveragePriceFromDateToDate(selectedDateFrom, selectedDateTo);
+
+                    return null;
+                }
+            });
+        });
+
+        ownerHistoryLabel.setText("Owners history");
+        ownerHistoryLabel.setBorder(new EmptyBorder(10, 0, 0, 10));
+        ownerHistoryLabel.setMinimumSize(new Dimension(Integer.MAX_VALUE, priceHistoryLabel.getPreferredSize().height));
+        ownerHistoryLabel.setFont(new Font("sans-serif", Font.BOLD, 16));
+        ownersHistoryTableScrollPane.setViewportView(ownersHistoryTable);
+        ownersHistoryTableScrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
+        ownersHistoryTable.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
+        editOwnersHistoryLabel.setText("Edit owners history");
+        editOwnersHistoryLabel.setBorder(new EmptyBorder(10, 0, 0, 10));
+        editOwnersHistoryLabel.setMinimumSize(new Dimension(Integer.MAX_VALUE, priceHistoryLabel.getPreferredSize().height));
+        editOwnersHistoryLabel.setFont(new Font("sans-serif", Font.BOLD, 16));
+        editOwnersHistoryPanel.setPreferredSize(new Dimension(Integer.MAX_VALUE, 50));
+        editOwnersHistoryPanel.setLayout(new BoxLayout(editOwnersHistoryPanel, BoxLayout.X_AXIS));
+        editOwnersHistoryPanel.add(editOwnersHistoryDatePickerFromLabel);
+        editOwnersHistoryPanel.add((JComponent) (editOwnersHistoryDatePickerFrom));
+        editOwnersHistoryPanel.add(editOwnersHistoryDatePickerToLabel);
+        editOwnersHistoryPanel.add((JComponent) (editOwnersHistoryDatePickerTo));
+        editOwnersHistoryPanel.add(editOwnersHistoryPersonComboBoxLabel);
+        editOwnersHistoryPanel.add(editOwnersHistoryPersonComboBox);
+        editOwnersHistoryPanel.add(editOwnersHistoryEditButton);
+        editOwnersHistoryPanel.add(editOwnersHistoryDeleteButton);
+        editOwnersHistoryDatePickerFromLabel.setText("Select date from");
+        editOwnersHistoryDatePickerFromLabel.setBorder(new EmptyBorder(0, 0, 0, 0));
+        editOwnersHistoryDatePickerToLabel.setText("Select date to");
+        editOwnersHistoryDatePickerToLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
+        editOwnersHistoryPersonComboBoxLabel.setText("Select owner");
+        editOwnersHistoryPersonComboBoxLabel.setBorder(new EmptyBorder(0, 10, 0, 0));
+        editOwnersHistoryPersonComboBox.setBorder(new EmptyBorder(10, 0, 10, 10));
+        editOwnersHistoryEditButton.setText("Save");
+        editOwnersHistoryEditButton.addActionListener(e -> {
+
+            Date selectedDateFrom = (Date) editOwnersHistoryDatePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) editOwnersHistoryDatePickerTo.getModel().getValue();
+            Person selectedPerson = (Person) editOwnersHistoryPersonComboBox.getSelectedItem();
+
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.saveOwnerFromDateToDate(selectedPerson, selectedDateFrom, selectedDateTo);
+
+                    return null;
+                }
+            });
+        });
+        editOwnersHistoryDeleteButton.setText("Delete");
+        editOwnersHistoryDeleteButton.addActionListener(e -> {
+
+            Date selectedDateFrom = (Date) editOwnersHistoryDatePickerFrom.getModel().getValue();
+            Date selectedDateTo = (Date) editOwnersHistoryDatePickerTo.getModel().getValue();
+
+            runSwingWorker(new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    controller.deleteOwnerFromDateToDate(selectedDateFrom, selectedDateTo);
+
+                    return null;
+                }
+            });
+        });
         statusLabel.setText("status");
+        if (!App.isDebug()) {
+            statusLabel.setVisible(false);
+        }
 
-        mainFrame.setSize(1200, 800);
-        mainFrame.setPreferredSize(new Dimension(1200, 800));
-        mainFrame.setBounds(100, 100, 500, 400);
+        mainFrame.setSize(new Dimension(1200, 900));
         mainFrame.setContentPane(contentPanePanel);
-        mainFrame.pack();
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         mainFrame.addWindowListener(new WindowAdapter() {
@@ -312,12 +514,17 @@ public class PropertyWindow implements PropertyContract.View {
     }
 
     /**
-     * Callback on exit launcher
+     * Callback on exit window
      */
     private void onExit() {
         mainFrame.dispose();
     }
 
+    /**
+     * Shows loading dialog
+     *
+     * @param swingWorker runnable which will be executed while is dialog showed
+     */
     private void runSwingWorker(SwingWorker<Void, Void> swingWorker) {
         final JDialog dialog = new JDialog(mainFrame, "Dialog", Dialog.ModalityType.APPLICATION_MODAL);
 
@@ -341,16 +548,31 @@ public class PropertyWindow implements PropertyContract.View {
         dialog.setVisible(true);
     }
 
+    /**
+     * Set controller of this view
+     *
+     * @param controller instance of controller
+     */
     @Override
     public void setController(PropertyContract.Controller controller) {
         this.controller = controller;
     }
 
+    /**
+     * Shows dialog with information message
+     *
+     * @param message message
+     */
     @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(mainFrame, message, "Message", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Shows dialog with error message
+     *
+     * @param error message
+     */
     @Override
     public void showError(String error) {
         JOptionPane.showMessageDialog(
@@ -360,17 +582,25 @@ public class PropertyWindow implements PropertyContract.View {
                 JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Fills all window components relating to property with property data
+     *
+     * @param property property which will be showed
+     */
     @Override
     public void showProperty(Property property) {
         SwingUtilities.invokeLater(() -> {
             mainFrame.setTitle("Detail of property " + property.getName());
             nameLabel.setText(property.getName());
-            priceCurrentLabel.setText(property.getPriceCurrent() != null ? String.valueOf(property.getPriceCurrent().getPrice()) : "no price");
-            ownerLabel.setText(property.getOwnerCurrent() != null ? property.getOwnerCurrent().getFirstName() + " " + property.getOwnerCurrent().getLastName() : "no owner");
+            priceCurrentTextField.setPropertyPrice(property.getPriceCurrent());
+            ownerLabel.setText(property.hasOwner() ? property.getOwnerCurrent().getPerson().getFirstName() + " " + property.getOwnerCurrent().getPerson().getLastName() : "no owner");
             descriptionLabel.setText(property.getDescription());
 
             if (property.getGroundPlans().size() > 0) {
-                System.out.println("There are " + property.getGroundPlans().size() + " ground plans");
+                if (App.isDebug()) {
+                    System.out.println("There are " + property.getGroundPlans().size() + " ground plans");
+                }
+
                 for (GroundPlan groundPlan : property.getGroundPlans()) {
                     // TODO option to view other ground plans (something like gallery)
                     groundPlanPanel.setGroundPlan(groundPlan);
@@ -413,7 +643,8 @@ public class PropertyWindow implements PropertyContract.View {
                         }
                     }));
                 }
-            } else {// disable rotate buttons
+            } else {
+                // disable rotate buttons
                 groundPlanPanel.setGroundPlan(null);
                 groundPlanPanel.repaint();
                 deleteGroundPlanButton.setEnabled(false);
@@ -423,40 +654,79 @@ public class PropertyWindow implements PropertyContract.View {
 
             DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
-            System.out.println("price count " + property.getPriceHistory().size());
-
-            for (PropertyPrice propertyPrice : property.getPriceHistory()) {
-                dataSet.addValue(propertyPrice.getPrice(), "price", propertyPrice.getValidFrom() + "-" + propertyPrice.getValidTo());
+            if (App.isDebug()) {
+                System.out.println("price count " + property.getPriceHistory().size());
             }
 
-            JFreeChart lineChart = ChartFactory.createLineChart(
-                    "Price history",
+            for (PropertyPrice propertyPrice : property.getPriceHistory()) {
+                dataSet.addValue(propertyPrice.getPrice(), "price", propertyPrice.getValidFrom());
+            }
+
+            JFreeChart lineChart = ChartFactory.createLineChart3D(
+                    "",
                     "Time",
                     "Price",
                     dataSet,
                     PlotOrientation.VERTICAL,
-                    true,
+                    false,
                     true,
                     false
             );
+            lineChart.setBackgroundPaint(null);
+            CategoryAxis axis = lineChart.getCategoryPlot().getDomainAxis();
+            axis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
             ChartPanel chartPanel = new ChartPanel(lineChart);
 
             priceHistoryPanel.removeAll();
             priceHistoryPanel.add(chartPanel, BorderLayout.CENTER);
             priceHistoryPanel.revalidate();
+
+            String[] columnNames = {"First Name",
+                    "Last Name",
+                    "Owner from",
+                    "Owner to"};
+
+            Object[][] data = new Object[property.getOwnerHistory().size()][columnNames.length];
+
+            if (App.isDebug()) {
+                System.out.println("There are " + property.getOwnerHistory().size() + " owners");
+            }
+
+            for (int i = 0; i < property.getOwnerHistory().size(); i++) {
+                data[i][0] = property.getOwnerHistory().get(i).getPerson().getFirstName();
+                data[i][1] = property.getOwnerHistory().get(i).getPerson().getLastName();
+                data[i][2] = property.getOwnerHistory().get(i).getValidFrom();
+                data[i][3] = property.getOwnerHistory().get(i).getValidTo();
+            }
+
+            ownersHistoryTable.setModel(new DefaultTableModel(data, columnNames) {
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    //all cells false
+                    return false;
+                }
+            });
         });
     }
 
+    /**
+     * Show similar property list in right panel
+     *
+     * @param propertyList list of property which will be showed
+     */
     @Override
     public void showPropertyListSimilar(List<Property> propertyList) {
         SwingUtilities.invokeLater(() -> {
             // remove old property items
-            propertyListPanel.removeAll();
+            propertyListSimilarPanel.removeAll();
 
             // add list of properties to map
             for (Property property : propertyList) {
 
-                System.out.println("property: " + property.getName());
+                if (App.isDebug()) {
+                    System.out.println("property: " + property.getName());
+                }
 
                 PropertyItem propertyItem = new PropertyItem(property);
                 propertyItem.addMouseListener(new MouseAdapter() {
@@ -487,17 +757,20 @@ public class PropertyWindow implements PropertyContract.View {
                     }
                 });
 
-                propertyListPanel.add(propertyItem);
+                propertyListSimilarPanel.add(propertyItem);
                 JSeparator seperator = new JSeparator(SwingConstants.HORIZONTAL);
                 seperator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
-                propertyListPanel.add(seperator);
+                propertyListSimilarPanel.add(seperator);
             }
 
-            propertyListPanel.revalidate();
-            propertyListPanel.repaint();
+            propertyListSimilarPanel.revalidate();
+            propertyListSimilarPanel.repaint();
         });
     }
 
+    /**
+     * Hide window
+     */
     @Override
     public void hide() {
         onExit();

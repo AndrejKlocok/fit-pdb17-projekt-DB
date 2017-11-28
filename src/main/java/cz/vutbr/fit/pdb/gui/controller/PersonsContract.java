@@ -16,59 +16,41 @@
 
 package cz.vutbr.fit.pdb.gui.controller;
 
-import cz.vutbr.fit.pdb.core.model.Property;
-import oracle.spatial.geometry.JGeometry;
+import cz.vutbr.fit.pdb.core.model.Person;
 
+import java.util.Date;
 import java.util.List;
 
 /**
- * Contract specifying interface between map view and controller
+ * Contract specifying interface between persons view and controller
  *
  * @author Matúš Bútora
  * @author Andrej Klocok
  * @author Tomáš Vlk
  */
-public class MapContract {
+public class PersonsContract {
 
     public interface View {
 
-        void setController(MapContract.Controller controller);
+        void setController(PersonsContract.Controller controller);
 
         void showMessage(String message);
 
         void showError(String error);
 
-        void showPropertyList(List<Property> propertyList);
+        void showPersonsList(List<Person> ownerList);
 
         void hide();
     }
 
     public interface Controller {
 
-        void refresh();
+        void filterPersonsList(Date date_from, Date date_to);
 
-        void resetDatabase();
+        Integer getPersonsCountOfPropertyDate(Person person, Date dateFrom, Date dateTo);
 
-        void executeSqlFile(String fileName);
+        Integer getPersonsSumOfPropertyDate(Person person, Date dateFrom, Date dateTo);
 
-        void createProperty(Property property);
-
-        void savePropertyGeometry(Property property, JGeometry geometry);
-
-        void getProperty(Property property);
-
-        void getPersons();
-
-        void filterPropertyList(String name, double maxPrice, boolean hasOwner);
-
-        void findNearestProperty(double lat, double lng);
-
-        void findNearestProperty(Property property);
-
-        void findAdjacentProperty(Property property);
-
-        void calculateArea(Property property);
-
-        int getNewIdForProperty();
+        Integer getPersonsDurationOfPropertyDate(Person person, Date dateFrom, Date dateTo);
     }
 }

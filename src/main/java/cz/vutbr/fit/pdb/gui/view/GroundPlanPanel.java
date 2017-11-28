@@ -1,9 +1,17 @@
-/**
- * VUT FIT PDB project
+/*
+ * Copyright (C) 2017 VUT FIT PDB project authors
  *
- * @author Matúš Bútora
- * @author Andrej Klocok
- * @author Tomáš Vlk
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package cz.vutbr.fit.pdb.gui.view;
@@ -17,6 +25,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+/**
+ * Component displaying image of property ground plan
+ *
+ * @author Matúš Bútora
+ * @author Andrej Klocok
+ * @author Tomáš Vlk
+ * @see GroundPlan
+ */
 public class GroundPlanPanel extends JPanel {
 
     private GroundPlan groundPlan;
@@ -24,10 +40,20 @@ public class GroundPlanPanel extends JPanel {
     private BufferedImage image;
 
 
+    /**
+     * Getter of ground plan attribute
+     *
+     * @return ground plan
+     */
     public GroundPlan getGroundPlan() {
         return groundPlan;
     }
 
+    /**
+     * Setter of ground plan
+     *
+     * @param groundPlan
+     */
     public void setGroundPlan(GroundPlan groundPlan) {
         this.groundPlan = groundPlan;
 
@@ -44,14 +70,29 @@ public class GroundPlanPanel extends JPanel {
         }
     }
 
+    /**
+     * Get ground plan converted to image data
+     *
+     * @return image data
+     */
     public BufferedImage getImage() {
         return image;
     }
 
+    /**
+     * Set instantly image data without ground plan object
+     *
+     * @param image image data
+     */
     public void setImage(BufferedImage image) {
         this.image = image;
     }
 
+    /**
+     * Paints image of ground plan or display "no image" placeholder
+     *
+     * @param g graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
