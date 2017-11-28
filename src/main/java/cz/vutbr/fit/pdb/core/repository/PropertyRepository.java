@@ -16,6 +16,7 @@
 
 package cz.vutbr.fit.pdb.core.repository;
 
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.*;
 import oracle.jdbc.pool.OracleDataSource;
 import oracle.spatial.geometry.JGeometry;
@@ -681,7 +682,6 @@ public class PropertyRepository extends Observable {
 
             while (resultSet.next()) {
                 int propertyId = resultSet.getInt("id_property");
-                System.out.println("PROPERTY ID " + propertyId);
                 adjacentPropertyList.add(getPropertyById(propertyId));
             }
 

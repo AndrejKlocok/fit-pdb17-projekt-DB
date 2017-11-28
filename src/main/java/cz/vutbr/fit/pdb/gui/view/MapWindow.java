@@ -474,8 +474,12 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                         break;
                                     case 4:
                                         newProperty.setType(Property.Type.APARTMENT);
-                                        JGeometry j = JGeometry.createCircle(16.608989, 49.187766, 16.612989, 49.191766,
-                                                16.608989, 49.195766, 8307);
+                                        double r = 0.05;
+                                        JGeometry.computeArc(currentLng, currentLat-r, )
+                                        JGeometry densify = JGeometry.densifyArcs(currentLng, currentLat);
+                                        newProperty.setGeometry(JGeometry.createCircle(densifyArcs, 6.0, 8307));
+                                        /*JGeometry j = JGeometry.createCircle(16.608989, 49.187766, 16.612989, 49.191766,
+                                                16.608989, 49.195766, 8307);*/
                                         break;
                                 }
 
