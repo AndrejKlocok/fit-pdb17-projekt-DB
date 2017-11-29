@@ -335,8 +335,8 @@ public class PropertyPriceRepository extends Observable {
                 pp.setIdPropertyPrice(resultSet.getInt("id_price"));
                 pp.getProperty().setIdProperty(resultSet.getInt("id_property"));
                 pp.setPrice(resultSet.getDouble("price"));
-                pp.setValidFrom(resultSet.getDate("valid_from"));
-                pp.setValidTo(resultSet.getDate("valid_to"));
+                pp.setValidFrom(new Date(resultSet.getDate("valid_from").getTime()));
+                pp.setValidTo(new Date(resultSet.getDate("valid_to").getTime()));
                 propertyPriceList.add(pp);
             }
 
@@ -388,8 +388,8 @@ public class PropertyPriceRepository extends Observable {
                 newPropertyPrice.setIdPropertyPrice(resultSet.getInt("id_price"));
                 newPropertyPrice.getProperty().setIdProperty(resultSet.getInt("id_property"));
                 newPropertyPrice.setPrice(resultSet.getDouble("price"));
-                newPropertyPrice.setValidFrom(resultSet.getDate("valid_from"));
-                newPropertyPrice.setValidTo(resultSet.getDate("valid_to"));
+                newPropertyPrice.setValidFrom(new Date(resultSet.getDate("valid_from").getTime()));
+                newPropertyPrice.setValidTo(new Date(resultSet.getDate("valid_to").getTime()));
 
                 connection.close();
                 statement.close();
@@ -431,7 +431,7 @@ public class PropertyPriceRepository extends Observable {
         // if to date is not set, than set maximum SQL date
         java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
 
-        String query = "CALL temporal_insert('property_price', ?, ?, ?, ?)";
+        String query = "CALL temporal_insert('property_price', ?, ?, TO_DATE('" + sqlDateFrom + "','yyyy-mm-dd'),TO_DATE('" + sqlDateTo + "','yyyy-mm-dd'))";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -440,8 +440,6 @@ public class PropertyPriceRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getProperty().getIdProperty());
             statement.setDouble(2, propertyPrice.getPrice());
-            statement.setDate(3, sqlDateFrom);
-            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -480,7 +478,7 @@ public class PropertyPriceRepository extends Observable {
         // if to date is not set, than set maximum SQL date
         java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
 
-        String query = "CALL temporal_delete('property_price', ?, ?, ?)";
+        String query = "CALL temporal_delete('property_price', ?, ?, TO_DATE('" + sqlDateFrom + "','yyyy-mm-dd'),TO_DATE('" + sqlDateTo + "','yyyy-mm-dd'))";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -489,8 +487,6 @@ public class PropertyPriceRepository extends Observable {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getProperty().getIdProperty());
-            statement.setDate(2, sqlDateFrom);
-            statement.setDate(3, sqlDateTo);
 
             statement.executeQuery();
 
@@ -529,7 +525,7 @@ public class PropertyPriceRepository extends Observable {
         // if to date is not set, than set maximum SQL date
         java.sql.Date sqlDateTo = propertyPrice.getValidTo() == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(propertyPrice.getValidTo().getTime());
 
-        String query = "CALL temporal_update('property_price',?,?,?,?)";
+        String query = "CALL temporal_update('property_price',?, ?, TO_DATE('" + sqlDateFrom + "','yyyy-mm-dd'),TO_DATE('" + sqlDateTo + "','yyyy-mm-dd'))";
         Connection connection = null;
         PreparedStatement statement;
 
@@ -538,8 +534,6 @@ public class PropertyPriceRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, propertyPrice.getProperty().getIdProperty());
             statement.setDouble(2, propertyPrice.getPrice());
-            statement.setDate(3, sqlDateFrom);
-            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 

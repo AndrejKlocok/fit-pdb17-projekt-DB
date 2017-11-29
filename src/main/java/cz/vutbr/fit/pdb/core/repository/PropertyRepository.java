@@ -369,7 +369,8 @@ public class PropertyRepository extends Observable {
 
             // notify observers about change
             setChanged();
-            notifyObservers();
+            // give observers name of method
+            notifyObservers(new Object(){}.getClass().getEnclosingMethod().getName());
 
             return true;
         } catch (SQLException exception) {
