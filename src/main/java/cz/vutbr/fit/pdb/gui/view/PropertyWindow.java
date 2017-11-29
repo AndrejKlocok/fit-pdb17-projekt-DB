@@ -36,6 +36,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -413,7 +414,6 @@ public class PropertyWindow implements PropertyContract.View {
         ownerHistoryLabel.setFont(new Font("sans-serif", Font.BOLD, 16));
         ownersHistoryTableScrollPane.setViewportView(ownersHistoryTable);
         ownersHistoryTableScrollPane.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
-        ownersHistoryTable.setPreferredSize(new Dimension(Integer.MAX_VALUE, 100));
         editOwnersHistoryLabel.setText("Edit owners history");
         editOwnersHistoryLabel.setBorder(new EmptyBorder(10, 0, 0, 10));
         editOwnersHistoryLabel.setMinimumSize(new Dimension(Integer.MAX_VALUE, priceHistoryLabel.getPreferredSize().height));
@@ -648,6 +648,9 @@ public class PropertyWindow implements PropertyContract.View {
                 rotateRightGroundPlanButton.setEnabled(false);
             }
 
+            // format of displayed price history and owner history dates
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
             DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
             if (App.isDebug()) {
@@ -655,7 +658,7 @@ public class PropertyWindow implements PropertyContract.View {
             }
 
             for (PropertyPrice propertyPrice : property.getPriceHistory()) {
-                dataSet.addValue(propertyPrice.getPrice(), "price", propertyPrice.getValidFrom());
+                dataSet.addValue(propertyPrice.getPrice(), "price", simpleDateFormat.format(propertyPrice.getValidFrom()));
             }
 
             JFreeChart lineChart = ChartFactory.createLineChart3D(
@@ -691,8 +694,8 @@ public class PropertyWindow implements PropertyContract.View {
             for (int i = 0; i < property.getOwnerHistory().size(); i++) {
                 data[i][0] = property.getOwnerHistory().get(i).getPerson().getFirstName();
                 data[i][1] = property.getOwnerHistory().get(i).getPerson().getLastName();
-                data[i][2] = property.getOwnerHistory().get(i).getValidFrom();
-                data[i][3] = property.getOwnerHistory().get(i).getValidTo().after(new Date()) ? "presence" : property.getOwnerHistory().get(i).getValidTo();
+                data[i][2] = simpleDateFormat.format(property.getOwnerHistory().get(i).getValidFrom());
+                data[i][3] = property.getOwnerHistory().get(i).getValidTo().after(new Date()) ? "presence" : simpleDateFormat.format(property.getOwnerHistory().get(i).getValidTo());
             }
 
             ownersHistoryTable.setModel(new DefaultTableModel(data, columnNames) {

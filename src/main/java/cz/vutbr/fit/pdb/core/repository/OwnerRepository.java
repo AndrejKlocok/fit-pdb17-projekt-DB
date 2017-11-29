@@ -83,8 +83,8 @@ public class OwnerRepository extends Observable {
                         propertyRepository.toPropertyType(resultSet.getString("property_type")),
                         resultSet.getString("property_name"), resultSet.getString("property_description")
                 ));
-                owner.setValidFrom(resultSet.getDate("valid_from"));
-                owner.setValidTo(resultSet.getDate("valid_to"));
+                owner.setValidFrom(new Date(resultSet.getDate("valid_from").getTime()));
+                owner.setValidTo(new Date(resultSet.getDate("valid_to").getTime()));
                 ownerLinkedList.add(owner);
             }
             connection.close();
@@ -137,8 +137,8 @@ public class OwnerRepository extends Observable {
                         propertyRepository.toPropertyType(resultSet.getString("property_type")),
                         resultSet.getString("property_name"), resultSet.getString("property_description")
                 ));
-                owner.setValidFrom(resultSet.getDate("valid_from"));
-                owner.setValidTo(resultSet.getDate("valid_to"));
+                owner.setValidFrom(new Date(resultSet.getDate("valid_from").getTime()));
+                owner.setValidTo(new Date(resultSet.getDate("valid_to").getTime()));
 
                 Person person = new Person();
                 person.setIdPerson(resultSet.getInt("id_person"));
@@ -212,8 +212,8 @@ public class OwnerRepository extends Observable {
                 Owner owner = new Owner();
                 owner.getPerson().setIdPerson(resultSet.getInt("id_owner"));
                 owner.getProperty().setIdProperty(resultSet.getInt("id_property"));
-                owner.setValidFrom(resultSet.getDate("valid_from"));
-                owner.setValidTo(resultSet.getDate("valid_to"));
+                owner.setValidFrom(new Date(resultSet.getDate("valid_from").getTime()));
+                owner.setValidTo(new Date(resultSet.getDate("valid_to").getTime()));
 
                 connection.close();
                 statement.close();
@@ -674,8 +674,8 @@ public class OwnerRepository extends Observable {
                 Owner o = new Owner();
                 o.getPerson().setIdPerson(resultSet.getInt("id_owner"));
                 o.getProperty().setIdProperty(resultSet.getInt("id_property"));
-                o.setValidFrom(resultSet.getDate("valid_from"));
-                o.setValidTo(resultSet.getDate("valid_to"));
+                o.setValidFrom(new Date(resultSet.getDate("valid_from").getTime()));
+                o.setValidTo(new Date(resultSet.getDate("valid_to").getTime()));
                 ownerLinkedList.add(o);
             }
             connection.close();

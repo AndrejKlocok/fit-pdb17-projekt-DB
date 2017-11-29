@@ -130,8 +130,8 @@ public class PropertyController implements PropertyContract.Controller {
      * Insert new owner of property from and to sepcified date
      *
      * @param person person (owner)
-     * @param from from date
-     * @param to to date
+     * @param from   from date
+     * @param to     to date
      */
     @Override
     public void createOwnerFromDateToDate(Person person, Date from, Date to) {
