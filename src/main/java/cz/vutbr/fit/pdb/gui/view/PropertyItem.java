@@ -43,6 +43,7 @@ public class PropertyItem extends JPanel {
     private JPanel info;
     private JLabel name;
     private JLabel price;
+    private PropertyPriceTextField priceFormat;
 
     /**
      * Constructor of item by given property
@@ -57,6 +58,7 @@ public class PropertyItem extends JPanel {
         info = new JPanel();
         image = new GroundPlanPanel();
         price = new JLabel();
+        priceFormat = new PropertyPriceTextField();
 
         setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
         setMaximumSize(getPreferredSize());
@@ -87,14 +89,22 @@ public class PropertyItem extends JPanel {
 
         name.setText(property.getName());
         name.setFont(new Font("sans-serif", Font.BOLD, 14));
-        name.setPreferredSize(new Dimension(name.getPreferredSize().width, 25));
+        name.setPreferredSize(new Dimension(DEFAULT_WIDTH - DEFAULT_HEIGHT, 25));
         name.setMaximumSize(name.getPreferredSize());
         name.setMinimumSize(name.getPreferredSize());
 
-        price.setText(property.hasPrice() ? String.valueOf(property.getPriceCurrent().getPrice()) + " Kč" : "no price");
+        price.setPreferredSize(new Dimension(DEFAULT_WIDTH - DEFAULT_HEIGHT, 25));
+        price.setMaximumSize(priceFormat.getPreferredSize());
+        price.setMinimumSize(priceFormat.getPreferredSize());
+        if (property.hasPrice()) {
+            priceFormat.setValue(property.getPriceCurrent().getPrice());
+            price.setText(priceFormat.getText());
+        } else {
+            price.setText("no price");
+        }
         price.setFont(new Font("sans-Serif", Font.PLAIN, 12));
 
-        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+        info.setLayout(new FlowLayout());
         info.setBorder(new EmptyBorder(10, 10, 10, 10));
         info.add(name);
         info.add(price);

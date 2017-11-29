@@ -295,9 +295,20 @@ public class PropertyWindow implements PropertyContract.View {
                 descriptionLabel.setEditable(false);
                 descriptionLabel.setBackground(null);
 
-                        controller.savePropertyName(nameLabel.getText());
-                        controller.savePropertyDescription(descriptionLabel.getText());
-                        controller.savePropertyCurrentPrice(priceCurrentTextField.getPrice());
+                String newName = nameLabel.getText();
+                String newDescription = descriptionLabel.getText();
+                double newPrice = (Integer) priceCurrentTextField.getValue();
+
+                runSwingWorker(new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        controller.savePropertyCurrentPrice(newPrice);
+                        controller.savePropertyName(newName);
+                        controller.savePropertyDescription(newDescription);
+
+                        return null;
+                    }
+                });
             }
         });
         deletePropertyButton.setText("Delete");
@@ -575,7 +586,9 @@ public class PropertyWindow implements PropertyContract.View {
         SwingUtilities.invokeLater(() -> {
             mainFrame.setTitle("Detail of property " + property.getName());
             nameLabel.setText(property.getName());
-            priceCurrentTextField.setPropertyPrice(property.getPriceCurrent());
+            if (property.hasPrice()) {
+                priceCurrentTextField.setValue(property.getPriceCurrent().getPrice());
+            }
             ownerLabel.setText(property.hasOwner() ? property.getOwnerCurrent().getPerson().getFirstName() + " " + property.getOwnerCurrent().getPerson().getLastName() : "no owner");
             descriptionLabel.setText(property.getDescription());
 
