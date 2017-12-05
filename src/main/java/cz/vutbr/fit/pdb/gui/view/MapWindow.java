@@ -36,11 +36,8 @@ import oracle.spatial.geometry.JGeometry;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,7 +68,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
     private JLabel searchNameLabel;
     private JTextField searchNameInput;
     private JLabel searchPriceLabel;
-    private JFormattedTextField searchPriceInput;
+    private PropertyPriceTextField searchPriceInput;
     private JCheckBox searchHasOwnerCheckbox;
     private JButton searchButton;
 
@@ -108,7 +105,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         searchNameLabel = new JLabel();
         searchNameInput = new JTextField();
         searchPriceLabel = new JLabel();
-        searchPriceInput = new JFormattedTextField();
+        searchPriceInput = new PropertyPriceTextField();
         searchHasOwnerCheckbox = new JCheckBox();
         searchButton = new JButton();
 
@@ -174,14 +171,6 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
         searchPriceLabel.setText("Maximal price:");
         searchPriceLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
         searchPriceInput.setBorder(new EmptyBorder(10, 10, 10, 10));
-        NumberFormat format = NumberFormat.getInstance();
-        NumberFormatter formatter = new NumberFormatter(format);
-        formatter.setValueClass(Integer.class);
-        formatter.setMinimum(0);
-        formatter.setMaximum(Integer.MAX_VALUE);
-        formatter.setAllowsInvalid(false);
-        searchPriceInput.setValue(0);
-        searchPriceInput.setFormatterFactory(new DefaultFormatterFactory(formatter));
         searchHasOwnerCheckbox.setText("Only which has owner");
         searchHasOwnerCheckbox.setBorder(new EmptyBorder(10, 10, 10, 10));
         searchButton.setText("Search");

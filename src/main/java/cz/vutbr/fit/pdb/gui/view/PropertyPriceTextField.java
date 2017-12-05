@@ -19,6 +19,12 @@ package cz.vutbr.fit.pdb.gui.view;
 import cz.vutbr.fit.pdb.core.model.PropertyPrice;
 
 import javax.swing.*;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
+import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 /**
  * Component to display and format property price with currency, but still holding original value.
@@ -28,18 +34,30 @@ import javax.swing.*;
  * @author Tomáš Vlk
  * @see PropertyPrice
  */
-public class PropertyPriceTextField extends JTextField {
+public class PropertyPriceTextField extends JFormattedTextField {
 
     private static final String CURRENCY = "Kč";
 
-    private PropertyPrice propertyPrice;
 
     /**
      * Default constructor
      */
     public PropertyPriceTextField() {
         setBorder(null);
-        setEditable(false);
+
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
+        otherSymbols.setDecimalSeparator('.');
+        otherSymbols.setGroupingSeparator(' ');
+        DecimalFormat format = new DecimalFormat("###,### " + CURRENCY);
+        format.setGroupingSize(3);
+        format.setDecimalFormatSymbols(otherSymbols);
+        NumberFormatter formatter = new NumberFormatter(format);
+        formatter.setValueClass(Integer.class);
+        formatter.setMinimum(0);
+        formatter.setCommitsOnValidEdit(true);
+        formatter.setAllowsInvalid(false);
+        setFormatterFactory(new DefaultFormatterFactory(formatter));
+        setValue(0);
     }
 
     /**
@@ -49,34 +67,26 @@ public class PropertyPriceTextField extends JTextField {
      */
     public PropertyPriceTextField(PropertyPrice propertyPrice) {
         this();
-        setPropertyPrice(propertyPrice);
+        setValue(propertyPrice.getPrice());
     }
 
     /**
-     * Getter for property price attribute
+     * Display placeholder when there is no price
      *
-     * @return property price attribute
+     * @param pG graphics
      */
-    public PropertyPrice getPropertyPrice() {
-        return propertyPrice;
-    }
+    @Override
+    protected void paintComponent(final Graphics pG) {
+        super.paintComponent(pG);
 
-    /**
-     * Setter for property price attribute
-     *
-     * @param propertyPrice property price object
-     */
-    public void setPropertyPrice(PropertyPrice propertyPrice) {
-        this.propertyPrice = propertyPrice;
-        setText(propertyPrice != null ? propertyPrice.getPrice() + " " + CURRENCY : "no price");
-    }
+        if (getText().equals("0 Kč")) {
 
-    /**
-     * Get original unformatted value of property price
-     *
-     * @return original unformatted price
-     */
-    public double getPrice() {
-        return propertyPrice.getPrice();
+            final Graphics2D g = (Graphics2D) pG;
+            g.setRenderingHint(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g.drawString("no price", getInsets().left + 40, pG.getFontMetrics()
+                    .getMaxAscent() + getInsets().top);
+        }
     }
 }

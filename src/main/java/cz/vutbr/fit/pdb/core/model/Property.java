@@ -19,7 +19,6 @@ package cz.vutbr.fit.pdb.core.model;
 import oracle.spatial.geometry.JGeometry;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
