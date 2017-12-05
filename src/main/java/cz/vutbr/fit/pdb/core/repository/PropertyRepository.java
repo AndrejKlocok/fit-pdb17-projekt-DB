@@ -593,7 +593,7 @@ public class PropertyRepository extends Observable {
                 "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
                 "FROM property PR2 " +
                 "WHERE MDSYS.SDO_NN(PR2.geometry,SDO_GEOMETRY(2001, 8307, SDO_POINT_TYPE(?,?, NULL), " +
-                " NULL, NULL ) , 'UNIT=meter', 1) = 'TRUE' " +
+                " NULL, NULL ) , 'SDO_NUM_RES=2  UNIT=meter', 1) = 'TRUE' " +
                 "ORDER BY distance) P, " +
                 "(SELECT DISTINCT PR.id_property " +
                 "FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) " +
@@ -651,7 +651,7 @@ public class PropertyRepository extends Observable {
                 "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
                 "FROM property PR1, property PR2 " +
                 "WHERE PR1.id_property=? AND PR1.id_property <> PR2.id_property AND PR2.property_type <> 'land' AND " +
-                "MDSYS.SDO_NN(PR2.geometry, PR1.geometry, 'UNIT=meter', 1) = 'TRUE' " +
+                "MDSYS.SDO_NN(PR2.geometry, PR1.geometry, 'SDO_NUM_RES=2 UNIT=meter', 1) = 'TRUE' " +
                 "ORDER BY distance) P, " +
                 "(SELECT DISTINCT PR.id_property " +
                 "FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) WHERE (CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to AND " +
