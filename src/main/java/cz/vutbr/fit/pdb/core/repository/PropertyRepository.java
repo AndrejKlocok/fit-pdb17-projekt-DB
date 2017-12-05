@@ -393,7 +393,7 @@ public class PropertyRepository extends Observable {
      * @param groundPlans List of @GroundPlan
      * @return List of @see Property typed objects
      */
-    public List<Property> getPropertyListSimilarByGroundPlans(List<GroundPlan> groundPlans, boolean filterHasOwner) {
+    public List<Property> getPropertyListSimilarByGroundPlans(List<GroundPlan> groundPlans, boolean filterHasNotOwner) {
         // TODO option to get similar by more ground plans
 
         GroundPlan groundPlan;
@@ -415,8 +415,7 @@ public class PropertyRepository extends Observable {
                 "WHERE " +
                 "   (src.id_ground_plan <> dst.id_ground_plan) AND src.id_ground_plan = ? AND dst.id_property <> ? " +
                 "ORDER BY " +
-                "   similarity ASC " +
-                "FETCH FIRST 5 ROWS ONLY";
+                "   similarity ASC";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -459,12 +458,12 @@ public class PropertyRepository extends Observable {
                 property.setOwnerHistory(ownerList);
             }
 
-            if (filterHasOwner) {
+            if (filterHasNotOwner) {
                 // owner filter is set
                 for (Iterator<Property> iterator = propertyList.iterator(); iterator.hasNext(); ) {
                     Property property = iterator.next();
-                    // remove from list only property without owner
-                    if (!property.hasOwner()) {
+                    // remove from list only property with owner
+                    if (property.hasOwner()) {
                         iterator.remove();
                     }
                 }

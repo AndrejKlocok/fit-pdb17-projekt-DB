@@ -73,7 +73,7 @@ public class PropertyContract {
 
         void getPropertySimilar(Property property);
 
-        void filterPropertyListSimilar(boolean checked);
+        void filterPropertyListSimilar(boolean hasNotOwner);
 
         void calculateAveragePriceFromDateToDate(Date from, Date to);
     }
