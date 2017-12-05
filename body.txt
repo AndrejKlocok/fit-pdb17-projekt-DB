@@ -1,0 +1,11 @@
+xbutor01 120 %
+xkloco00 90 %
+xvlkto00 90 %
+Matúš Bútora (xbutor01)     je vedoucím projektu,
+                            implementoval databázové operace nad prostorovými daty,
+                            implementoval vykreslování prostorových objektů na mapu
+Andrej Klocok (xkloco00)    implementoval databázové operace nad temporálními daty,
+                            implementoval PL/SQL procedur pro temporální data
+Tomáš Vlk (xvlkto00)        implementoval databázové operace nad multimediálními daty,
+                            implementoval uživatelské rozhraní aplikace
+                            navrhnul a implementoval MVC architekturu aplikace

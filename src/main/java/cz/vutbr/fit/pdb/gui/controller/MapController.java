@@ -254,6 +254,7 @@ public class MapController extends Observable implements MapContract.Controller 
     public void getProperty(Property property) {
         PropertyWindow propertyWindow = new PropertyWindow();
 
+        //FIXME after delete property and than create new property there is random error message
         //FIXME: when property id = 0
         if(property.getIdProperty() == 0) {
             property.setIdProperty(propertyRepository.lastInsertedId());
@@ -340,6 +341,16 @@ public class MapController extends Observable implements MapContract.Controller 
             view.showMessage("Area of " + property.getName() + " = " + area);
         } else {
             view.showError("You cannot calculate area of property of this type");
+        }
+    }
+
+    @Override
+    public void calculateLength(Property property) {
+        if (property.getType() == Property.Type.LAND) {
+            double area = propertyRepository.getPropertyLength(property);
+            view.showMessage("Length of " + property.getName() + " = " + area);
+        } else {
+            view.showError("You cannot calculate Length of property of this type");
         }
     }
 }

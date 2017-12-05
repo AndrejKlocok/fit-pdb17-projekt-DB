@@ -786,6 +786,50 @@ public class PropertyRepository extends Observable {
     }
 
     /**
+     * Calculates length of property shape
+     *
+     * @param property property
+     * @return length in square metres
+     */
+    public double getPropertyLength(Property property) {
+        String query = "SELECT SDO_GEOM.SDO_LENGTH(PR.geometry,1,'unit=M') AS length FROM property PR WHERE id_property=?";
+
+        Connection connection = null;
+
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, property.getIdProperty());
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                double propertyArea = resultSet.getDouble("length");
+
+                connection.close();
+                statement.close();
+                return propertyArea;
+            } else {
+
+                statement.close();
+                connection.close();
+                return 0;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return 0;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getPropertyLength " + exception.getMessage());
+            }
+        }
+    }
+
+    /**
      * Method calls query to Oracle database, which returns properties which are available in current date.
      *
      * @return List of @see Property objects

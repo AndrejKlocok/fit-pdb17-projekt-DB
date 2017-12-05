@@ -291,8 +291,26 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
 
         JMenuItem mHelpAbout = new JMenuItem("About");
         mHelpAbout.addActionListener(actionEvent ->
-                // TODO create help message
-                JOptionPane.showMessageDialog(null, "Project for PDB course", "About PDB app", JOptionPane.INFORMATION_MESSAGE)
+                JOptionPane.showMessageDialog(null, "<html><h1>Project for PDB course</h1><br>" +
+                                "<br>" +
+                                "Property management for reality estate agency. <br>" +
+                                "The application allows you to work with these types of property:<br>" +
+                                "<ul>" +
+                                "<li>Land (on map it is shown as polygon with black border and no fill)" +
+                                "<li>House (on map it is shown as polygon with purple border)" +
+                                "<li>Terrace house (on map it is shown as blue line)" +
+                                "<li>Prefab (on map it is shown as green rectangle)" +
+                                "<li>Apartment (on map it is shown as red octagon)" +
+                                "</ul><br>" +
+                                "You can initialize database with sample data or load the custom SQL file by option in the Main menu of the application.\n" +
+                                "If you want to see all people in the system with statistics at a given time, choose option Persons list in Main menu.\n" +
+                                "By right click on map you can create new property. You can see the property detail by clicking the left button on the property.\n" +
+                                "In the property detail, you can perform advanced operations over a given property. Note that the graph with the history of price development can be edited with the right button.\n" +
+                                "Right-click the property on the map to get an operation (edit, move, get nearest property, ...) above the property.\n" +
+                                "Note that right-click above property of type Land can also be used for calculation of area, calculation of length and to get adjacent property list.\n",
+
+                        "About PDB app",
+                        JOptionPane.INFORMATION_MESSAGE)
         );
 
         mMainMenu.add(mMainMenuPersonsList);
@@ -468,7 +486,7 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                         newProperty.setGeometry(JGeometry.circle_polygon(currentLng, currentLat, 2, 0.2));
                                         if (App.isDebug()) {
                                             System.out.println(newProperty.getGeometry().getType());
-                                            System.out.println(currentLat +" " + currentLng);
+                                            System.out.println(currentLat + " " + currentLng);
                                         }
                                         break;
                                 }
@@ -691,6 +709,15 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                 return null;
                             }
                         });
+                    } else if (event.getActionCommand().equalsIgnoreCase("Calculate length")) {
+                        runSwingWorker(new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                controller.calculateLength(property);
+
+                                return null;
+                            }
+                        });
                     }
                 };
 
@@ -698,10 +725,13 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                     // special menu for property of type land
                     JMenuItem findAdjacentItem = new JMenuItem("Find adjacent property");
                     JMenuItem calculateAreaItem = new JMenuItem("Calculate area");
+                    JMenuItem calculateLengthItem = new JMenuItem("Calculate length");
                     propertyPopupMenu.add(findAdjacentItem);
                     propertyPopupMenu.add(calculateAreaItem);
+                    propertyPopupMenu.add(calculateLengthItem);
                     findAdjacentItem.addActionListener(menuListener);
                     calculateAreaItem.addActionListener(menuListener);
+                    calculateLengthItem.addActionListener(menuListener);
                 }
 
                 propertyEditItem.addActionListener(menuListener);
