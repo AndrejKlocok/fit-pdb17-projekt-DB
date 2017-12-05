@@ -717,8 +717,6 @@ public class PropertyRepository extends Observable {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                int propertyId = resultSet.getInt("id_property");
-                adjacentPropertyList.add(getPropertyById(propertyId));
                 adjacentPropertyList.add(getPropertyById(resultSet.getInt("id_property")));
             }
 
