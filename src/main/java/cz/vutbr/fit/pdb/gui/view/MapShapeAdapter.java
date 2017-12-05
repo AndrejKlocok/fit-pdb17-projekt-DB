@@ -39,6 +39,8 @@ import java.util.List;
  */
 public class MapShapeAdapter {
 
+    private static final int polyLine = 2;
+
     /**
      * Convert JGeometry to MapShape
      *
@@ -46,23 +48,27 @@ public class MapShapeAdapter {
      * @return converted MapShape
      */
     public static MapShape jGeometry2MapShape(JGeometry geometry, Property.Type type) {
-        if (geometry.isCircle()) {
-            // FIXME circle type
+        if (type == Property.Type.APARTMENT) {
             if (App.isDebug()) {
-                System.out.println("CIRCLE");
+                System.out.println("circle");
             }
-            /*
-            LatLong point = new LatLong(x, y);
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(point)
-                    .radius(20)
-                    .strokeColor("black")
+
+            List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
+            MVCArray mvc = new MVCArray(col.toArray());
+
+            PolygonOptions polygonOptions = new PolygonOptions()
+                    .paths(mvc)
+                    .strokeColor("red")
                     .strokeWeight(2)
-                    .fillColor("gray")
-                    .fillOpacity(0.3);
-            */
-            return null;
+                    .editable(false)
+                    .fillColor("red")
+                    .fillOpacity(0.5);
+
+            return new Polygon(polygonOptions);
         } else if (geometry.isRectangle()) {
+            if (App.isDebug()) {
+                System.out.println("rectangle");
+            }
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
 
             LatLongBounds rb = new LatLongBounds(col.get(0), col.get(1));
@@ -73,8 +79,11 @@ public class MapShapeAdapter {
                     .fillColor("green");
 
             return new Rectangle(rectangleOptions);
-
-        } else if (geometry.getType() == 2) {
+          /* polyline */
+        } else if (geometry.getType() == polyLine) {
+            if (App.isDebug()) {
+                System.out.println("polyline");
+            }
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
@@ -84,6 +93,9 @@ public class MapShapeAdapter {
                     .editable(false)
                     .strokeWeight(4));
         } else {
+            if (App.isDebug()) {
+                System.out.println("polygon");
+            }
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
