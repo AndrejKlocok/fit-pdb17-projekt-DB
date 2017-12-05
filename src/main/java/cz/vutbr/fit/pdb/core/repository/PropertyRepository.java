@@ -718,6 +718,8 @@ public class PropertyRepository extends Observable {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
+                int propertyId = resultSet.getInt("id_property");
+                adjacentPropertyList.add(getPropertyById(propertyId));
                 adjacentPropertyList.add(getPropertyById(resultSet.getInt("id_property")));
             }
 
@@ -833,6 +835,42 @@ public class PropertyRepository extends Observable {
             }
         }
     }
+
+    /**
+    * Method calls query to Oracle database, which returns last inserted ID of property.
+     *
+     * @return int last inserted ID of property
+    * */
+    public int lastInsertedId() {
+        int lastInsertedId;
+        String query = "select id_property from property where id_property = (select max(id_property) from property)";
+
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                lastInsertedId = resultSet.getInt("id_property");
+
+                connection.close();
+                statement.close();
+                return lastInsertedId;
+            } else {
+
+                connection.close();
+                statement.close();
+                return 0;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return 0;
+        }
+
+    }
+
 
     /**
      * Method converts Property type (enum) to lowercase.

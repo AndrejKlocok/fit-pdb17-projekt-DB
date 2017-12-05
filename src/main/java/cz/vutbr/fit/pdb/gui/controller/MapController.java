@@ -253,6 +253,11 @@ public class MapController extends Observable implements MapContract.Controller 
     @Override
     public void getProperty(Property property) {
         PropertyWindow propertyWindow = new PropertyWindow();
+
+        //FIXME: when property id = 0
+        if(property.getIdProperty() == 0) {
+            property.setIdProperty(propertyRepository.lastInsertedId());
+        }
         new PropertyController(propertyRepository, groundPlanRepository, propertyPriceRepository, ownerRepository, propertyWindow, property);
     }
 

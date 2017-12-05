@@ -465,8 +465,11 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                         break;
                                     case 4:
                                         newProperty.setType(Property.Type.APARTMENT);
-                                        JGeometry j = JGeometry.createCircle(16.608989, 49.187766, 16.612989, 49.191766,
-                                                16.608989, 49.195766, 8307);
+                                        newProperty.setGeometry(JGeometry.circle_polygon(currentLng, currentLat, 2, 0.2));
+                                        if (App.isDebug()) {
+                                            System.out.println(newProperty.getGeometry().getType());
+                                            System.out.println(currentLat +" " + currentLng);
+                                        }
                                         break;
                                 }
 
@@ -644,12 +647,10 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                 @Override
                                 protected Void doInBackground() throws Exception {
                                     JGeometry newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
-                                    ;
+
                                     if (property.getType() == Property.Type.PREFAB) {
                                         newGeometry = new JGeometry(newShapeCoordinates[0], newShapeCoordinates[1],
                                                 newShapeCoordinates[2], newShapeCoordinates[3], 8307);
-                                    } else if (property.getType() == Property.Type.APARTMENT) {
-
                                     } else if (property.getType() == Property.Type.HOUSE) {
                                         newGeometry = JGeometry.createLinearPolygon(newShapeCoordinates, 2, 8307);
                                     } else if (property.getType() == Property.Type.TERRACE_HOUSE) {
