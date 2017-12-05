@@ -116,6 +116,7 @@ public class MapController extends Observable implements MapContract.Controller 
             if (App.isDebug()) {
                 System.out.println("no filter");
             }
+
             propertyList = propertyRepository.getPropertyList();
         } else {
             // filter is set
@@ -257,6 +258,9 @@ public class MapController extends Observable implements MapContract.Controller 
         //FIXME after delete property and than create new property there is random error message
         //FIXME: when property id = 0
         if(property.getIdProperty() == 0) {
+            if(App.isDebug()) {
+                System.out.println("id property je 0");
+            }
             property.setIdProperty(propertyRepository.lastInsertedId());
         }
         new PropertyController(propertyRepository, groundPlanRepository, propertyPriceRepository, ownerRepository, propertyWindow, property);

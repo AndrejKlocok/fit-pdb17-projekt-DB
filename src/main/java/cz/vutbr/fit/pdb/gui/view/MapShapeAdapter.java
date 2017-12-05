@@ -49,10 +49,6 @@ public class MapShapeAdapter {
      */
     public static MapShape jGeometry2MapShape(JGeometry geometry, Property.Type type) {
         if (type == Property.Type.APARTMENT) {
-            if (App.isDebug()) {
-                System.out.println("circle");
-            }
-
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
@@ -66,12 +62,9 @@ public class MapShapeAdapter {
 
             return new Polygon(polygonOptions);
         } else if (geometry.isRectangle()) {
-            if (App.isDebug()) {
-                System.out.println("rectangle");
-            }
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
-
             LatLongBounds rb = new LatLongBounds(col.get(0), col.get(1));
+
             RectangleOptions rectangleOptions = new RectangleOptions()
                     .bounds(rb)
                     .strokeColor("green")
@@ -81,9 +74,6 @@ public class MapShapeAdapter {
             return new Rectangle(rectangleOptions);
           /* polyline */
         } else if (geometry.getType() == polyLine) {
-            if (App.isDebug()) {
-                System.out.println("polyline");
-            }
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 
@@ -93,9 +83,6 @@ public class MapShapeAdapter {
                     .editable(false)
                     .strokeWeight(10));
         } else {
-            if (App.isDebug()) {
-                System.out.println("polygon");
-            }
             List<LatLong> col = LatLngToLngLat(geometry.getOrdinatesArray());
             MVCArray mvc = new MVCArray(col.toArray());
 

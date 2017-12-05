@@ -16,6 +16,7 @@
 
 package cz.vutbr.fit.pdb.core.repository;
 
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Owner;
 import cz.vutbr.fit.pdb.core.model.Property;
@@ -639,7 +640,7 @@ public class PropertyRepository extends Observable {
             }
         }
     }
-    //FIXME: nenajde nearest property ani od bodu
+
     /**
      * Search nearest property to given property
      *
