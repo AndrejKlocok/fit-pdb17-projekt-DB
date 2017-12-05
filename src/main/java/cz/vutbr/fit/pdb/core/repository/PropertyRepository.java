@@ -593,7 +593,7 @@ public class PropertyRepository extends Observable {
                 "FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
                 "FROM property PR2 " +
                 "WHERE MDSYS.SDO_NN(PR2.geometry,SDO_GEOMETRY(2001, 8307, SDO_POINT_TYPE(?,?, NULL), " +
-                " NULL, NULL ) , 'UNIT=meter', 1) = 'TRUE' " +
+                " NULL, NULL ) , 'SDO_NUM_RES=2  UNIT=meter', 1) = 'TRUE' " +
                 "ORDER BY distance) P, " +
                 "(SELECT DISTINCT PR.id_property " +
                 "FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) " +
@@ -651,7 +651,7 @@ public class PropertyRepository extends Observable {
                 "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
                 "FROM property PR1, property PR2 " +
                 "WHERE PR1.id_property=? AND PR1.id_property <> PR2.id_property AND PR2.property_type <> 'land' AND " +
-                "MDSYS.SDO_NN(PR2.geometry, PR1.geometry, 'UNIT=meter', 1) = 'TRUE' " +
+                "MDSYS.SDO_NN(PR2.geometry, PR1.geometry, 'SDO_NUM_RES=2 UNIT=meter', 1) = 'TRUE' " +
                 "ORDER BY distance) P, " +
                 "(SELECT DISTINCT PR.id_property " +
                 "FROM property PR LEFT OUTER JOIN owner O ON (PR.id_property=O.id_property) WHERE (CURRENT_DATE  NOT BETWEEN O.valid_from AND O.valid_to AND " +
@@ -781,6 +781,50 @@ public class PropertyRepository extends Observable {
                     connection.close();
             } catch (SQLException exception) {
                 System.err.println("Error getPropertyArea " + exception.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Calculates length of property shape
+     *
+     * @param property property
+     * @return length in square metres
+     */
+    public double getPropertyLength(Property property) {
+        String query = "SELECT SDO_GEOM.SDO_LENGTH(PR.geometry,1,'unit=M') AS length FROM property PR WHERE id_property=?";
+
+        Connection connection = null;
+
+        try {
+            connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, property.getIdProperty());
+
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                double propertyArea = resultSet.getDouble("length");
+
+                connection.close();
+                statement.close();
+                return propertyArea;
+            } else {
+
+                statement.close();
+                connection.close();
+                return 0;
+            }
+
+        } catch (SQLException exception) {
+            System.err.println("Error " + exception.getMessage());
+
+            return 0;
+        } finally {
+            try {
+                if (connection != null)
+                    connection.close();
+            } catch (SQLException exception) {
+                System.err.println("Error getPropertyLength " + exception.getMessage());
             }
         }
     }
