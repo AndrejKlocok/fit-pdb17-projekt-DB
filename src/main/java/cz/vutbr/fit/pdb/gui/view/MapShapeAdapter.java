@@ -91,7 +91,7 @@ public class MapShapeAdapter {
                     .path(mvc)
                     .strokeColor("blue")
                     .editable(false)
-                    .strokeWeight(4));
+                    .strokeWeight(10));
         } else {
             if (App.isDebug()) {
                 System.out.println("polygon");
@@ -101,14 +101,14 @@ public class MapShapeAdapter {
 
             PolygonOptions polygonOptions = new PolygonOptions()
                     .paths(mvc)
-                    .strokeColor("black")
+                    .strokeColor("purple")
                     .strokeWeight(2)
                     .editable(false)
-                    .fillColor("gray")
+                    .fillColor("purple")
                     .fillOpacity(0.5);
 
             if (type == Property.Type.LAND) {
-                polygonOptions.fillColor("white").strokeColor("white");
+                polygonOptions.fillColor("").strokeWeight(4).strokeColor("black").fillOpacity(0.0);
             }
 
             return new Polygon(polygonOptions);
