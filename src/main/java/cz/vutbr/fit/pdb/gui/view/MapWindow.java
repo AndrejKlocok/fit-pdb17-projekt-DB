@@ -465,17 +465,11 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                                 currentLng + 0.0001, currentLat + 0.0001, currentLng,
                                                 currentLat + 0.0001, currentLng, currentLat};
                                         newProperty.setGeometry(JGeometry.createLinearPolygon(coordsHouse, 2, 8307));
-                                        if (App.isDebug()) {
-                                            System.out.println(newProperty.getGeometry().getType());
-                                        }
                                         break;
                                     case 2:
                                         newProperty.setType(Property.Type.TERRACE_HOUSE);
                                         double coordsTerrace[] = {currentLng, currentLat, currentLng + 0.0001, currentLat + 0.0001};
                                         newProperty.setGeometry(JGeometry.createLinearLineString(coordsTerrace, 2, 8307));
-                                        if (App.isDebug()) {
-                                            System.out.println(newProperty.getGeometry().getType());
-                                        }
                                         break;
                                     case 3:
                                         newProperty.setType(Property.Type.PREFAB);
@@ -484,10 +478,6 @@ public class MapWindow implements MapContract.View, MapComponentInitializedListe
                                     case 4:
                                         newProperty.setType(Property.Type.APARTMENT);
                                         newProperty.setGeometry(JGeometry.circle_polygon(currentLng, currentLat, 2, 0.2));
-                                        if (App.isDebug()) {
-                                            System.out.println(newProperty.getGeometry().getType());
-                                            System.out.println(currentLat + " " + currentLng);
-                                        }
                                         break;
                                 }
 

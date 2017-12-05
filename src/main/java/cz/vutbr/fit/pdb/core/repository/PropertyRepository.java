@@ -16,6 +16,7 @@
 
 package cz.vutbr.fit.pdb.core.repository;
 
+import cz.vutbr.fit.pdb.core.App;
 import cz.vutbr.fit.pdb.core.model.GroundPlan;
 import cz.vutbr.fit.pdb.core.model.Owner;
 import cz.vutbr.fit.pdb.core.model.Property;
@@ -590,7 +591,7 @@ public class PropertyRepository extends Observable {
      */
     public Property getNearestProperty(double lat, double lng) {
         String query = "SELECT P.id_property, P.distance " +
-                "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
+                "FROM (SELECT /*+ ORDERED */ PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
                 "FROM property PR2 " +
                 "WHERE MDSYS.SDO_NN(PR2.geometry,SDO_GEOMETRY(2001, 8307, SDO_POINT_TYPE(?,?, NULL), " +
                 " NULL, NULL ) , 'SDO_NUM_RES=2  UNIT=meter', 1) = 'TRUE' " +
@@ -647,7 +648,7 @@ public class PropertyRepository extends Observable {
      * @return found nearest property
      */
     public Property getPropertyNearestProperty(Property property) {
-        String query = "SELECT P.id_property, ROUND(P.distance,1) as PropertyDistance " +
+        String query = "SELECT /*+ ORDERED */ P.id_property, ROUND(P.distance,1) as PropertyDistance " +
                 "FROM (SELECT PR2.id_property AS id_property, MDSYS.SDO_NN_DISTANCE(1) as distance " +
                 "FROM property PR1, property PR2 " +
                 "WHERE PR1.id_property=? AND PR1.id_property <> PR2.id_property AND PR2.property_type <> 'land' AND " +

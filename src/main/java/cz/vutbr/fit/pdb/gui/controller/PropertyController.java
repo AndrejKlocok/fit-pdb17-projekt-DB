@@ -104,9 +104,7 @@ public class PropertyController implements PropertyContract.Controller {
 
         property = propertyRepository.getProperty(property);
 
-        if (property == null) {
-            view.showError("Could not load property");
-        } else {
+        if (property != null ){
             List<Property> propertyListSimilar = propertyRepository.getPropertyListSimilarByGroundPlans(property.getGroundPlans(), filterHasOwner);
             // show only first 5 similar property
             if (propertyListSimilar.size() > 5 ) {
@@ -114,6 +112,10 @@ public class PropertyController implements PropertyContract.Controller {
             }
             view.showProperty(property);
             view.showPropertyListSimilar(propertyListSimilar);
+        } else {
+            if (App.isDebug()) {
+                System.out.println("Could not load property");
+            }
         }
     }
 
