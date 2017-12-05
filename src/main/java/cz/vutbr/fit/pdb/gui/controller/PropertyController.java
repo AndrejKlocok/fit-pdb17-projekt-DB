@@ -108,6 +108,10 @@ public class PropertyController implements PropertyContract.Controller {
             view.showError("Could not load property");
         } else {
             List<Property> propertyListSimilar = propertyRepository.getPropertyListSimilarByGroundPlans(property.getGroundPlans(), filterHasOwner);
+            // show only first 5 similar property
+            if (propertyListSimilar.size() > 5 ) {
+                propertyListSimilar = propertyListSimilar.subList(0, 5);
+            }
             view.showProperty(property);
             view.showPropertyListSimilar(propertyListSimilar);
         }
@@ -306,11 +310,11 @@ public class PropertyController implements PropertyContract.Controller {
     /**
      * Filter property list similar
      *
-     * @param hasOwner get only property which currently has owner
+     * @param hasNotOwner get only property which currently has owner
      */
     @Override
-    public void filterPropertyListSimilar(boolean hasOwner) {
-        filterHasOwner = hasOwner;
+    public void filterPropertyListSimilar(boolean hasNotOwner) {
+        filterHasOwner = hasNotOwner;
         update();
     }
 
