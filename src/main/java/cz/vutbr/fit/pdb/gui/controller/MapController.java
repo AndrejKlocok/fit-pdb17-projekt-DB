@@ -257,13 +257,16 @@ public class MapController extends Observable implements MapContract.Controller 
 
         //FIXME after delete property and than create new property there is random error message
         //FIXME: when property id = 0
-        if(property.getIdProperty() == 0) {
-            if(App.isDebug()) {
-                System.out.println("id property je 0");
-            }
-            property.setIdProperty(propertyRepository.lastInsertedId());
+        if(property != null) {
+             if (property.getIdProperty() == 0) {
+                 if (App.isDebug()) {
+                     System.out.println("id property je 0");
+                 }
+                 property.setIdProperty(propertyRepository.lastInsertedId());
+             }
+
+             new PropertyController(propertyRepository, groundPlanRepository, propertyPriceRepository, ownerRepository, propertyWindow, property);
         }
-        new PropertyController(propertyRepository, groundPlanRepository, propertyPriceRepository, ownerRepository, propertyWindow, property);
     }
 
     /**
@@ -304,7 +307,7 @@ public class MapController extends Observable implements MapContract.Controller 
             view.showError("Could not get nearest property");
             return;
         }
-        view.showMessage("Nearest property of " + lat + ", " + lng + " is " + nearestProperty.getName());
+        view.showMessage("Nearest property is " + nearestProperty.getName());
     }
 
     /**
@@ -319,7 +322,7 @@ public class MapController extends Observable implements MapContract.Controller 
             view.showError("Could not get nearest property");
             return;
         }
-        view.showMessage("nearest of " + property.getName() + " is " + nearestProperty.getName());
+        view.showMessage("Nearest property of " + property.getName() + " is " + nearestProperty.getName());
     }
 
     /**
