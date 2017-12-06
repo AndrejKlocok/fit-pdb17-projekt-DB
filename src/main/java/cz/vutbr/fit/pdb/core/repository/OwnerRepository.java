@@ -261,7 +261,7 @@ public class OwnerRepository extends Observable {
         // if to date is not set, than set maximum SQL date
         java.sql.Date sqlDateTo = to == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(to.getTime());
 
-        String query = "CALL temporal_insert('owner', ?, ?, ?, ?)";
+        String query = "CALL temporal_insert('owner', ?, ?, TO_DATE('" + sqlDateFrom + "','yyyy-mm-dd'),TO_DATE('" + sqlDateTo + "','yyyy-mm-dd'))";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -271,8 +271,6 @@ public class OwnerRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
             statement.setInt(2, person.getIdPerson());
-            statement.setDate(3, sqlDateFrom);
-            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -314,7 +312,7 @@ public class OwnerRepository extends Observable {
         // if to date is not set, than set maximum SQL date
         java.sql.Date sqlDateTo = to == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(to.getTime());
 
-        String query = "CALL temporal_update('owner',?,?,?,?)";
+        String query = "CALL temporal_update('owner',?,?, TO_DATE('" + sqlDateFrom + "','yyyy-mm-dd'),TO_DATE('" + sqlDateTo + "','yyyy-mm-dd'))";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -324,8 +322,6 @@ public class OwnerRepository extends Observable {
             statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
             statement.setInt(2, person.getIdPerson());
-            statement.setDate(3, sqlDateFrom);
-            statement.setDate(4, sqlDateTo);
 
             statement.executeQuery();
 
@@ -366,7 +362,7 @@ public class OwnerRepository extends Observable {
         // if to date is not set, than set maximum SQL date
         java.sql.Date sqlDateTo = to == null ? java.sql.Date.valueOf("9999-12-30") : new java.sql.Date(to.getTime());
 
-        String query = "CALL temporal_delete('owner',?,?,?) ";
+        String query = "CALL temporal_delete('owner',?,TO_DATE('" + sqlDateFrom + "','yyyy-mm-dd'),TO_DATE('" + sqlDateTo + "','yyyy-mm-dd')) ";
 
         Connection connection = null;
         PreparedStatement statement;
@@ -374,8 +370,6 @@ public class OwnerRepository extends Observable {
             connection = dataSource.getConnection();
             statement = connection.prepareStatement(query);
             statement.setInt(1, property.getIdProperty());
-            statement.setDate(2, sqlDateFrom);
-            statement.setDate(3, sqlDateTo);
 
             statement.executeQuery();
 
