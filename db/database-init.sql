@@ -139,48 +139,48 @@ Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,2,TO_DATE
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,2,TO_DATE('2015-12-22','yyyy-mm-dd'),TO_DATE('2016-8-30','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,2,TO_DATE('2016-9-1','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (9,3,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2012-12-14','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,3,TO_DATE('2013-1-1','yyyy-mm-dd'),TO_DATE('2015-12-28','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (9,3,TO_DATE('2010-1-1','yyyy-mm-dd'),TO_DATE('2013-12-14','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,3,TO_DATE('2013-12-15','yyyy-mm-dd'),TO_DATE('2014-12-28','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,3,TO_DATE('2015-1-1','yyyy-mm-dd'),TO_DATE('2016-6-1','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,3,TO_DATE('2016-8-1','yyyy-mm-dd'),TO_DATE('2016-12-28','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,3,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('2017-6-30','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-7-30','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,3,TO_DATE('2016-6-2','yyyy-mm-dd'),TO_DATE('2016-12-28','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,3,TO_DATE('2016-12-29','yyyy-mm-dd'),TO_DATE('2017-6-29','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,3,TO_DATE('2017-6-30','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,4,TO_DATE('2016-1-11','yyyy-mm-dd'),TO_DATE('2017-10-18','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,4,TO_DATE('2016-1-11','yyyy-mm-dd'),TO_DATE('2017-10-17','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,4,TO_DATE('2017-10-18','yyyy-mm-dd'),TO_DATE('2017-10-20','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (7,4,TO_DATE('2017-10-20','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (7,4,TO_DATE('2017-10-21','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,5,TO_DATE('2013-8-1','yyyy-mm-dd'),TO_DATE('2014-12-28','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,5,TO_DATE('2014-12-28','yyyy-mm-dd'),TO_DATE('2016-6-30','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,5,TO_DATE('2013-8-1','yyyy-mm-dd'),TO_DATE('2014-12-27','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,5,TO_DATE('2014-12-28','yyyy-mm-dd'),TO_DATE('2016-6-29','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,5,TO_DATE('2016-6-30','yyyy-mm-dd'),TO_DATE('2017-1-1','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,5,TO_DATE('2017-1-1','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,5,TO_DATE('2017-1-2','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,6,TO_DATE('2013-1-1','yyyy-mm-dd'),TO_DATE('2014-11-28','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,6,TO_DATE('2014-11-28','yyyy-mm-dd'),TO_DATE('2016-4-30','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,6,TO_DATE('2016-4-30','yyyy-mm-dd'),TO_DATE('2017-4-4','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,6,TO_DATE('2013-1-1','yyyy-mm-dd'),TO_DATE('2014-11-27','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,6,TO_DATE('2014-11-28','yyyy-mm-dd'),TO_DATE('2016-4-29','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,6,TO_DATE('2016-4-30','yyyy-mm-dd'),TO_DATE('2017-4-3','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,6,TO_DATE('2017-4-4','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,7,TO_DATE('2012-1-12','yyyy-mm-dd'),TO_DATE('2015-11-11','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,7,TO_DATE('2012-1-12','yyyy-mm-dd'),TO_DATE('2015-11-10','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,7,TO_DATE('2015-11-11','yyyy-mm-dd'),TO_DATE('2016-4-12','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,7,TO_DATE('2016-4-12','yyyy-mm-dd'),TO_DATE('2017-5-8','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,7,TO_DATE('2017-5-8','yyyy-mm-dd'),TO_DATE('2017-9-14','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,7,TO_DATE('2016-4-13','yyyy-mm-dd'),TO_DATE('2017-5-7','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,7,TO_DATE('2017-5-8','yyyy-mm-dd'),TO_DATE('2017-9-13','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,7,TO_DATE('2017-9-14','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (8,8,TO_DATE('2012-1-1','yyyy-mm-dd'),TO_DATE('2016-11-28','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,8,TO_DATE('2016-11-28','yyyy-mm-dd'),TO_DATE('2017-1-13','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (8,8,TO_DATE('2012-1-1','yyyy-mm-dd'),TO_DATE('2016-11-27','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,8,TO_DATE('2016-11-28','yyyy-mm-dd'),TO_DATE('2017-1-12','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,8,TO_DATE('2017-1-13','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,9,TO_DATE('2014-1-1','yyyy-mm-dd'),TO_DATE('2015-11-28','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,9,TO_DATE('2015-11-28','yyyy-mm-dd'),TO_DATE('2016-2-13','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,9,TO_DATE('2014-1-1','yyyy-mm-dd'),TO_DATE('2015-11-27','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,9,TO_DATE('2015-11-28','yyyy-mm-dd'),TO_DATE('2016-2-12','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (3,9,TO_DATE('2016-2-13','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,10,TO_DATE('2015-2-2','yyyy-mm-dd'),TO_DATE('2016-12-28','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,10,TO_DATE('2016-12-28','yyyy-mm-dd'),TO_DATE('2017-2-13','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (4,10,TO_DATE('2015-2-2','yyyy-mm-dd'),TO_DATE('2016-12-27','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,10,TO_DATE('2016-12-28','yyyy-mm-dd'),TO_DATE('2017-2-12','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,10,TO_DATE('2017-2-13','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,11,TO_DATE('2014-3-2','yyyy-mm-dd'),TO_DATE('2015-10-21','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,11,TO_DATE('2015-10-21','yyyy-mm-dd'),TO_DATE('2016-4-13','yyyy-mm-dd'));
-Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,11,TO_DATE('2016-4-13','yyyy-mm-dd'),TO_DATE('2017-11-22','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (2,11,TO_DATE('2014-3-2','yyyy-mm-dd'),TO_DATE('2015-10-20','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (1,11,TO_DATE('2015-10-21','yyyy-mm-dd'),TO_DATE('2016-4-12','yyyy-mm-dd'));
+Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (5,11,TO_DATE('2016-4-13','yyyy-mm-dd'),TO_DATE('2017-11-21','yyyy-mm-dd'));
 Insert into OWNER (ID_OWNER,ID_PROPERTY,VALID_FROM,VALID_TO) values (6,11,TO_DATE('2017-11-22','yyyy-mm-dd'),TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 
@@ -259,91 +259,91 @@ INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) V
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 5,
                 2350000,  TO_DATE('2013-8-1','yyyy-mm-dd'), TO_DATE('2014-8-7','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 5,
-                4559000,  TO_DATE('2014-8-7','yyyy-mm-dd'), TO_DATE('2016-8-4','yyyy-mm-dd'));
+                4559000,  TO_DATE('2014-8-8','yyyy-mm-dd'), TO_DATE('2016-8-3','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 5,
                 2080000,  TO_DATE('2016-8-4','yyyy-mm-dd'), TO_DATE('2016-12-18','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 5,
-                2840000,  TO_DATE('2017-1-19','yyyy-mm-dd'), TO_DATE('2017-5-14','yyyy-mm-dd'));
+                2840000,  TO_DATE('2017-1-19','yyyy-mm-dd'), TO_DATE('2017-5-13','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 5,
-                1240000,  TO_DATE('2017-5-14','yyyy-mm-dd'), TO_DATE('2017-9-18','yyyy-mm-dd'));
+                1240000,  TO_DATE('2017-5-14','yyyy-mm-dd'), TO_DATE('2017-9-17','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 5,
                 2330000,  TO_DATE('2017-9-18','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 6,
-                1490000,  TO_DATE('2013-1-1','yyyy-mm-dd'), TO_DATE('2014-8-8','yyyy-mm-dd'));
+                1490000,  TO_DATE('2013-1-1','yyyy-mm-dd'), TO_DATE('2014-8-7','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 6,
-                1790000,  TO_DATE('2014-8-8','yyyy-mm-dd'), TO_DATE('2015-5-4','yyyy-mm-dd'));
+                1790000,  TO_DATE('2014-8-8','yyyy-mm-dd'), TO_DATE('2015-5-3','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 6,
-                2450000,  TO_DATE('2015-5-4','yyyy-mm-dd'), TO_DATE('2016-8-18','yyyy-mm-dd'));
+                2450000,  TO_DATE('2015-5-4','yyyy-mm-dd'), TO_DATE('2016-8-17','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 6,
-                3840000,  TO_DATE('2016-8-18','yyyy-mm-dd'), TO_DATE('2016-12-14','yyyy-mm-dd'));
+                3840000,  TO_DATE('2016-8-18','yyyy-mm-dd'), TO_DATE('2016-12-13','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 6,
-                1000000,  TO_DATE('2016-12-14','yyyy-mm-dd'), TO_DATE('2017-4-18','yyyy-mm-dd'));
+                1000000,  TO_DATE('2016-12-14','yyyy-mm-dd'), TO_DATE('2017-4-17','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 6,
                 2220000,  TO_DATE('2017-4-18','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 7,
-                2550000,  TO_DATE('2012-1-12','yyyy-mm-dd'), TO_DATE('2013-8-15','yyyy-mm-dd'));
+                2550000,  TO_DATE('2012-1-12','yyyy-mm-dd'), TO_DATE('2013-8-14','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 7,
-                2990000,  TO_DATE('2013-8-15','yyyy-mm-dd'), TO_DATE('2014-7-14','yyyy-mm-dd'));
+                2990000,  TO_DATE('2013-8-15','yyyy-mm-dd'), TO_DATE('2014-7-13','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 7,
-                4080000,  TO_DATE('2014-7-14','yyyy-mm-dd'), TO_DATE('2015-8-12','yyyy-mm-dd'));
+                4080000,  TO_DATE('2014-7-14','yyyy-mm-dd'), TO_DATE('2015-8-11','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 7,
-                1640000,  TO_DATE('2015-8-12','yyyy-mm-dd'), TO_DATE('2016-11-12','yyyy-mm-dd'));
+                1640000,  TO_DATE('2015-8-12','yyyy-mm-dd'), TO_DATE('2016-11-11','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 7,
-                1480000,  TO_DATE('2016-11-12','yyyy-mm-dd'), TO_DATE('2016-12-27','yyyy-mm-dd'));
+                1480000,  TO_DATE('2016-11-12','yyyy-mm-dd'), TO_DATE('2016-12-26','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 7,
                 2240000,  TO_DATE('2016-12-27','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 8,
                 2350000,  TO_DATE('2012-1-1','yyyy-mm-dd'), TO_DATE('2013-7-1','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 8,
-                1990000,  TO_DATE('2013-7-1','yyyy-mm-dd'), TO_DATE('2014-3-24','yyyy-mm-dd'));
+                1990000,  TO_DATE('2013-7-2','yyyy-mm-dd'), TO_DATE('2014-3-23','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 8,
-                1280000,  TO_DATE('2014-3-24','yyyy-mm-dd'), TO_DATE('2015-8-11','yyyy-mm-dd'));
+                1280000,  TO_DATE('2014-3-24','yyyy-mm-dd'), TO_DATE('2015-8-10','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 8,
                 1540000,  TO_DATE('2015-8-11','yyyy-mm-dd'), TO_DATE('2015-12-11','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 8,
-                1780000,  TO_DATE('2016-11-5','yyyy-mm-dd'), TO_DATE('2017-5-22','yyyy-mm-dd'));
+                1780000,  TO_DATE('2016-11-5','yyyy-mm-dd'), TO_DATE('2017-5-21','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 8,
                 1530000,  TO_DATE('2017-5-22','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 9,
                 2050000,  TO_DATE('2014-1-1','yyyy-mm-dd'), TO_DATE('2014-12-1','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 9,
-                1890000,  TO_DATE('2014-12-1','yyyy-mm-dd'), TO_DATE('2015-3-21','yyyy-mm-dd'));
+                1890000,  TO_DATE('2014-12-2','yyyy-mm-dd'), TO_DATE('2015-3-21','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 9,
-                1580000,  TO_DATE('2015-3-21','yyyy-mm-dd'), TO_DATE('2015-8-11','yyyy-mm-dd'));
+                1580000,  TO_DATE('2015-3-22','yyyy-mm-dd'), TO_DATE('2015-8-10','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 9,
-                1550000,  TO_DATE('2015-8-11','yyyy-mm-dd'), TO_DATE('2016-8-11','yyyy-mm-dd'));
+                1550000,  TO_DATE('2015-8-11','yyyy-mm-dd'), TO_DATE('2016-8-10','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 9,
-                1770000,  TO_DATE('2016-8-11','yyyy-mm-dd'), TO_DATE('2016-12-22','yyyy-mm-dd'));
+                1770000,  TO_DATE('2016-8-11','yyyy-mm-dd'), TO_DATE('2016-12-21','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 9,
                 1430000,  TO_DATE('2016-12-22','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 10,
                 2450000,  TO_DATE('2015-2-2','yyyy-mm-dd'), TO_DATE('2015-8-1','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 10,
-                1490000,  TO_DATE('2015-8-1','yyyy-mm-dd'), TO_DATE('2015-11-21','yyyy-mm-dd'));
+                1490000,  TO_DATE('2015-8-2','yyyy-mm-dd'), TO_DATE('2015-11-20','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 10,
-                1980000,  TO_DATE('2015-11-21','yyyy-mm-dd'), TO_DATE('2016-1-11','yyyy-mm-dd'));
+                1980000,  TO_DATE('2015-11-21','yyyy-mm-dd'), TO_DATE('2016-1-10','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 10,
                 1560000,  TO_DATE('2016-1-11','yyyy-mm-dd'), TO_DATE('2016-9-10','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 10,
-                1970000,  TO_DATE('2016-9-10','yyyy-mm-dd'), TO_DATE('2016-11-1','yyyy-mm-dd'));
+                1970000,  TO_DATE('2016-9-11','yyyy-mm-dd'), TO_DATE('2016-11-1','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 10,
-                2430000,  TO_DATE('2016-11-1','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
+                2430000,  TO_DATE('2016-11-2','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 11,
-                3450000,  TO_DATE('2014-3-2','yyyy-mm-dd'), TO_DATE('2014-8-14','yyyy-mm-dd'));
+                3450000,  TO_DATE('2014-3-2','yyyy-mm-dd'), TO_DATE('2014-8-13','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 11,
-                2490000,  TO_DATE('2014-8-14','yyyy-mm-dd'), TO_DATE('2015-1-21','yyyy-mm-dd'));
+                2490000,  TO_DATE('2014-8-14','yyyy-mm-dd'), TO_DATE('2015-1-20','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 11,
                 3980000,  TO_DATE('2015-1-21','yyyy-mm-dd'), TO_DATE('2015-12-1','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 11,
-                2560000,  TO_DATE('2015-12-1','yyyy-mm-dd'), TO_DATE('2016-5-27','yyyy-mm-dd'));
+                2560000,  TO_DATE('2015-12-2','yyyy-mm-dd'), TO_DATE('2016-5-26','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 11,
                 2070000,  TO_DATE('2016-5-27','yyyy-mm-dd'), TO_DATE('2017-3-1','yyyy-mm-dd'));
 INSERT INTO property_price(id_price, id_property, price, valid_from, valid_to) VALUES(property_price_seq.NEXTVAL, 11,
-                2230000,  TO_DATE('2017-3-1','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
+                2230000,  TO_DATE('2017-3-2','yyyy-mm-dd'), TO_DATE('9999-12-30','yyyy-mm-dd'));
 
